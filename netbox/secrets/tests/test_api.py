@@ -10,30 +10,29 @@ from .constants import PRIVATE_KEY, PUBLIC_KEY
 
 
 class AppTest(APITestCase):
-
     def test_root(self):
 
-        url = reverse('secrets-api:api-root')
-        response = self.client.get('{}?format=api'.format(url), **self.header)
+        url = reverse("secrets-api:api-root")
+        response = self.client.get("{}?format=api".format(url), **self.header)
 
         self.assertEqual(response.status_code, 200)
 
 
 class SecretRoleTest(APIViewTestCases.APIViewTestCase):
     model = SecretRole
-    brief_fields = ['id', 'name', 'secret_count', 'slug', 'url']
+    brief_fields = ["id", "name", "secret_count", "slug", "url"]
     create_data = [
         {
-            'name': 'Secret Role 4',
-            'slug': 'secret-role-4',
+            "name": "Secret Role 4",
+            "slug": "secret-role-4",
         },
         {
-            'name': 'Secret Role 5',
-            'slug': 'secret-role-5',
+            "name": "Secret Role 5",
+            "slug": "secret-role-5",
         },
         {
-            'name': 'Secret Role 6',
-            'slug': 'secret-role-6',
+            "name": "Secret Role 6",
+            "slug": "secret-role-6",
         },
     ]
 
@@ -41,16 +40,16 @@ class SecretRoleTest(APIViewTestCases.APIViewTestCase):
     def setUpTestData(cls):
 
         secret_roles = (
-            SecretRole(name='Secret Role 1', slug='secret-role-1'),
-            SecretRole(name='Secret Role 2', slug='secret-role-2'),
-            SecretRole(name='Secret Role 3', slug='secret-role-3'),
+            SecretRole(name="Secret Role 1", slug="secret-role-1"),
+            SecretRole(name="Secret Role 2", slug="secret-role-2"),
+            SecretRole(name="Secret Role 3", slug="secret-role-3"),
         )
         SecretRole.objects.bulk_create(secret_roles)
 
 
 class SecretTest(APIViewTestCases.APIViewTestCase):
     model = Secret
-    brief_fields = ['id', 'name', 'url']
+    brief_fields = ["id", "name", "url"]
 
     def setUp(self):
         super().setUp()
@@ -65,24 +64,38 @@ class SecretTest(APIViewTestCases.APIViewTestCase):
         session_key.save(self.master_key)
 
         # Append the session key to the test client's request header
-        self.header['HTTP_X_SESSION_KEY'] = base64.b64encode(session_key.key)
+        self.header["HTTP_X_SESSION_KEY"] = base64.b64encode(session_key.key)
 
-        site = Site.objects.create(name='Site 1', slug='site-1')
-        manufacturer = Manufacturer.objects.create(name='Manufacturer 1', slug='manufacturer-1')
-        devicetype = DeviceType.objects.create(manufacturer=manufacturer, model='Device Type 1')
-        devicerole = DeviceRole.objects.create(name='Device Role 1', slug='device-role-1')
-        device = Device.objects.create(name='Device 1', site=site, device_type=devicetype, device_role=devicerole)
+        site = Site.objects.create(name="Site 1", slug="site-1")
+        manufacturer = Manufacturer.objects.create(
+            name="Manufacturer 1", slug="manufacturer-1"
+        )
+        devicetype = DeviceType.objects.create(
+            manufacturer=manufacturer, model="Device Type 1"
+        )
+        devicerole = DeviceRole.objects.create(
+            name="Device Role 1", slug="device-role-1"
+        )
+        device = Device.objects.create(
+            name="Device 1", site=site, device_type=devicetype, device_role=devicerole
+        )
 
         secret_roles = (
-            SecretRole(name='Secret Role 1', slug='secret-role-1'),
-            SecretRole(name='Secret Role 2', slug='secret-role-2'),
+            SecretRole(name="Secret Role 1", slug="secret-role-1"),
+            SecretRole(name="Secret Role 2", slug="secret-role-2"),
         )
         SecretRole.objects.bulk_create(secret_roles)
 
         secrets = (
-            Secret(device=device, role=secret_roles[0], name='Secret 1', plaintext='ABC'),
-            Secret(device=device, role=secret_roles[0], name='Secret 2', plaintext='DEF'),
-            Secret(device=device, role=secret_roles[0], name='Secret 3', plaintext='GHI'),
+            Secret(
+                device=device, role=secret_roles[0], name="Secret 1", plaintext="ABC"
+            ),
+            Secret(
+                device=device, role=secret_roles[0], name="Secret 2", plaintext="DEF"
+            ),
+            Secret(
+                device=device, role=secret_roles[0], name="Secret 3", plaintext="GHI"
+            ),
         )
         for secret in secrets:
             secret.encrypt(self.master_key)
@@ -90,22 +103,22 @@ class SecretTest(APIViewTestCases.APIViewTestCase):
 
         self.create_data = [
             {
-                'device': device.pk,
-                'role': secret_roles[1].pk,
-                'name': 'Secret 4',
-                'plaintext': 'JKL',
+                "device": device.pk,
+                "role": secret_roles[1].pk,
+                "name": "Secret 4",
+                "plaintext": "JKL",
             },
             {
-                'device': device.pk,
-                'role': secret_roles[1].pk,
-                'name': 'Secret 5',
-                'plaintext': 'MNO',
+                "device": device.pk,
+                "role": secret_roles[1].pk,
+                "name": "Secret 5",
+                "plaintext": "MNO",
             },
             {
-                'device': device.pk,
-                'role': secret_roles[1].pk,
-                'name': 'Secret 6',
-                'plaintext': 'PQR',
+                "device": device.pk,
+                "role": secret_roles[1].pk,
+                "name": "Secret 6",
+                "plaintext": "PQR",
             },
         ]
 
@@ -116,7 +129,6 @@ class SecretTest(APIViewTestCases.APIViewTestCase):
 
 
 class GetSessionKeyTest(APITestCase):
-
     def setUp(self):
 
         super().setUp()
@@ -128,32 +140,32 @@ class GetSessionKeyTest(APITestCase):
         self.session_key.save(master_key)
 
         self.header = {
-            'HTTP_AUTHORIZATION': 'Token {}'.format(self.token.key),
+            "HTTP_AUTHORIZATION": "Token {}".format(self.token.key),
         }
 
     def test_get_session_key(self):
 
         encoded_session_key = base64.b64encode(self.session_key.key).decode()
 
-        url = reverse('secrets-api:get-session-key-list')
+        url = reverse("secrets-api:get-session-key-list")
         data = {
-            'private_key': PRIVATE_KEY,
+            "private_key": PRIVATE_KEY,
         }
         response = self.client.post(url, data, **self.header)
 
         self.assertHttpStatus(response, status.HTTP_200_OK)
-        self.assertIsNotNone(response.data.get('session_key'))
-        self.assertNotEqual(response.data.get('session_key'), encoded_session_key)
+        self.assertIsNotNone(response.data.get("session_key"))
+        self.assertNotEqual(response.data.get("session_key"), encoded_session_key)
 
     def test_get_session_key_preserved(self):
 
         encoded_session_key = base64.b64encode(self.session_key.key).decode()
 
-        url = reverse('secrets-api:get-session-key-list') + '?preserve_key=True'
+        url = reverse("secrets-api:get-session-key-list") + "?preserve_key=True"
         data = {
-            'private_key': PRIVATE_KEY,
+            "private_key": PRIVATE_KEY,
         }
         response = self.client.post(url, data, **self.header)
 
         self.assertHttpStatus(response, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('session_key'), encoded_session_key)
+        self.assertEqual(response.data.get("session_key"), encoded_session_key)

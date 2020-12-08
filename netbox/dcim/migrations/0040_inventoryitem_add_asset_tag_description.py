@@ -7,18 +7,25 @@ import utilities.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcim', '0039_interface_add_enabled_mtu'),
+        ("dcim", "0039_interface_add_enabled_mtu"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='inventoryitem',
-            name='asset_tag',
-            field=utilities.fields.NullableCharField(blank=True, help_text='A unique tag used to identify this item', max_length=50, null=True, unique=True, verbose_name='Asset tag'),
+            model_name="inventoryitem",
+            name="asset_tag",
+            field=utilities.fields.NullableCharField(
+                blank=True,
+                help_text="A unique tag used to identify this item",
+                max_length=50,
+                null=True,
+                unique=True,
+                verbose_name="Asset tag",
+            ),
         ),
         migrations.AddField(
-            model_name='inventoryitem',
-            name='description',
+            model_name="inventoryitem",
+            name="description",
             field=models.CharField(blank=True, max_length=100),
         ),
     ]

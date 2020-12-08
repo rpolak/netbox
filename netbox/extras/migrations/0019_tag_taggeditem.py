@@ -8,36 +8,60 @@ import utilities.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('contenttypes', '0002_remove_content_type_name'),
-        ('extras', '0018_exporttemplate_add_jinja2'),
+        ("contenttypes", "0002_remove_content_type_name"),
+        ("extras", "0018_exporttemplate_add_jinja2"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Tag',
+            name="Tag",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=100, unique=True)),
-                ('slug', models.SlugField(max_length=100, unique=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True, primary_key=True, serialize=False
+                    ),
+                ),
+                ("name", models.CharField(max_length=100, unique=True)),
+                ("slug", models.SlugField(max_length=100, unique=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='TaggedItem',
+            name="TaggedItem",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False)),
-                ('object_id', models.IntegerField(db_index=True)),
-                ('content_type', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='extras_taggeditem_tagged_items', to='contenttypes.ContentType')),
-                ('tag', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='extras_taggeditem_items', to='extras.Tag')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True, primary_key=True, serialize=False
+                    ),
+                ),
+                ("object_id", models.IntegerField(db_index=True)),
+                (
+                    "content_type",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="extras_taggeditem_tagged_items",
+                        to="contenttypes.ContentType",
+                    ),
+                ),
+                (
+                    "tag",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="extras_taggeditem_items",
+                        to="extras.Tag",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.AlterIndexTogether(
-            name='taggeditem',
-            index_together={('content_type', 'object_id')},
+            name="taggeditem",
+            index_together={("content_type", "object_id")},
         ),
     ]

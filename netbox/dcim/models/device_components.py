@@ -22,43 +22,28 @@ from utilities.utils import serialize_object
 
 
 __all__ = (
-    'BaseInterface',
-    'CableTermination',
-    'ConsolePort',
-    'ConsoleServerPort',
-    'DeviceBay',
-    'FrontPort',
-    'Interface',
-    'InventoryItem',
-    'PowerOutlet',
-    'PowerPort',
-    'RearPort',
+    "BaseInterface",
+    "CableTermination",
+    "ConsolePort",
+    "ConsoleServerPort",
+    "DeviceBay",
+    "FrontPort",
+    "Interface",
+    "InventoryItem",
+    "PowerOutlet",
+    "PowerPort",
+    "RearPort",
 )
 
 
 class ComponentModel(models.Model):
     device = models.ForeignKey(
-        to='dcim.Device',
-        on_delete=models.CASCADE,
-        related_name='%(class)ss'
+        to="dcim.Device", on_delete=models.CASCADE, related_name="%(class)ss"
     )
-    name = models.CharField(
-        max_length=64
-    )
-    _name = NaturalOrderingField(
-        target_field='name',
-        max_length=100,
-        blank=True
-    )
-    label = models.CharField(
-        max_length=64,
-        blank=True,
-        help_text="Physical label"
-    )
-    description = models.CharField(
-        max_length=200,
-        blank=True
-    )
+    name = models.CharField(max_length=64)
+    _name = NaturalOrderingField(target_field="name", max_length=100, blank=True)
+    label = models.CharField(max_length=64, blank=True, help_text="Physical label")
+    description = models.CharField(max_length=200, blank=True)
 
     objects = RestrictedQuerySet.as_manager()
 
@@ -82,33 +67,33 @@ class ComponentModel(models.Model):
             object_repr=str(self),
             action=action,
             related_object=device,
-            object_data=serialize_object(self)
+            object_data=serialize_object(self),
         )
 
     @property
     def parent(self):
-        return getattr(self, 'device', None)
+        return getattr(self, "device", None)
 
 
 class CableTermination(models.Model):
     cable = models.ForeignKey(
-        to='dcim.Cable',
+        to="dcim.Cable",
         on_delete=models.SET_NULL,
-        related_name='+',
+        related_name="+",
         blank=True,
-        null=True
+        null=True,
     )
 
     # Generic relations to Cable. These ensure that an attached Cable is deleted if the terminated object is deleted.
     _cabled_as_a = GenericRelation(
-        to='dcim.Cable',
-        content_type_field='termination_a_type',
-        object_id_field='termination_a_id'
+        to="dcim.Cable",
+        content_type_field="termination_a_type",
+        object_id_field="termination_a_id",
     )
     _cabled_as_b = GenericRelation(
-        to='dcim.Cable',
-        content_type_field='termination_b_type',
-        object_id_field='termination_b_id'
+        to="dcim.Cable",
+        content_type_field="termination_b_type",
+        object_id_field="termination_b_id",
     )
 
     class Meta:
@@ -163,9 +148,11 @@ class CableTermination(models.Model):
 
                     # Validate the position
                     if position not in range(1, termination.positions + 1):
-                        raise Exception("Invalid position for {} ({} positions): {})".format(
-                            termination, termination.positions, position
-                        ))
+                        raise Exception(
+                            "Invalid position for {} ({} positions): {})".format(
+                                termination, termination.positions, position
+                            )
+                        )
                 else:
                     # Don't use the stack for RearPorts with a single position. The only possible position is 1.
                     position = 1
@@ -190,7 +177,7 @@ class CableTermination(models.Model):
             else:
                 return None
 
-        logger = logging.getLogger('netbox.dcim.cable.trace')
+        logger = logging.getLogger("netbox.dcim.cable.trace")
         logger.debug("Tracing cable from {} {}".format(self.parent, self))
 
         while endpoint is not None:
@@ -209,9 +196,15 @@ class CableTermination(models.Model):
             # Record the current segment in the path
             far_end = endpoint.get_cable_peer()
             path.append((endpoint, endpoint.cable, far_end))
-            logger.debug("{}[{}] --- Cable {} ---> {}[{}]".format(
-                endpoint.parent, endpoint, endpoint.cable.pk, far_end.parent, far_end
-            ))
+            logger.debug(
+                "{}[{}] --- Cable {} ---> {}[{}]".format(
+                    endpoint.parent,
+                    endpoint,
+                    endpoint.cable.pk,
+                    far_end.parent,
+                    far_end,
+                )
+            )
 
             # Get the peer port of the far end termination
             try:
@@ -252,39 +245,39 @@ class CableTermination(models.Model):
 # Console ports
 #
 
-@extras_features('export_templates', 'webhooks')
+
+@extras_features("export_templates", "webhooks")
 class ConsolePort(CableTermination, ComponentModel):
     """
     A physical console port within a Device. ConsolePorts connect to ConsoleServerPorts.
     """
+
     type = models.CharField(
         max_length=50,
         choices=ConsolePortTypeChoices,
         blank=True,
-        help_text='Physical port type'
+        help_text="Physical port type",
     )
     connected_endpoint = models.OneToOneField(
-        to='dcim.ConsoleServerPort',
+        to="dcim.ConsoleServerPort",
         on_delete=models.SET_NULL,
-        related_name='connected_endpoint',
+        related_name="connected_endpoint",
         blank=True,
-        null=True
+        null=True,
     )
     connection_status = models.BooleanField(
-        choices=CONNECTION_STATUS_CHOICES,
-        blank=True,
-        null=True
+        choices=CONNECTION_STATUS_CHOICES, blank=True, null=True
     )
     tags = TaggableManager(through=TaggedItem)
 
-    csv_headers = ['device', 'name', 'label', 'type', 'description']
+    csv_headers = ["device", "name", "label", "type", "description"]
 
     class Meta:
-        ordering = ('device', '_name')
-        unique_together = ('device', 'name')
+        ordering = ("device", "_name")
+        unique_together = ("device", "name")
 
     def get_absolute_url(self):
-        return reverse('dcim:consoleport', kwargs={'pk': self.pk})
+        return reverse("dcim:consoleport", kwargs={"pk": self.pk})
 
     def to_csv(self):
         return (
@@ -300,32 +293,32 @@ class ConsolePort(CableTermination, ComponentModel):
 # Console server ports
 #
 
-@extras_features('webhooks')
+
+@extras_features("webhooks")
 class ConsoleServerPort(CableTermination, ComponentModel):
     """
     A physical port within a Device (typically a designated console server) which provides access to ConsolePorts.
     """
+
     type = models.CharField(
         max_length=50,
         choices=ConsolePortTypeChoices,
         blank=True,
-        help_text='Physical port type'
+        help_text="Physical port type",
     )
     connection_status = models.BooleanField(
-        choices=CONNECTION_STATUS_CHOICES,
-        blank=True,
-        null=True
+        choices=CONNECTION_STATUS_CHOICES, blank=True, null=True
     )
     tags = TaggableManager(through=TaggedItem)
 
-    csv_headers = ['device', 'name', 'label', 'type', 'description']
+    csv_headers = ["device", "name", "label", "type", "description"]
 
     class Meta:
-        ordering = ('device', '_name')
-        unique_together = ('device', 'name')
+        ordering = ("device", "_name")
+        unique_together = ("device", "name")
 
     def get_absolute_url(self):
-        return reverse('dcim:consoleserverport', kwargs={'pk': self.pk})
+        return reverse("dcim:consoleserverport", kwargs={"pk": self.pk})
 
     def to_csv(self):
         return (
@@ -341,58 +334,66 @@ class ConsoleServerPort(CableTermination, ComponentModel):
 # Power ports
 #
 
-@extras_features('export_templates', 'webhooks')
+
+@extras_features("export_templates", "webhooks")
 class PowerPort(CableTermination, ComponentModel):
     """
     A physical power supply (intake) port within a Device. PowerPorts connect to PowerOutlets.
     """
+
     type = models.CharField(
         max_length=50,
         choices=PowerPortTypeChoices,
         blank=True,
-        help_text='Physical port type'
+        help_text="Physical port type",
     )
     maximum_draw = models.PositiveSmallIntegerField(
         blank=True,
         null=True,
         validators=[MinValueValidator(1)],
-        help_text="Maximum power draw (watts)"
+        help_text="Maximum power draw (watts)",
     )
     allocated_draw = models.PositiveSmallIntegerField(
         blank=True,
         null=True,
         validators=[MinValueValidator(1)],
-        help_text="Allocated power draw (watts)"
+        help_text="Allocated power draw (watts)",
     )
     _connected_poweroutlet = models.OneToOneField(
-        to='dcim.PowerOutlet',
+        to="dcim.PowerOutlet",
         on_delete=models.SET_NULL,
-        related_name='connected_endpoint',
+        related_name="connected_endpoint",
         blank=True,
-        null=True
+        null=True,
     )
     _connected_powerfeed = models.OneToOneField(
-        to='dcim.PowerFeed',
+        to="dcim.PowerFeed",
         on_delete=models.SET_NULL,
-        related_name='+',
+        related_name="+",
         blank=True,
-        null=True
+        null=True,
     )
     connection_status = models.BooleanField(
-        choices=CONNECTION_STATUS_CHOICES,
-        blank=True,
-        null=True
+        choices=CONNECTION_STATUS_CHOICES, blank=True, null=True
     )
     tags = TaggableManager(through=TaggedItem)
 
-    csv_headers = ['device', 'name', 'label', 'type', 'maximum_draw', 'allocated_draw', 'description']
+    csv_headers = [
+        "device",
+        "name",
+        "label",
+        "type",
+        "maximum_draw",
+        "allocated_draw",
+        "description",
+    ]
 
     class Meta:
-        ordering = ('device', '_name')
-        unique_together = ('device', 'name')
+        ordering = ("device", "_name")
+        unique_together = ("device", "name")
 
     def get_absolute_url(self):
-        return reverse('dcim:powerport', kwargs={'pk': self.pk})
+        return reverse("dcim:powerport", kwargs={"pk": self.pk})
 
     def to_csv(self):
         return (
@@ -409,9 +410,11 @@ class PowerPort(CableTermination, ComponentModel):
 
         if self.maximum_draw is not None and self.allocated_draw is not None:
             if self.allocated_draw > self.maximum_draw:
-                raise ValidationError({
-                    'allocated_draw': f"Allocated draw cannot exceed the maximum draw ({self.maximum_draw}W)."
-                })
+                raise ValidationError(
+                    {
+                        "allocated_draw": f"Allocated draw cannot exceed the maximum draw ({self.maximum_draw}W)."
+                    }
+                )
 
     @property
     def connected_endpoint(self):
@@ -447,7 +450,9 @@ class PowerPort(CableTermination, ComponentModel):
             self._connected_powerfeed = value
         else:
             raise ValueError(
-                "Connected endpoint must be a PowerOutlet or PowerFeed, not {}.".format(type(value))
+                "Connected endpoint must be a PowerOutlet or PowerFeed, not {}.".format(
+                    type(value)
+                )
             )
 
     def get_power_draw(self):
@@ -456,41 +461,55 @@ class PowerPort(CableTermination, ComponentModel):
         """
         # Calculate aggregate draw of all child power outlets if no numbers have been defined manually
         if self.allocated_draw is None and self.maximum_draw is None:
-            outlet_ids = PowerOutlet.objects.filter(power_port=self).values_list('pk', flat=True)
-            utilization = PowerPort.objects.filter(_connected_poweroutlet_id__in=outlet_ids).aggregate(
-                maximum_draw_total=Sum('maximum_draw'),
-                allocated_draw_total=Sum('allocated_draw'),
+            outlet_ids = PowerOutlet.objects.filter(power_port=self).values_list(
+                "pk", flat=True
+            )
+            utilization = PowerPort.objects.filter(
+                _connected_poweroutlet_id__in=outlet_ids
+            ).aggregate(
+                maximum_draw_total=Sum("maximum_draw"),
+                allocated_draw_total=Sum("allocated_draw"),
             )
             ret = {
-                'allocated': utilization['allocated_draw_total'] or 0,
-                'maximum': utilization['maximum_draw_total'] or 0,
-                'outlet_count': len(outlet_ids),
-                'legs': [],
+                "allocated": utilization["allocated_draw_total"] or 0,
+                "maximum": utilization["maximum_draw_total"] or 0,
+                "outlet_count": len(outlet_ids),
+                "legs": [],
             }
 
             # Calculate per-leg aggregates for three-phase feeds
-            if self._connected_powerfeed and self._connected_powerfeed.phase == PowerFeedPhaseChoices.PHASE_3PHASE:
+            if (
+                self._connected_powerfeed
+                and self._connected_powerfeed.phase
+                == PowerFeedPhaseChoices.PHASE_3PHASE
+            ):
                 for leg, leg_name in PowerOutletFeedLegChoices:
-                    outlet_ids = PowerOutlet.objects.filter(power_port=self, feed_leg=leg).values_list('pk', flat=True)
-                    utilization = PowerPort.objects.filter(_connected_poweroutlet_id__in=outlet_ids).aggregate(
-                        maximum_draw_total=Sum('maximum_draw'),
-                        allocated_draw_total=Sum('allocated_draw'),
+                    outlet_ids = PowerOutlet.objects.filter(
+                        power_port=self, feed_leg=leg
+                    ).values_list("pk", flat=True)
+                    utilization = PowerPort.objects.filter(
+                        _connected_poweroutlet_id__in=outlet_ids
+                    ).aggregate(
+                        maximum_draw_total=Sum("maximum_draw"),
+                        allocated_draw_total=Sum("allocated_draw"),
                     )
-                    ret['legs'].append({
-                        'name': leg_name,
-                        'allocated': utilization['allocated_draw_total'] or 0,
-                        'maximum': utilization['maximum_draw_total'] or 0,
-                        'outlet_count': len(outlet_ids),
-                    })
+                    ret["legs"].append(
+                        {
+                            "name": leg_name,
+                            "allocated": utilization["allocated_draw_total"] or 0,
+                            "maximum": utilization["maximum_draw_total"] or 0,
+                            "outlet_count": len(outlet_ids),
+                        }
+                    )
 
             return ret
 
         # Default to administratively defined values
         return {
-            'allocated': self.allocated_draw or 0,
-            'maximum': self.maximum_draw or 0,
-            'outlet_count': PowerOutlet.objects.filter(power_port=self).count(),
-            'legs': [],
+            "allocated": self.allocated_draw or 0,
+            "maximum": self.maximum_draw or 0,
+            "outlet_count": PowerOutlet.objects.filter(power_port=self).count(),
+            "legs": [],
         }
 
 
@@ -498,45 +517,53 @@ class PowerPort(CableTermination, ComponentModel):
 # Power outlets
 #
 
-@extras_features('webhooks')
+
+@extras_features("webhooks")
 class PowerOutlet(CableTermination, ComponentModel):
     """
     A physical power outlet (output) within a Device which provides power to a PowerPort.
     """
+
     type = models.CharField(
         max_length=50,
         choices=PowerOutletTypeChoices,
         blank=True,
-        help_text='Physical port type'
+        help_text="Physical port type",
     )
     power_port = models.ForeignKey(
-        to='dcim.PowerPort',
+        to="dcim.PowerPort",
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
-        related_name='poweroutlets'
+        related_name="poweroutlets",
     )
     feed_leg = models.CharField(
         max_length=50,
         choices=PowerOutletFeedLegChoices,
         blank=True,
-        help_text="Phase (for three-phase feeds)"
+        help_text="Phase (for three-phase feeds)",
     )
     connection_status = models.BooleanField(
-        choices=CONNECTION_STATUS_CHOICES,
-        blank=True,
-        null=True
+        choices=CONNECTION_STATUS_CHOICES, blank=True, null=True
     )
     tags = TaggableManager(through=TaggedItem)
 
-    csv_headers = ['device', 'name', 'label', 'type', 'power_port', 'feed_leg', 'description']
+    csv_headers = [
+        "device",
+        "name",
+        "label",
+        "type",
+        "power_port",
+        "feed_leg",
+        "description",
+    ]
 
     class Meta:
-        ordering = ('device', '_name')
-        unique_together = ('device', 'name')
+        ordering = ("device", "_name")
+        unique_together = ("device", "name")
 
     def get_absolute_url(self):
-        return reverse('dcim:poweroutlet', kwargs={'pk': self.pk})
+        return reverse("dcim:poweroutlet", kwargs={"pk": self.pk})
 
     def to_csv(self):
         return (
@@ -554,7 +581,9 @@ class PowerOutlet(CableTermination, ComponentModel):
         # Validate power port assignment
         if self.power_port and self.power_port.device != self.device:
             raise ValidationError(
-                "Parent power port ({}) must belong to the same device".format(self.power_port)
+                "Parent power port ({}) must belong to the same device".format(
+                    self.power_port
+                )
             )
 
 
@@ -562,29 +591,21 @@ class PowerOutlet(CableTermination, ComponentModel):
 # Interfaces
 #
 
+
 class BaseInterface(models.Model):
     """
     Abstract base class for fields shared by dcim.Interface and virtualization.VMInterface.
     """
-    enabled = models.BooleanField(
-        default=True
-    )
-    mac_address = MACAddressField(
-        null=True,
-        blank=True,
-        verbose_name='MAC Address'
-    )
+
+    enabled = models.BooleanField(default=True)
+    mac_address = MACAddressField(null=True, blank=True, verbose_name="MAC Address")
     mtu = models.PositiveIntegerField(
         blank=True,
         null=True,
         validators=[MinValueValidator(1), MaxValueValidator(65536)],
-        verbose_name='MTU'
+        verbose_name="MTU",
     )
-    mode = models.CharField(
-        max_length=50,
-        choices=InterfaceModeChoices,
-        blank=True
-    )
+    mode = models.CharField(max_length=50, choices=InterfaceModeChoices, blank=True)
 
     class Meta:
         abstract = True
@@ -602,86 +623,88 @@ class BaseInterface(models.Model):
         return super().save(*args, **kwargs)
 
 
-@extras_features('graphs', 'export_templates', 'webhooks')
+@extras_features("graphs", "export_templates", "webhooks")
 class Interface(CableTermination, ComponentModel, BaseInterface):
     """
     A network interface within a Device. A physical Interface can connect to exactly one other Interface.
     """
+
     # Override ComponentModel._name to specify naturalize_interface function
     _name = NaturalOrderingField(
-        target_field='name',
+        target_field="name",
         naturalize_function=naturalize_interface,
         max_length=100,
-        blank=True
+        blank=True,
     )
     _connected_interface = models.OneToOneField(
-        to='self',
-        on_delete=models.SET_NULL,
-        related_name='+',
-        blank=True,
-        null=True
+        to="self", on_delete=models.SET_NULL, related_name="+", blank=True, null=True
     )
     _connected_circuittermination = models.OneToOneField(
-        to='circuits.CircuitTermination',
+        to="circuits.CircuitTermination",
         on_delete=models.SET_NULL,
-        related_name='+',
+        related_name="+",
         blank=True,
-        null=True
+        null=True,
     )
     connection_status = models.BooleanField(
-        choices=CONNECTION_STATUS_CHOICES,
-        blank=True,
-        null=True
+        choices=CONNECTION_STATUS_CHOICES, blank=True, null=True
     )
     lag = models.ForeignKey(
-        to='self',
+        to="self",
         on_delete=models.SET_NULL,
-        related_name='member_interfaces',
+        related_name="member_interfaces",
         null=True,
         blank=True,
-        verbose_name='Parent LAG'
+        verbose_name="Parent LAG",
     )
-    type = models.CharField(
-        max_length=50,
-        choices=InterfaceTypeChoices
-    )
+    type = models.CharField(max_length=50, choices=InterfaceTypeChoices)
     mgmt_only = models.BooleanField(
         default=False,
-        verbose_name='OOB Management',
-        help_text='This interface is used only for out-of-band management'
+        verbose_name="OOB Management",
+        help_text="This interface is used only for out-of-band management",
     )
     untagged_vlan = models.ForeignKey(
-        to='ipam.VLAN',
+        to="ipam.VLAN",
         on_delete=models.SET_NULL,
-        related_name='interfaces_as_untagged',
+        related_name="interfaces_as_untagged",
         null=True,
         blank=True,
-        verbose_name='Untagged VLAN'
+        verbose_name="Untagged VLAN",
     )
     tagged_vlans = models.ManyToManyField(
-        to='ipam.VLAN',
-        related_name='interfaces_as_tagged',
+        to="ipam.VLAN",
+        related_name="interfaces_as_tagged",
         blank=True,
-        verbose_name='Tagged VLANs'
+        verbose_name="Tagged VLANs",
     )
     ip_addresses = GenericRelation(
-        to='ipam.IPAddress',
-        content_type_field='assigned_object_type',
-        object_id_field='assigned_object_id',
-        related_query_name='interface'
+        to="ipam.IPAddress",
+        content_type_field="assigned_object_type",
+        object_id_field="assigned_object_id",
+        related_query_name="interface",
     )
     tags = TaggableManager(through=TaggedItem)
 
     csv_headers = [
-        'device', 'name', 'label', 'lag', 'type', 'enabled', 'mac_address', 'mtu', 'mgmt_only', 'description', 'mode',
+        "device",
+        "name",
+        "label",
+        "lag",
+        "type",
+        "enabled",
+        "mac_address",
+        "mtu",
+        "mgmt_only",
+        "description",
+        "mode",
     ]
 
     class Meta:
-        ordering = ('device', CollateAsChar('_name'))
-        unique_together = ('device', 'name')
+        ordering = ("device", CollateAsChar("_name"))
+        unique_together = ("device", "name")
 
     def get_absolute_url(self):
-        return reverse('dcim:interface', kwargs={'pk': self.pk})
+        return reverse("dcim:interface", kwargs={"pk": self.pk})
 
     def to_csv(self):
         return (
@@ -702,39 +725,52 @@ class Interface(CableTermination, ComponentModel, BaseInterface):
 
         # Virtual interfaces cannot be connected
         if self.type in NONCONNECTABLE_IFACE_TYPES and (
-                self.cable or getattr(self, 'circuit_termination', False)
+            self.cable or getattr(self, "circuit_termination", False)
         ):
-            raise ValidationError({
-                'type': "Virtual and wireless interfaces cannot be connected to another interface or circuit. "
-                        "Disconnect the interface or choose a suitable type."
-            })
+            raise ValidationError(
+                {
+                    "type": "Virtual and wireless interfaces cannot be connected to another interface or circuit. "
+                    "Disconnect the interface or choose a suitable type."
+                }
+            )
 
         # An interface's LAG must belong to the same device or virtual chassis
         if self.lag and self.lag.device != self.device:
             if self.device.virtual_chassis is None:
-                raise ValidationError({
-                    'lag': f"The selected LAG interface ({self.lag}) belongs to a different device ({self.lag.device})."
-                })
+                raise ValidationError(
+                    {
+                        "lag": f"The selected LAG interface ({self.lag}) belongs to a different device ({self.lag.device})."
+                    }
+                )
             elif self.lag.device.virtual_chassis != self.device.virtual_chassis:
-                raise ValidationError({
-                    'lag': f"The selected LAG interface ({self.lag}) belongs to {self.lag.device}, which is not part "
-                           f"of virtual chassis {self.device.virtual_chassis}."
-                })
+                raise ValidationError(
+                    {
+                        "lag": f"The selected LAG interface ({self.lag}) belongs to {self.lag.device}, which is not part "
+                        f"of virtual chassis {self.device.virtual_chassis}."
+                    }
+                )
 
         # A virtual interface cannot have a parent LAG
         if self.type == InterfaceTypeChoices.TYPE_VIRTUAL and self.lag is not None:
-            raise ValidationError({'lag': "Virtual interfaces cannot have a parent LAG interface."})
+            raise ValidationError(
+                {"lag": "Virtual interfaces cannot have a parent LAG interface."}
+            )
 
         # A LAG interface cannot be its own parent
         if self.pk and self.lag_id == self.pk:
-            raise ValidationError({'lag': "A LAG interface cannot be its own parent."})
+            raise ValidationError({"lag": "A LAG interface cannot be its own parent."})
 
         # Validate untagged VLAN
-        if self.untagged_vlan and self.untagged_vlan.site not in [self.parent.site, None]:
-            raise ValidationError({
-                'untagged_vlan': "The untagged VLAN ({}) must belong to the same site as the interface's parent "
-                                 "device, or it must be global".format(self.untagged_vlan)
-            })
+        if self.untagged_vlan and self.untagged_vlan.site not in [
+            self.parent.site,
+            None,
+        ]:
+            raise ValidationError(
+                {
+                    "untagged_vlan": "The untagged VLAN ({}) must belong to the same site as the interface's parent "
+                    "device, or it must be global".format(self.untagged_vlan)
+                }
+            )
 
     @property
     def connected_endpoint(self):
@@ -769,7 +805,9 @@ class Interface(CableTermination, ComponentModel, BaseInterface):
             self._connected_circuittermination = value
         else:
             raise ValueError(
-                "Connected endpoint must be an Interface or CircuitTermination, not {}.".format(type(value))
+                "Connected endpoint must be an Interface or CircuitTermination, not {}.".format(
+                    type(value)
+                )
             )
 
     @property
@@ -801,40 +839,45 @@ class Interface(CableTermination, ComponentModel, BaseInterface):
 # Pass-through ports
 #
 
-@extras_features('webhooks')
+
+@extras_features("webhooks")
 class FrontPort(CableTermination, ComponentModel):
     """
     A pass-through port on the front of a Device.
     """
-    type = models.CharField(
-        max_length=50,
-        choices=PortTypeChoices
-    )
+
+    type = models.CharField(max_length=50, choices=PortTypeChoices)
     rear_port = models.ForeignKey(
-        to='dcim.RearPort',
-        on_delete=models.CASCADE,
-        related_name='frontports'
+        to="dcim.RearPort", on_delete=models.CASCADE, related_name="frontports"
     )
     rear_port_position = models.PositiveSmallIntegerField(
         default=1,
         validators=[
             MinValueValidator(REARPORT_POSITIONS_MIN),
-            MaxValueValidator(REARPORT_POSITIONS_MAX)
-        ]
+            MaxValueValidator(REARPORT_POSITIONS_MAX),
+        ],
     )
     tags = TaggableManager(through=TaggedItem)
 
-    csv_headers = ['device', 'name', 'label', 'type', 'rear_port', 'rear_port_position', 'description']
+    csv_headers = [
+        "device",
+        "name",
+        "label",
+        "type",
+        "rear_port",
+        "rear_port_position",
+        "description",
+    ]
 
     class Meta:
-        ordering = ('device', '_name')
+        ordering = ("device", "_name")
         unique_together = (
-            ('device', 'name'),
-            ('rear_port', 'rear_port_position'),
+            ("device", "name"),
+            ("rear_port", "rear_port_position"),
         )
 
     def get_absolute_url(self):
-        return reverse('dcim:frontport', kwargs={'pk': self.pk})
+        return reverse("dcim:frontport", kwargs={"pk": self.pk})
 
     def to_csv(self):
         return (
@@ -851,54 +894,58 @@ class FrontPort(CableTermination, ComponentModel):
 
         # Validate rear port assignment
         if self.rear_port.device != self.device:
-            raise ValidationError({
-                "rear_port": f"Rear port ({self.rear_port}) must belong to the same device"
-            })
+            raise ValidationError(
+                {
+                    "rear_port": f"Rear port ({self.rear_port}) must belong to the same device"
+                }
+            )
 
         # Validate rear port position assignment
         if self.rear_port_position > self.rear_port.positions:
-            raise ValidationError({
-                "rear_port_position": f"Invalid rear port position ({self.rear_port_position}): Rear port "
-                                      f"{self.rear_port.name} has only {self.rear_port.positions} positions"
-            })
+            raise ValidationError(
+                {
+                    "rear_port_position": f"Invalid rear port position ({self.rear_port_position}): Rear port "
+                    f"{self.rear_port.name} has only {self.rear_port.positions} positions"
+                }
+            )
 
 
-@extras_features('webhooks')
+@extras_features("webhooks")
 class RearPort(CableTermination, ComponentModel):
     """
     A pass-through port on the rear of a Device.
     """
-    type = models.CharField(
-        max_length=50,
-        choices=PortTypeChoices
-    )
+
+    type = models.CharField(max_length=50, choices=PortTypeChoices)
     positions = models.PositiveSmallIntegerField(
         default=1,
         validators=[
             MinValueValidator(REARPORT_POSITIONS_MIN),
-            MaxValueValidator(REARPORT_POSITIONS_MAX)
-        ]
+            MaxValueValidator(REARPORT_POSITIONS_MAX),
+        ],
     )
     tags = TaggableManager(through=TaggedItem)
 
-    csv_headers = ['device', 'name', 'label', 'type', 'positions', 'description']
+    csv_headers = ["device", "name", "label", "type", "positions", "description"]
 
     class Meta:
-        ordering = ('device', '_name')
-        unique_together = ('device', 'name')
+        ordering = ("device", "_name")
+        unique_together = ("device", "name")
 
     def get_absolute_url(self):
-        return reverse('dcim:rearport', kwargs={'pk': self.pk})
+        return reverse("dcim:rearport", kwargs={"pk": self.pk})
 
     def clean(self):
 
         # Check that positions count is greater than or equal to the number of associated FrontPorts
         frontport_count = self.frontports.count()
         if self.positions < frontport_count:
-            raise ValidationError({
-                "positions": f"The number of positions cannot be less than the number of mapped front ports "
-                             f"({frontport_count})"
-            })
+            raise ValidationError(
+                {
+                    "positions": f"The number of positions cannot be less than the number of mapped front ports "
+                    f"({frontport_count})"
+                }
+            )
 
     def to_csv(self):
         return (
@@ -915,28 +962,30 @@ class RearPort(CableTermination, ComponentModel):
 # Device bays
 #
 
-@extras_features('webhooks')
+
+@extras_features("webhooks")
 class DeviceBay(ComponentModel):
     """
     An empty space within a Device which can house a child device
     """
+
     installed_device = models.OneToOneField(
-        to='dcim.Device',
+        to="dcim.Device",
         on_delete=models.SET_NULL,
-        related_name='parent_bay',
+        related_name="parent_bay",
         blank=True,
-        null=True
+        null=True,
     )
     tags = TaggableManager(through=TaggedItem)
 
-    csv_headers = ['device', 'name', 'label', 'installed_device', 'description']
+    csv_headers = ["device", "name", "label", "installed_device", "description"]
 
     class Meta:
-        ordering = ('device', '_name')
-        unique_together = ('device', 'name')
+        ordering = ("device", "_name")
+        unique_together = ("device", "name")
 
     def get_absolute_url(self):
-        return reverse('dcim:devicebay', kwargs={'pk': self.pk})
+        return reverse("dcim:devicebay", kwargs={"pk": self.pk})
 
     def to_csv(self):
         return (
@@ -951,9 +1000,11 @@ class DeviceBay(ComponentModel):
 
         # Validate that the parent Device can have DeviceBays
         if not self.device.device_type.is_parent_device:
-            raise ValidationError("This type of device ({}) does not support device bays.".format(
-                self.device.device_type
-            ))
+            raise ValidationError(
+                "This type of device ({}) does not support device bays.".format(
+                    self.device.device_type
+                )
+            )
 
         # Cannot install a device into itself, obviously
         if self.device == self.installed_device:
@@ -961,79 +1012,88 @@ class DeviceBay(ComponentModel):
 
         # Check that the installed device is not already installed elsewhere
         if self.installed_device:
-            current_bay = DeviceBay.objects.filter(installed_device=self.installed_device).first()
+            current_bay = DeviceBay.objects.filter(
+                installed_device=self.installed_device
+            ).first()
             if current_bay and current_bay != self:
-                raise ValidationError({
-                    'installed_device': "Cannot install the specified device; device is already installed in {}".format(
-                        current_bay
-                    )
-                })
+                raise ValidationError(
+                    {
+                        "installed_device": "Cannot install the specified device; device is already installed in {}".format(
+                            current_bay
+                        )
+                    }
+                )
 
 
 #
 # Inventory items
 #
 
-@extras_features('export_templates', 'webhooks')
+
+@extras_features("export_templates", "webhooks")
 class InventoryItem(ComponentModel):
     """
     An InventoryItem represents a serialized piece of hardware within a Device, such as a line card or power supply.
     InventoryItems are used only for inventory purposes.
     """
+
     parent = models.ForeignKey(
-        to='self',
+        to="self",
         on_delete=models.CASCADE,
-        related_name='child_items',
+        related_name="child_items",
         blank=True,
-        null=True
+        null=True,
     )
     manufacturer = models.ForeignKey(
-        to='dcim.Manufacturer',
+        to="dcim.Manufacturer",
         on_delete=models.PROTECT,
-        related_name='inventory_items',
+        related_name="inventory_items",
         blank=True,
-        null=True
+        null=True,
     )
     part_id = models.CharField(
         max_length=50,
-        verbose_name='Part ID',
+        verbose_name="Part ID",
         blank=True,
-        help_text='Manufacturer-assigned part identifier'
+        help_text="Manufacturer-assigned part identifier",
     )
-    serial = models.CharField(
-        max_length=50,
-        verbose_name='Serial number',
-        blank=True
-    )
+    serial = models.CharField(max_length=50, verbose_name="Serial number", blank=True)
     asset_tag = models.CharField(
         max_length=50,
         unique=True,
         blank=True,
         null=True,
-        verbose_name='Asset tag',
-        help_text='A unique tag used to identify this item'
+        verbose_name="Asset tag",
+        help_text="A unique tag used to identify this item",
     )
     discovered = models.BooleanField(
-        default=False,
-        help_text='This item was automatically discovered'
+        default=False, help_text="This item was automatically discovered"
     )
 
     tags = TaggableManager(through=TaggedItem)
 
     csv_headers = [
-        'device', 'name', 'label', 'manufacturer', 'part_id', 'serial', 'asset_tag', 'discovered', 'description',
+        "device",
+        "name",
+        "label",
+        "manufacturer",
+        "part_id",
+        "serial",
+        "asset_tag",
+        "discovered",
+        "description",
     ]
 
     class Meta:
-        ordering = ('device__id', 'parent__id', '_name')
-        unique_together = ('device', 'parent', 'name')
+        ordering = ("device__id", "parent__id", "_name")
+        unique_together = ("device", "parent", "name")
 
     def get_absolute_url(self):
-        return reverse('dcim:inventoryitem', kwargs={'pk': self.pk})
+        return reverse("dcim:inventoryitem", kwargs={"pk": self.pk})
 
     def to_csv(self):
         return (
-            self.device.name or '{{{}}}'.format(self.device.pk),
+            self.device.name or "{{{}}}".format(self.device.pk),
             self.name,
             self.label,
             self.manufacturer.name if self.manufacturer else None,

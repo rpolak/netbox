@@ -13,10 +13,12 @@ from users.models import Token
 # Renderers
 #
 
+
 class FormlessBrowsableAPIRenderer(BrowsableAPIRenderer):
     """
     Override the built-in BrowsableAPIRenderer to disable HTML forms.
     """
+
     def show_form_for_method(self, *args, **kwargs):
         return False
 
@@ -28,16 +30,18 @@ class FormlessBrowsableAPIRenderer(BrowsableAPIRenderer):
 # Authentication
 #
 
+
 class TokenAuthentication(authentication.TokenAuthentication):
     """
     A custom authentication scheme which enforces Token expiration times.
     """
+
     model = Token
 
     def authenticate_credentials(self, key):
         model = self.get_model()
         try:
-            token = model.objects.prefetch_related('user').get(key=key)
+            token = model.objects.prefetch_related("user").get(key=key)
         except model.DoesNotExist:
             raise exceptions.AuthenticationFailed("Invalid token")
 
@@ -56,15 +60,16 @@ class TokenPermissions(DjangoObjectPermissions):
     Custom permissions handler which extends the built-in DjangoModelPermissions to validate a Token's write ability
     for unsafe requests (POST/PUT/PATCH/DELETE).
     """
+
     # Override the stock perm_map to enforce view permissions
     perms_map = {
-        'GET': ['%(app_label)s.view_%(model_name)s'],
-        'OPTIONS': [],
-        'HEAD': ['%(app_label)s.view_%(model_name)s'],
-        'POST': ['%(app_label)s.add_%(model_name)s'],
-        'PUT': ['%(app_label)s.change_%(model_name)s'],
-        'PATCH': ['%(app_label)s.change_%(model_name)s'],
-        'DELETE': ['%(app_label)s.delete_%(model_name)s'],
+        "GET": ["%(app_label)s.view_%(model_name)s"],
+        "OPTIONS": [],
+        "HEAD": ["%(app_label)s.view_%(model_name)s"],
+        "POST": ["%(app_label)s.add_%(model_name)s"],
+        "PUT": ["%(app_label)s.change_%(model_name)s"],
+        "PATCH": ["%(app_label)s.change_%(model_name)s"],
+        "DELETE": ["%(app_label)s.delete_%(model_name)s"],
     }
 
     def __init__(self):
@@ -83,7 +88,9 @@ class TokenPermissions(DjangoObjectPermissions):
     def has_permission(self, request, view):
 
         # Enforce Token write ability
-        if isinstance(request.auth, Token) and not self._verify_write_permission(request):
+        if isinstance(request.auth, Token) and not self._verify_write_permission(
+            request
+        ):
             return False
 
         return super().has_permission(request, view)
@@ -91,7 +98,9 @@ class TokenPermissions(DjangoObjectPermissions):
     def has_object_permission(self, request, view, obj):
 
         # Enforce Token write ability
-        if isinstance(request.auth, Token) and not self._verify_write_permission(request):
+        if isinstance(request.auth, Token) and not self._verify_write_permission(
+            request
+        ):
             return False
 
         return super().has_object_permission(request, view, obj)
@@ -100,6 +109,7 @@ class TokenPermissions(DjangoObjectPermissions):
 #
 # Pagination
 #
+
 
 class OptionalLimitOffsetPagination(LimitOffsetPagination):
     """
@@ -127,9 +137,9 @@ class OptionalLimitOffsetPagination(LimitOffsetPagination):
             return list()
 
         if self.limit:
-            return list(queryset[self.offset:self.offset + self.limit])
+            return list(queryset[self.offset : self.offset + self.limit])
         else:
-            return list(queryset[self.offset:])
+            return list(queryset[self.offset :])
 
     def get_limit(self, request):
 
@@ -171,23 +181,26 @@ class OptionalLimitOffsetPagination(LimitOffsetPagination):
 # Miscellaneous
 #
 
+
 def get_view_name(view, suffix=None):
     """
     Derive the view name from its associated model, if it has one. Fall back to DRF's built-in `get_view_name`.
     """
-    if hasattr(view, 'queryset'):
+    if hasattr(view, "queryset"):
         # Determine the model name from the queryset.
         name = view.queryset.model._meta.verbose_name
-        name = ' '.join([w[0].upper() + w[1:] for w in name.split()])  # Capitalize each word
+        name = " ".join(
+            [w[0].upper() + w[1:] for w in name.split()]
+        )  # Capitalize each word
 
     else:
         # Replicate DRF's built-in behavior.
         name = view.__class__.__name__
-        name = formatting.remove_trailing_string(name, 'View')
-        name = formatting.remove_trailing_string(name, 'ViewSet')
+        name = formatting.remove_trailing_string(name, "View")
+        name = formatting.remove_trailing_string(name, "ViewSet")
         name = formatting.camelcase_to_spaces(name)
 
     if suffix:
-        name += ' ' + suffix
+        name += " " + suffix
 
     return name

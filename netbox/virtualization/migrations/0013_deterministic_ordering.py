@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('virtualization', '0012_vm_name_nonunique'),
+        ("virtualization", "0012_vm_name_nonunique"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='virtualmachine',
-            options={'ordering': ('name', 'pk')},
+            name="virtualmachine",
+            options={"ordering": ("name", "pk")},
         ),
     ]

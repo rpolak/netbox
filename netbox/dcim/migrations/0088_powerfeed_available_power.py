@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcim', '0087_role_descriptions'),
+        ("dcim", "0087_role_descriptions"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='powerfeed',
-            name='available_power',
+            model_name="powerfeed",
+            name="available_power",
             field=models.PositiveIntegerField(default=0, editable=False),
         ),
     ]

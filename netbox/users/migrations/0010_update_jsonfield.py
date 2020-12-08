@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0009_replicate_permissions'),
+        ("users", "0009_replicate_permissions"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='objectpermission',
-            name='constraints',
+            model_name="objectpermission",
+            name="constraints",
             field=models.JSONField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='userconfig',
-            name='data',
+            model_name="userconfig",
+            name="data",
             field=models.JSONField(default=dict),
         ),
     ]

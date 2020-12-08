@@ -7,19 +7,23 @@ import taggit.managers
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('circuits', '0014_circuittermination_description'),
-        ('extras', '0019_tag_taggeditem'),
+        ("circuits", "0014_circuittermination_description"),
+        ("extras", "0019_tag_taggeditem"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='circuit',
-            name='tags',
-            field=taggit.managers.TaggableManager(through='extras.TaggedItem', to='extras.Tag'),
+            model_name="circuit",
+            name="tags",
+            field=taggit.managers.TaggableManager(
+                through="extras.TaggedItem", to="extras.Tag"
+            ),
         ),
         migrations.AlterField(
-            model_name='provider',
-            name='tags',
-            field=taggit.managers.TaggableManager(through='extras.TaggedItem', to='extras.Tag'),
+            model_name="provider",
+            name="tags",
+            field=taggit.managers.TaggableManager(
+                through="extras.TaggedItem", to="extras.Tag"
+            ),
         ),
     ]

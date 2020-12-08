@@ -7,13 +7,18 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcim', '0060_change_logging'),
+        ("dcim", "0060_change_logging"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='platform',
-            name='napalm_args',
-            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, help_text='Additional arguments to pass when initiating the NAPALM driver (JSON format)', null=True, verbose_name='NAPALM arguments'),
+            model_name="platform",
+            name="napalm_args",
+            field=django.contrib.postgres.fields.jsonb.JSONField(
+                blank=True,
+                help_text="Additional arguments to pass when initiating the NAPALM driver (JSON format)",
+                null=True,
+                verbose_name="NAPALM arguments",
+            ),
         ),
     ]

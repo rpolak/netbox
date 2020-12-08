@@ -25,18 +25,18 @@ class SecretsRootView(APIRootView):
     """
     Secrets API root view
     """
+
     def get_view_name(self):
-        return 'Secrets'
+        return "Secrets"
 
 
 #
 # Secret Roles
 #
 
+
 class SecretRoleViewSet(ModelViewSet):
-    queryset = SecretRole.objects.annotate(
-        secret_count=get_subquery(Secret, 'role')
-    )
+    queryset = SecretRole.objects.annotate(secret_count=get_subquery(Secret, "role"))
     serializer_class = serializers.SecretRoleSerializer
     filterset_class = filters.SecretRoleFilterSet
 
@@ -45,9 +45,13 @@ class SecretRoleViewSet(ModelViewSet):
 # Secrets
 #
 
+
 class SecretViewSet(ModelViewSet):
     queryset = Secret.objects.prefetch_related(
-        'device__primary_ip4', 'device__primary_ip6', 'role', 'tags',
+        "device__primary_ip4",
+        "device__primary_ip6",
+        "role",
+        "tags",
     )
     serializer_class = serializers.SecretSerializer
     filterset_class = filters.SecretFilterSet
@@ -58,7 +62,7 @@ class SecretViewSet(ModelViewSet):
 
         # Make the master key available to the serializer for encrypting plaintext values
         context = super().get_serializer_context()
-        context['master_key'] = self.master_key
+        context["master_key"] = self.master_key
 
         return context
 
@@ -70,16 +74,18 @@ class SecretViewSet(ModelViewSet):
 
             # Read session key from HTTP cookie or header if it has been provided. The session key must be provided in
             # order to encrypt/decrypt secrets.
-            if 'session_key' in request.COOKIES:
-                session_key = base64.b64decode(request.COOKIES['session_key'])
-            elif 'HTTP_X_SESSION_KEY' in request.META:
-                session_key = base64.b64decode(request.META['HTTP_X_SESSION_KEY'])
+            if "session_key" in request.COOKIES:
+                session_key = base64.b64decode(request.COOKIES["session_key"])
+            elif "HTTP_X_SESSION_KEY" in request.META:
+                session_key = base64.b64decode(request.META["HTTP_X_SESSION_KEY"])
             else:
                 session_key = None
 
             # We can't encrypt secret plaintext without a session key.
-            if self.action in ['create', 'update'] and session_key is None:
-                raise ValidationError("A session key must be provided when creating or updating secrets.")
+            if self.action in ["create", "update"] and session_key is None:
+                raise ValidationError(
+                    "A session key must be provided when creating or updating secrets."
+                )
 
             # Attempt to retrieve the master key for encryption/decryption if a session key has been provided.
             if session_key is not None:
@@ -140,12 +146,13 @@ class GetSessionKeyViewSet(ViewSet):
     This endpoint accepts one optional parameter: `preserve_key`. If True and a session key exists, the existing session
     key will be returned instead of a new one.
     """
+
     permission_classes = [IsAuthenticated]
 
     def create(self, request):
 
         # Read private key
-        private_key = request.POST.get('private_key', None)
+        private_key = request.POST.get("private_key", None)
         if private_key is None:
             return HttpResponseBadRequest(ERR_PRIVKEY_MISSING)
 
@@ -163,11 +170,13 @@ class GetSessionKeyViewSet(ViewSet):
             return HttpResponseBadRequest(ERR_PRIVKEY_INVALID)
 
         try:
-            current_session_key = SessionKey.objects.get(userkey__user_id=request.user.pk)
+            current_session_key = SessionKey.objects.get(
+                userkey__user_id=request.user.pk
+            )
         except SessionKey.DoesNotExist:
             current_session_key = None
 
-        if current_session_key and request.GET.get('preserve_key', False):
+        if current_session_key and request.GET.get("preserve_key", False):
 
             # Retrieve the existing session key
             key = current_session_key.get_session_key(master_key)
@@ -184,13 +193,15 @@ class GetSessionKeyViewSet(ViewSet):
         encoded_key = base64.b64encode(key).decode()
 
         # Craft the response
-        response = Response({
-            'session_key': encoded_key,
-        })
+        response = Response(
+            {
+                "session_key": encoded_key,
+            }
+        )
 
         # If token authentication is not in use, assign the session key as a cookie
         if request.auth is None:
-            response.set_cookie('session_key', value=encoded_key)
+            response.set_cookie("session_key", value=encoded_key)
 
         return response
 
@@ -204,21 +215,24 @@ class GenerateRSAKeyPairViewSet(ViewSet):
             "private_key": "<private key>"
         }
     """
+
     permission_classes = [IsAuthenticated]
 
     def list(self, request):
 
         # Determine what size key to generate
-        key_size = request.GET.get('key_size', 2048)
+        key_size = request.GET.get("key_size", 2048)
         if key_size not in range(2048, 4097, 256):
             key_size = 2048
 
         # Export RSA private and public keys in PEM format
         key = RSA.generate(key_size)
-        private_key = key.exportKey('PEM')
-        public_key = key.publickey().exportKey('PEM')
+        private_key = key.exportKey("PEM")
+        public_key = key.publickey().exportKey("PEM")
 
-        return Response({
-            'private_key': private_key,
-            'public_key': public_key,
-        })
+        return Response(
+            {
+                "private_key": private_key,
+                "public_key": public_key,
+            }
+        )

@@ -15,15 +15,15 @@ class ASNField(models.BigIntegerField):
 
     def formfield(self, **kwargs):
         defaults = {
-            'min_value': BGP_ASN_MIN,
-            'max_value': BGP_ASN_MAX,
+            "min_value": BGP_ASN_MIN,
+            "max_value": BGP_ASN_MAX,
         }
         defaults.update(**kwargs)
         return super().formfield(**defaults)
 
 
 class mac_unix_expanded_uppercase(mac_unix_expanded):
-    word_fmt = '%.2X'
+    word_fmt = "%.2X"
 
 
 class MACAddressField(models.Field):
@@ -44,7 +44,7 @@ class MACAddressField(models.Field):
             raise ValidationError("Invalid MAC address format: {}".format(value))
 
     def db_type(self, connection):
-        return 'macaddr'
+        return "macaddr"
 
     def get_prep_value(self, value):
         if not value:

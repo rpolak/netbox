@@ -7,13 +7,15 @@ import utilities.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcim', '0045_devicerole_vm_role'),
+        ("dcim", "0045_devicerole_vm_role"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='rack',
-            name='facility_id',
-            field=utilities.fields.NullableCharField(blank=True, max_length=50, null=True, verbose_name='Facility ID'),
+            model_name="rack",
+            name="facility_id",
+            field=utilities.fields.NullableCharField(
+                blank=True, max_length=50, null=True, verbose_name="Facility ID"
+            ),
         ),
     ]

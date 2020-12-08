@@ -6,24 +6,24 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('extras', '0034_configcontext_tags'),
+        ("extras", "0034_configcontext_tags"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='customfieldvalue',
-            options={'ordering': ('obj_type', 'obj_id', 'pk')},
+            name="customfieldvalue",
+            options={"ordering": ("obj_type", "obj_id", "pk")},
         ),
         migrations.AlterModelOptions(
-            name='graph',
-            options={'ordering': ('type', 'weight', 'name', 'pk')},
+            name="graph",
+            options={"ordering": ("type", "weight", "name", "pk")},
         ),
         migrations.AlterModelOptions(
-            name='imageattachment',
-            options={'ordering': ('name', 'pk')},
+            name="imageattachment",
+            options={"ordering": ("name", "pk")},
         ),
         migrations.AlterModelOptions(
-            name='webhook',
-            options={'ordering': ('name',)},
+            name="webhook",
+            options={"ordering": ("name",)},
         ),
     ]

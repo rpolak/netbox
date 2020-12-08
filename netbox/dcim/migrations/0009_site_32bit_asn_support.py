@@ -7,13 +7,13 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcim', '0008_device_remove_primary_ip'),
+        ("dcim", "0008_device_remove_primary_ip"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='site',
-            name='asn',
-            field=dcim.fields.ASNField(blank=True, null=True, verbose_name=b'ASN'),
+            model_name="site",
+            name="asn",
+            field=dcim.fields.ASNField(blank=True, null=True, verbose_name=b"ASN"),
         ),
     ]

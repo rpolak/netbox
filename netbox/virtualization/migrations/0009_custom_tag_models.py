@@ -7,19 +7,23 @@ import taggit.managers
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('virtualization', '0008_virtualmachine_local_context_data'),
-        ('extras', '0019_tag_taggeditem'),
+        ("virtualization", "0008_virtualmachine_local_context_data"),
+        ("extras", "0019_tag_taggeditem"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='cluster',
-            name='tags',
-            field=taggit.managers.TaggableManager(through='extras.TaggedItem', to='extras.Tag'),
+            model_name="cluster",
+            name="tags",
+            field=taggit.managers.TaggableManager(
+                through="extras.TaggedItem", to="extras.Tag"
+            ),
         ),
         migrations.AlterField(
-            model_name='virtualmachine',
-            name='tags',
-            field=taggit.managers.TaggableManager(through='extras.TaggedItem', to='extras.Tag'),
+            model_name="virtualmachine",
+            name="tags",
+            field=taggit.managers.TaggableManager(
+                through="extras.TaggedItem", to="extras.Tag"
+            ),
         ),
     ]

@@ -7,36 +7,62 @@ import django.db.models.expressions
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ipam', '0032_role_description'),
+        ("ipam", "0032_role_description"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='aggregate',
-            options={'ordering': ('family', 'prefix', 'pk')},
+            name="aggregate",
+            options={"ordering": ("family", "prefix", "pk")},
         ),
         migrations.AlterModelOptions(
-            name='ipaddress',
-            options={'ordering': ('family', 'address', 'pk'), 'verbose_name': 'IP address', 'verbose_name_plural': 'IP addresses'},
+            name="ipaddress",
+            options={
+                "ordering": ("family", "address", "pk"),
+                "verbose_name": "IP address",
+                "verbose_name_plural": "IP addresses",
+            },
         ),
         migrations.AlterModelOptions(
-            name='prefix',
-            options={'ordering': (django.db.models.expressions.OrderBy(django.db.models.expressions.F('vrf'), nulls_first=True), 'family', 'prefix', 'pk'), 'verbose_name_plural': 'prefixes'},
+            name="prefix",
+            options={
+                "ordering": (
+                    django.db.models.expressions.OrderBy(
+                        django.db.models.expressions.F("vrf"), nulls_first=True
+                    ),
+                    "family",
+                    "prefix",
+                    "pk",
+                ),
+                "verbose_name_plural": "prefixes",
+            },
         ),
         migrations.AlterModelOptions(
-            name='service',
-            options={'ordering': ('protocol', 'port', 'pk')},
+            name="service",
+            options={"ordering": ("protocol", "port", "pk")},
         ),
         migrations.AlterModelOptions(
-            name='vlan',
-            options={'ordering': ('site', 'group', 'vid', 'pk'), 'verbose_name': 'VLAN', 'verbose_name_plural': 'VLANs'},
+            name="vlan",
+            options={
+                "ordering": ("site", "group", "vid", "pk"),
+                "verbose_name": "VLAN",
+                "verbose_name_plural": "VLANs",
+            },
         ),
         migrations.AlterModelOptions(
-            name='vlangroup',
-            options={'ordering': ('site', 'name', 'pk'), 'verbose_name': 'VLAN group', 'verbose_name_plural': 'VLAN groups'},
+            name="vlangroup",
+            options={
+                "ordering": ("site", "name", "pk"),
+                "verbose_name": "VLAN group",
+                "verbose_name_plural": "VLAN groups",
+            },
         ),
         migrations.AlterModelOptions(
-            name='vrf',
-            options={'ordering': ('name', 'rd', 'pk'), 'verbose_name': 'VRF', 'verbose_name_plural': 'VRFs'},
+            name="vrf",
+            options={
+                "ordering": ("name", "rd", "pk"),
+                "verbose_name": "VRF",
+                "verbose_name_plural": "VRFs",
+            },
         ),
     ]

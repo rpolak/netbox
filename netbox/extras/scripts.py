@@ -19,27 +19,31 @@ from extras.api.serializers import ScriptOutputSerializer
 from extras.choices import JobResultStatusChoices, LogLevelChoices
 from extras.models import JobResult
 from ipam.formfields import IPAddressFormField, IPNetworkFormField
-from ipam.validators import MaxPrefixLengthValidator, MinPrefixLengthValidator, prefix_validator
+from ipam.validators import (
+    MaxPrefixLengthValidator,
+    MinPrefixLengthValidator,
+    prefix_validator,
+)
 from utilities.exceptions import AbortTransaction
 from utilities.forms import DynamicModelChoiceField, DynamicModelMultipleChoiceField
 from .context_managers import change_logging
 from .forms import ScriptForm
 
 __all__ = [
-    'BaseScript',
-    'BooleanVar',
-    'ChoiceVar',
-    'FileVar',
-    'IntegerVar',
-    'IPAddressVar',
-    'IPAddressWithMaskVar',
-    'IPNetworkVar',
-    'MultiChoiceVar',
-    'MultiObjectVar',
-    'ObjectVar',
-    'Script',
-    'StringVar',
-    'TextVar',
+    "BaseScript",
+    "BooleanVar",
+    "ChoiceVar",
+    "FileVar",
+    "IntegerVar",
+    "IPAddressVar",
+    "IPAddressWithMaskVar",
+    "IPNetworkVar",
+    "MultiChoiceVar",
+    "MultiObjectVar",
+    "ObjectVar",
+    "Script",
+    "StringVar",
+    "TextVar",
 ]
 
 
@@ -47,26 +51,30 @@ __all__ = [
 # Script variables
 #
 
+
 class ScriptVariable:
     """
     Base model for script variables
     """
+
     form_field = forms.CharField
 
-    def __init__(self, label='', description='', default=None, required=True, widget=None):
+    def __init__(
+        self, label="", description="", default=None, required=True, widget=None
+    ):
 
         # Initialize field attributes
-        if not hasattr(self, 'field_attrs'):
+        if not hasattr(self, "field_attrs"):
             self.field_attrs = {}
         if label:
-            self.field_attrs['label'] = label
+            self.field_attrs["label"] = label
         if description:
-            self.field_attrs['help_text'] = description
+            self.field_attrs["help_text"] = description
         if default:
-            self.field_attrs['initial'] = default
+            self.field_attrs["initial"] = default
         if widget:
-            self.field_attrs['widget'] = widget
-        self.field_attrs['required'] = required
+            self.field_attrs["widget"] = widget
+        self.field_attrs["required"] = required
 
     def as_field(self):
         """
@@ -74,10 +82,10 @@ class ScriptVariable:
         """
         form_field = self.form_field(**self.field_attrs)
         if not isinstance(form_field.widget, forms.CheckboxInput):
-            if form_field.widget.attrs and 'class' in form_field.widget.attrs.keys():
-                form_field.widget.attrs['class'] += ' form-control'
+            if form_field.widget.attrs and "class" in form_field.widget.attrs.keys():
+                form_field.widget.attrs["class"] += " form-control"
             else:
-                form_field.widget.attrs['class'] = 'form-control'
+                form_field.widget.attrs["class"] = "form-control"
 
         return form_field
 
@@ -86,22 +94,23 @@ class StringVar(ScriptVariable):
     """
     Character string representation. Can enforce minimum/maximum length and/or regex validation.
     """
+
     def __init__(self, min_length=None, max_length=None, regex=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # Optional minimum/maximum lengths
         if min_length:
-            self.field_attrs['min_length'] = min_length
+            self.field_attrs["min_length"] = min_length
         if max_length:
-            self.field_attrs['max_length'] = max_length
+            self.field_attrs["max_length"] = max_length
 
         # Optional regular expression validation
         if regex:
-            self.field_attrs['validators'] = [
+            self.field_attrs["validators"] = [
                 RegexValidator(
                     regex=regex,
-                    message='Invalid value. Must match regex: {}'.format(regex),
-                    code='invalid'
+                    message="Invalid value. Must match regex: {}".format(regex),
+                    code="invalid",
                 )
             ]
 
@@ -110,18 +119,20 @@ class TextVar(ScriptVariable):
     """
     Free-form text data. Renders as a <textarea>.
     """
+
     form_field = forms.CharField
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.field_attrs['widget'] = forms.Textarea
+        self.field_attrs["widget"] = forms.Textarea
 
 
 class IntegerVar(ScriptVariable):
     """
     Integer representation. Can enforce minimum/maximum values.
     """
+
     form_field = forms.IntegerField
 
     def __init__(self, min_value=None, max_value=None, *args, **kwargs):
@@ -129,22 +140,23 @@ class IntegerVar(ScriptVariable):
 
         # Optional minimum/maximum values
         if min_value:
-            self.field_attrs['min_value'] = min_value
+            self.field_attrs["min_value"] = min_value
         if max_value:
-            self.field_attrs['max_value'] = max_value
+            self.field_attrs["max_value"] = max_value
 
 
 class BooleanVar(ScriptVariable):
     """
     Boolean representation (true/false). Renders as a checkbox.
     """
+
     form_field = forms.BooleanField
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # Boolean fields cannot be required
-        self.field_attrs['required'] = False
+        self.field_attrs["required"] = False
 
 
 class ChoiceVar(ScriptVariable):
@@ -159,19 +171,21 @@ class ChoiceVar(ScriptVariable):
             )
         )
     """
+
     form_field = forms.ChoiceField
 
     def __init__(self, choices, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # Set field choices
-        self.field_attrs['choices'] = choices
+        self.field_attrs["choices"] = choices
 
 
 class MultiChoiceVar(ChoiceVar):
     """
     Like ChoiceVar, but allows for the selection of multiple choices.
     """
+
     form_field = forms.MultipleChoiceField
 
 
@@ -184,34 +198,46 @@ class ObjectVar(ScriptVariable):
     :param query_params: A dictionary of additional query parameters to attach when making REST API requests (optional)
     :param null_option: The label to use as a "null" selection option (optional)
     """
+
     form_field = DynamicModelChoiceField
 
-    def __init__(self, model=None, queryset=None, display_field='name', query_params=None, null_option=None, *args,
-                 **kwargs):
+    def __init__(
+        self,
+        model=None,
+        queryset=None,
+        display_field="name",
+        query_params=None,
+        null_option=None,
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
 
         # Set the form field's queryset. Support backward compatibility for the "queryset" argument for now.
         if model is not None:
-            self.field_attrs['queryset'] = model.objects.all()
+            self.field_attrs["queryset"] = model.objects.all()
         elif queryset is not None:
             warnings.warn(
                 f'{self}: Specifying a queryset for ObjectVar is no longer supported. Please use "model" instead.'
             )
-            self.field_attrs['queryset'] = queryset
+            self.field_attrs["queryset"] = queryset
         else:
-            raise TypeError('ObjectVar must specify a model')
+            raise TypeError("ObjectVar must specify a model")
 
-        self.field_attrs.update({
-            'display_field': display_field,
-            'query_params': query_params,
-            'null_option': null_option,
-        })
+        self.field_attrs.update(
+            {
+                "display_field": display_field,
+                "query_params": query_params,
+                "null_option": null_option,
+            }
+        )
 
 
 class MultiObjectVar(ObjectVar):
     """
     Like ObjectVar, but can represent one or more objects.
     """
+
     form_field = DynamicModelMultipleChoiceField
 
 
@@ -219,6 +245,7 @@ class FileVar(ScriptVariable):
     """
     An uploaded file.
     """
+
     form_field = forms.FileField
 
 
@@ -226,6 +253,7 @@ class IPAddressVar(ScriptVariable):
     """
     An IPv4 or IPv6 address without a mask.
     """
+
     form_field = IPAddressFormField
 
 
@@ -233,6 +261,7 @@ class IPAddressWithMaskVar(ScriptVariable):
     """
     An IPv4 or IPv6 address with a mask.
     """
+
     form_field = IPNetworkFormField
 
 
@@ -240,19 +269,20 @@ class IPNetworkVar(ScriptVariable):
     """
     An IPv4 or IPv6 prefix.
     """
+
     form_field = IPNetworkFormField
 
     def __init__(self, min_prefix_length=None, max_prefix_length=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # Set prefix validator and optional minimum/maximum prefix lengths
-        self.field_attrs['validators'] = [prefix_validator]
+        self.field_attrs["validators"] = [prefix_validator]
         if min_prefix_length is not None:
-            self.field_attrs['validators'].append(
+            self.field_attrs["validators"].append(
                 MinPrefixLengthValidator(min_prefix_length)
             )
         if max_prefix_length is not None:
-            self.field_attrs['validators'].append(
+            self.field_attrs["validators"].append(
                 MaxPrefixLengthValidator(max_prefix_length)
             )
 
@@ -261,18 +291,22 @@ class IPNetworkVar(ScriptVariable):
 # Scripts
 #
 
+
 class BaseScript:
     """
     Base model for custom scripts. User classes should inherit from this model if they want to extend Script
     functionality for use in other subclasses.
     """
+
     class Meta:
         pass
 
     def __init__(self):
 
         # Initiate the log
-        self.logger = logging.getLogger(f"netbox.scripts.{self.module()}.{self.__class__.__name__}")
+        self.logger = logging.getLogger(
+            f"netbox.scripts.{self.module()}.{self.__class__.__name__}"
+        )
         self.log = []
 
         # Declare the placeholder for the current request
@@ -287,15 +321,15 @@ class BaseScript:
 
     @classproperty
     def name(self):
-        return getattr(self.Meta, 'name', self.__class__.__name__)
+        return getattr(self.Meta, "name", self.__class__.__name__)
 
     @classproperty
     def full_name(self):
-        return '.'.join([self.__module__, self.__name__])
+        return ".".join([self.__module__, self.__name__])
 
     @classproperty
     def description(self):
-        return getattr(self.Meta, 'description', '')
+        return getattr(self.Meta, "description", "")
 
     @classmethod
     def module(cls):
@@ -318,15 +352,13 @@ class BaseScript:
         Return a Django form suitable for populating the context data required to run this Script.
         """
         # Create a dynamic ScriptForm subclass from script variables
-        fields = {
-            name: var.as_field() for name, var in self._get_vars().items()
-        }
-        FormClass = type('ScriptForm', (ScriptForm,), fields)
+        fields = {name: var.as_field() for name, var in self._get_vars().items()}
+        FormClass = type("ScriptForm", (ScriptForm,), fields)
 
         form = FormClass(data, files, initial=initial)
 
         # Set initial "commit" checkbox state based on the script's Meta parameter
-        form.fields['_commit'].initial = getattr(self.Meta, 'commit_default', True)
+        form.fields["_commit"].initial = getattr(self.Meta, "commit_default", True)
 
         return form
 
@@ -359,7 +391,7 @@ class BaseScript:
         Return data from a YAML file
         """
         file_path = os.path.join(settings.SCRIPTS_ROOT, filename)
-        with open(file_path, 'r') as datafile:
+        with open(file_path, "r") as datafile:
             data = yaml.load(datafile)
 
         return data
@@ -369,7 +401,7 @@ class BaseScript:
         Return data from a JSON file
         """
         file_path = os.path.join(settings.SCRIPTS_ROOT, filename)
-        with open(file_path, 'r') as datafile:
+        with open(file_path, "r") as datafile:
             data = json.load(datafile)
 
         return data
@@ -379,12 +411,14 @@ class Script(BaseScript):
     """
     Classes which inherit this model will appear in the list of available scripts.
     """
+
     pass
 
 
 #
 # Functions
 #
+
 
 def is_script(obj):
     """
@@ -403,14 +437,14 @@ def is_variable(obj):
     return isinstance(obj, ScriptVariable)
 
 
-@job('default')
+@job("default")
 def run_script(data, request, commit=True, *args, **kwargs):
     """
     A wrapper for calling Script.run(). This performs error handling and provides a hook for committing changes. It
     exists outside of the Script class to ensure it cannot be overridden by a script author.
     """
-    job_result = kwargs.pop('job_result')
-    module, script_name = job_result.name.split('.', 1)
+    job_result = kwargs.pop("job_result")
+    module, script_name = job_result.name.split(".", 1)
 
     script = get_script(module, script_name)()
 
@@ -430,11 +464,9 @@ def run_script(data, request, commit=True, *args, **kwargs):
 
     # TODO: Drop backward-compatibility for absent 'commit' argument in v2.10
     # Determine whether the script accepts a 'commit' argument (this was introduced in v2.7.8)
-    kwargs = {
-        'data': data
-    }
-    if 'commit' in inspect.signature(script.run).parameters:
-        kwargs['commit'] = commit
+    kwargs = {"data": data}
+    if "commit" in inspect.signature(script.run).parameters:
+        kwargs["commit"] = commit
     else:
         warnings.warn(
             f"The run() method of script {script} should support a 'commit' argument. This will be required beginning "
@@ -484,10 +516,8 @@ def run_script(data, request, commit=True, *args, **kwargs):
     JobResult.objects.filter(
         obj_type=job_result.obj_type,
         name=job_result.name,
-        status__in=JobResultStatusChoices.TERMINAL_STATE_CHOICES
-    ).exclude(
-        pk=job_result.pk
-    ).delete()
+        status__in=JobResultStatusChoices.TERMINAL_STATE_CHOICES,
+    ).exclude(pk=job_result.pk).delete()
 
 
 def get_scripts(use_names=False):
@@ -501,7 +531,7 @@ def get_scripts(use_names=False):
     # defined.
     for importer, module_name, _ in pkgutil.iter_modules([settings.SCRIPTS_ROOT]):
         module = importer.find_module(module_name).load_module(module_name)
-        if use_names and hasattr(module, 'name'):
+        if use_names and hasattr(module, "name"):
             module_name = module.name
         module_scripts = OrderedDict()
         for name, cls in inspect.getmembers(module, is_script):

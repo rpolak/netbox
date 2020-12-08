@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcim', '0044_virtualization'),
+        ("dcim", "0044_virtualization"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='devicerole',
-            name='vm_role',
-            field=models.BooleanField(default=True, help_text='Virtual machines may be assigned to this role', verbose_name='VM Role'),
+            model_name="devicerole",
+            name="vm_role",
+            field=models.BooleanField(
+                default=True,
+                help_text="Virtual machines may be assigned to this role",
+                verbose_name="VM Role",
+            ),
         ),
     ]

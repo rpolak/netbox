@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcim', '0019_new_iface_form_factors'),
+        ("dcim", "0019_new_iface_form_factors"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='rack',
-            name='desc_units',
-            field=models.BooleanField(default=False, help_text=b'Units are numbered top-to-bottom', verbose_name=b'Descending units'),
+            model_name="rack",
+            name="desc_units",
+            field=models.BooleanField(
+                default=False,
+                help_text=b"Units are numbered top-to-bottom",
+                verbose_name=b"Descending units",
+            ),
         ),
     ]

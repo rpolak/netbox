@@ -8,25 +8,46 @@ import extras.utils
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('contenttypes', '0002_remove_content_type_name'),
-        ('extras', '0005_useraction_add_bulk_create'),
+        ("contenttypes", "0002_remove_content_type_name"),
+        ("extras", "0005_useraction_add_bulk_create"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ImageAttachment',
+            name="ImageAttachment",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('object_id', models.PositiveIntegerField()),
-                ('image', models.ImageField(height_field=b'image_height', upload_to=extras.utils.image_upload, width_field=b'image_width')),
-                ('image_height', models.PositiveSmallIntegerField()),
-                ('image_width', models.PositiveSmallIntegerField()),
-                ('name', models.CharField(blank=True, max_length=50)),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('content_type', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='contenttypes.ContentType')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("object_id", models.PositiveIntegerField()),
+                (
+                    "image",
+                    models.ImageField(
+                        height_field=b"image_height",
+                        upload_to=extras.utils.image_upload,
+                        width_field=b"image_width",
+                    ),
+                ),
+                ("image_height", models.PositiveSmallIntegerField()),
+                ("image_width", models.PositiveSmallIntegerField()),
+                ("name", models.CharField(blank=True, max_length=50)),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                (
+                    "content_type",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="contenttypes.ContentType",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['name'],
+                "ordering": ["name"],
             },
         ),
     ]

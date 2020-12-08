@@ -6,18 +6,20 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcim', '0038_wireless_interfaces'),
+        ("dcim", "0038_wireless_interfaces"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='interface',
-            name='enabled',
+            model_name="interface",
+            name="enabled",
             field=models.BooleanField(default=True),
         ),
         migrations.AddField(
-            model_name='interface',
-            name='mtu',
-            field=models.PositiveSmallIntegerField(blank=True, null=True, verbose_name='MTU'),
+            model_name="interface",
+            name="mtu",
+            field=models.PositiveSmallIntegerField(
+                blank=True, null=True, verbose_name="MTU"
+            ),
         ),
     ]

@@ -7,20 +7,20 @@ def set_template_language(apps, schema_editor):
     """
     Set the language for all existing ExportTemplates to Django (Jinja2 is the default for new ExportTemplates).
     """
-    ExportTemplate = apps.get_model('extras', 'ExportTemplate')
+    ExportTemplate = apps.get_model("extras", "ExportTemplate")
     ExportTemplate.objects.update(template_language=10)
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('extras', '0017_exporttemplate_mime_type_length'),
+        ("extras", "0017_exporttemplate_mime_type_length"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='exporttemplate',
-            name='template_language',
+            model_name="exporttemplate",
+            name="template_language",
             field=models.PositiveSmallIntegerField(default=20),
         ),
         migrations.RunPython(set_template_language),

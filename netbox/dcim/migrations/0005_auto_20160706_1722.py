@@ -7,18 +7,25 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcim', '0004_auto_20160701_2049'),
+        ("dcim", "0004_auto_20160701_2049"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='interface',
-            name='mac_address',
-            field=dcim.fields.MACAddressField(blank=True, null=True, verbose_name=b'MAC Address'),
+            model_name="interface",
+            name="mac_address",
+            field=dcim.fields.MACAddressField(
+                blank=True, null=True, verbose_name=b"MAC Address"
+            ),
         ),
         migrations.AlterField(
-            model_name='devicetype',
-            name='subdevice_role',
-            field=models.NullBooleanField(choices=[(None, b'None'), (True, b'Parent'), (False, b'Child')], default=None, help_text=b'Parent devices house child devices in device bays. Select "None" if this device type is neither a parent nor a child.', verbose_name=b'Parent/child status'),
+            model_name="devicetype",
+            name="subdevice_role",
+            field=models.NullBooleanField(
+                choices=[(None, b"None"), (True, b"Parent"), (False, b"Child")],
+                default=None,
+                help_text=b'Parent devices house child devices in device bays. Select "None" if this device type is neither a parent nor a child.',
+                verbose_name=b"Parent/child status",
+            ),
         ),
     ]

@@ -6,28 +6,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcim', '0076_console_port_types'),
+        ("dcim", "0076_console_port_types"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='poweroutlet',
-            name='type',
+            model_name="poweroutlet",
+            name="type",
             field=models.CharField(blank=True, max_length=50),
         ),
         migrations.AddField(
-            model_name='poweroutlettemplate',
-            name='type',
+            model_name="poweroutlettemplate",
+            name="type",
             field=models.CharField(blank=True, max_length=50),
         ),
         migrations.AddField(
-            model_name='powerport',
-            name='type',
+            model_name="powerport",
+            name="type",
             field=models.CharField(blank=True, max_length=50),
         ),
         migrations.AddField(
-            model_name='powerporttemplate',
-            name='type',
+            model_name="powerporttemplate",
+            name="type",
             field=models.CharField(blank=True, max_length=50),
         ),
     ]

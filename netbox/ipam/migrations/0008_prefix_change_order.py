@@ -6,12 +6,15 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ipam', '0007_prefix_ipaddress_add_tenant'),
+        ("ipam", "0007_prefix_ipaddress_add_tenant"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='prefix',
-            options={'ordering': ['vrf', 'family', 'prefix'], 'verbose_name_plural': 'prefixes'},
+            name="prefix",
+            options={
+                "ordering": ["vrf", "family", "prefix"],
+                "verbose_name_plural": "prefixes",
+            },
         ),
     ]

@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcim', '0063_device_local_context_data'),
+        ("dcim", "0063_device_local_context_data"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='platform',
-            name='rpc_client',
+            model_name="platform",
+            name="rpc_client",
         ),
     ]

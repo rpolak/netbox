@@ -7,17 +7,21 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcim', '0054_site_status_timezone_description'),
+        ("dcim", "0054_site_status_timezone_description"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='virtualchassis',
-            options={'ordering': ['master'], 'verbose_name_plural': 'virtual chassis'},
+            name="virtualchassis",
+            options={"ordering": ["master"], "verbose_name_plural": "virtual chassis"},
         ),
         migrations.AlterField(
-            model_name='virtualchassis',
-            name='master',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, related_name='vc_master_for', to='dcim.Device'),
+            model_name="virtualchassis",
+            name="master",
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="vc_master_for",
+                to="dcim.Device",
+            ),
         ),
     ]

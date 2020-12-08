@@ -6,48 +6,48 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcim', '0110_virtualchassis_name'),
+        ("dcim", "0110_virtualchassis_name"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='consoleporttemplate',
-            name='description',
+            model_name="consoleporttemplate",
+            name="description",
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AddField(
-            model_name='consoleserverporttemplate',
-            name='description',
+            model_name="consoleserverporttemplate",
+            name="description",
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AddField(
-            model_name='devicebaytemplate',
-            name='description',
+            model_name="devicebaytemplate",
+            name="description",
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AddField(
-            model_name='frontporttemplate',
-            name='description',
+            model_name="frontporttemplate",
+            name="description",
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AddField(
-            model_name='interfacetemplate',
-            name='description',
+            model_name="interfacetemplate",
+            name="description",
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AddField(
-            model_name='poweroutlettemplate',
-            name='description',
+            model_name="poweroutlettemplate",
+            name="description",
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AddField(
-            model_name='powerporttemplate',
-            name='description',
+            model_name="powerporttemplate",
+            name="description",
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AddField(
-            model_name='rearporttemplate',
-            name='description',
+            model_name="rearporttemplate",
+            name="description",
             field=models.CharField(blank=True, max_length=200),
         ),
     ]

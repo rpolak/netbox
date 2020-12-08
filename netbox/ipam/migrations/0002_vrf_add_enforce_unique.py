@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ipam', '0001_initial'),
+        ("ipam", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='vrf',
-            name='enforce_unique',
-            field=models.BooleanField(default=True, help_text=b'Prevent duplicate prefixes/IP addresses within this VRF', verbose_name=b'Enforce unique space'),
+            model_name="vrf",
+            name="enforce_unique",
+            field=models.BooleanField(
+                default=True,
+                help_text=b"Prevent duplicate prefixes/IP addresses within this VRF",
+                verbose_name=b"Enforce unique space",
+            ),
         ),
     ]

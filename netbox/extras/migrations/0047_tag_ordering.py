@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('extras', '0046_update_jsonfield'),
+        ("extras", "0046_update_jsonfield"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='tag',
-            options={'ordering': ['name']},
+            name="tag",
+            options={"ordering": ["name"]},
         ),
     ]

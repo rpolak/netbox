@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcim', '0113_nullbooleanfield_to_booleanfield'),
+        ("dcim", "0113_nullbooleanfield_to_booleanfield"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='device',
-            name='local_context_data',
+            model_name="device",
+            name="local_context_data",
             field=models.JSONField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='platform',
-            name='napalm_args',
+            model_name="platform",
+            name="napalm_args",
             field=models.JSONField(blank=True, null=True),
         ),
     ]

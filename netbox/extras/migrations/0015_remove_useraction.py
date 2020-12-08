@@ -6,19 +6,19 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('extras', '0014_configcontexts'),
+        ("extras", "0014_configcontexts"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='useraction',
-            name='content_type',
+            model_name="useraction",
+            name="content_type",
         ),
         migrations.RemoveField(
-            model_name='useraction',
-            name='user',
+            model_name="useraction",
+            name="user",
         ),
         migrations.DeleteModel(
-            name='UserAction',
+            name="UserAction",
         ),
     ]

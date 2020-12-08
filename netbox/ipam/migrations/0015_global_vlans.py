@@ -7,18 +7,30 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ipam', '0014_ipaddress_status_add_deprecated'),
+        ("ipam", "0014_ipaddress_status_add_deprecated"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='vlan',
-            name='site',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='vlans', to='dcim.Site'),
+            model_name="vlan",
+            name="site",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="vlans",
+                to="dcim.Site",
+            ),
         ),
         migrations.AlterField(
-            model_name='vlangroup',
-            name='site',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='vlan_groups', to='dcim.Site'),
+            model_name="vlangroup",
+            name="site",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="vlan_groups",
+                to="dcim.Site",
+            ),
         ),
     ]

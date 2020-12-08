@@ -3,7 +3,6 @@ from django.core.paginator import Paginator, Page
 
 
 class EnhancedPaginator(Paginator):
-
     def __init__(self, object_list, per_page, **kwargs):
         try:
             per_page = int(per_page)
@@ -19,7 +18,6 @@ class EnhancedPaginator(Paginator):
 
 
 class EnhancedPage(Page):
-
     def smart_pages(self):
 
         # When dealing with five or fewer pages, simply return the whole list.
@@ -32,7 +30,9 @@ class EnhancedPage(Page):
         page_list = sorted(set(self.paginator.page_range).intersection(pages_wanted))
 
         # Insert skip markers
-        skip_pages = [x[1] for x in zip(page_list[:-1], page_list[1:]) if (x[1] - x[0] != 1)]
+        skip_pages = [
+            x[1] for x in zip(page_list[:-1], page_list[1:]) if (x[1] - x[0] != 1)
+        ]
         for i in skip_pages:
             page_list.insert(page_list.index(i), False)
 
@@ -47,15 +47,15 @@ def get_paginate_count(request):
         2. Saved user preference
         3. PAGINATE_COUNT global setting.
     """
-    if 'per_page' in request.GET:
+    if "per_page" in request.GET:
         try:
-            per_page = int(request.GET.get('per_page'))
+            per_page = int(request.GET.get("per_page"))
             if request.user.is_authenticated:
-                request.user.config.set('pagination.per_page', per_page, commit=True)
+                request.user.config.set("pagination.per_page", per_page, commit=True)
             return per_page
         except ValueError:
             pass
 
     if request.user.is_authenticated:
-        return request.user.config.get('pagination.per_page', settings.PAGINATE_COUNT)
+        return request.user.config.get("pagination.per_page", settings.PAGINATE_COUNT)
     return settings.PAGINATE_COUNT

@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('virtualization', '0013_deterministic_ordering'),
+        ("virtualization", "0013_deterministic_ordering"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='clustergroup',
-            name='description',
+            model_name="clustergroup",
+            name="description",
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AddField(
-            model_name='clustertype',
-            name='description',
+            model_name="clustertype",
+            name="description",
             field=models.CharField(blank=True, max_length=200),
         ),
     ]

@@ -10,7 +10,13 @@ from extras.models import Graph
 from utilities.api import ModelViewSet
 from utilities.utils import get_subquery
 from virtualization import filters
-from virtualization.models import Cluster, ClusterGroup, ClusterType, VirtualMachine, VMInterface
+from virtualization.models import (
+    Cluster,
+    ClusterGroup,
+    ClusterType,
+    VirtualMachine,
+    VMInterface,
+)
 from . import serializers
 
 
@@ -18,25 +24,25 @@ class VirtualizationRootView(APIRootView):
     """
     Virtualization API root view
     """
+
     def get_view_name(self):
-        return 'Virtualization'
+        return "Virtualization"
 
 
 #
 # Clusters
 #
 
+
 class ClusterTypeViewSet(ModelViewSet):
-    queryset = ClusterType.objects.annotate(
-        cluster_count=get_subquery(Cluster, 'type')
-    )
+    queryset = ClusterType.objects.annotate(cluster_count=get_subquery(Cluster, "type"))
     serializer_class = serializers.ClusterTypeSerializer
     filterset_class = filters.ClusterTypeFilterSet
 
 
 class ClusterGroupViewSet(ModelViewSet):
     queryset = ClusterGroup.objects.annotate(
-        cluster_count=get_subquery(Cluster, 'group')
+        cluster_count=get_subquery(Cluster, "group")
     )
     serializer_class = serializers.ClusterGroupSerializer
     filterset_class = filters.ClusterGroupFilterSet
@@ -44,10 +50,10 @@ class ClusterGroupViewSet(ModelViewSet):
 
 class ClusterViewSet(CustomFieldModelViewSet):
     queryset = Cluster.objects.prefetch_related(
-        'type', 'group', 'tenant', 'site', 'tags'
+        "type", "group", "tenant", "site", "tags"
     ).annotate(
-        device_count=get_subquery(Device, 'cluster'),
-        virtualmachine_count=get_subquery(VirtualMachine, 'cluster')
+        device_count=get_subquery(Device, "cluster"),
+        virtualmachine_count=get_subquery(VirtualMachine, "cluster"),
     )
     serializer_class = serializers.ClusterSerializer
     filterset_class = filters.ClusterFilterSet
@@ -57,9 +63,16 @@ class ClusterViewSet(CustomFieldModelViewSet):
 # Virtual machines
 #
 
+
 class VirtualMachineViewSet(CustomFieldModelViewSet, ConfigContextQuerySetMixin):
     queryset = VirtualMachine.objects.prefetch_related(
-        'cluster__site', 'role', 'tenant', 'platform', 'primary_ip4', 'primary_ip6', 'tags'
+        "cluster__site",
+        "role",
+        "tenant",
+        "platform",
+        "primary_ip4",
+        "primary_ip6",
+        "tags",
     )
     filterset_class = filters.VirtualMachineFilterSet
 
@@ -74,11 +87,11 @@ class VirtualMachineViewSet(CustomFieldModelViewSet, ConfigContextQuerySetMixin)
         Else, return the VirtualMachineWithConfigContextSerializer
         """
 
-        request = self.get_serializer_context()['request']
-        if request.query_params.get('brief', False):
+        request = self.get_serializer_context()["request"]
+        if request.query_params.get("brief", False):
             return serializers.NestedVirtualMachineSerializer
 
-        elif 'config_context' in request.query_params.get('exclude', []):
+        elif "config_context" in request.query_params.get("exclude", []):
             return serializers.VirtualMachineSerializer
 
         return serializers.VirtualMachineWithConfigContextSerializer
@@ -86,7 +99,7 @@ class VirtualMachineViewSet(CustomFieldModelViewSet, ConfigContextQuerySetMixin)
 
 class VMInterfaceViewSet(ModelViewSet):
     queryset = VMInterface.objects.prefetch_related(
-        'virtual_machine', 'tags', 'tagged_vlans'
+        "virtual_machine", "tags", "tagged_vlans"
     )
     serializer_class = serializers.VMInterfaceSerializer
     filterset_class = filters.VMInterfaceFilterSet
@@ -97,6 +110,10 @@ class VMInterfaceViewSet(ModelViewSet):
         A convenience method for rendering graphs for a particular VM interface.
         """
         vminterface = get_object_or_404(self.queryset, pk=pk)
-        queryset = Graph.objects.restrict(request.user).filter(type__model='vminterface')
-        serializer = RenderedGraphSerializer(queryset, many=True, context={'graphed_object': vminterface})
+        queryset = Graph.objects.restrict(request.user).filter(
+            type__model="vminterface"
+        )
+        serializer = RenderedGraphSerializer(
+            queryset, many=True, context={"graphed_object": vminterface}
+        )
         return Response(serializer.data)

@@ -6,18 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcim', '0058_relax_rack_naming_constraints'),
+        ("dcim", "0058_relax_rack_naming_constraints"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='site',
-            name='latitude',
-            field=models.DecimalField(blank=True, decimal_places=6, max_digits=8, null=True),
+            model_name="site",
+            name="latitude",
+            field=models.DecimalField(
+                blank=True, decimal_places=6, max_digits=8, null=True
+            ),
         ),
         migrations.AddField(
-            model_name='site',
-            name='longitude',
-            field=models.DecimalField(blank=True, decimal_places=6, max_digits=9, null=True),
+            model_name="site",
+            name="longitude",
+            field=models.DecimalField(
+                blank=True, decimal_places=6, max_digits=9, null=True
+            ),
         ),
     ]

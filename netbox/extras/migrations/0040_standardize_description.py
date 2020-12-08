@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('extras', '0039_update_features_content_types'),
+        ("extras", "0039_update_features_content_types"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='configcontext',
-            name='description',
+            model_name="configcontext",
+            name="description",
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name='customfield',
-            name='description',
+            model_name="customfield",
+            name="description",
             field=models.CharField(blank=True, max_length=200),
         ),
     ]

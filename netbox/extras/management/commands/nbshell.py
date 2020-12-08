@@ -9,7 +9,16 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.management.base import BaseCommand
 
-APPS = ['circuits', 'dcim', 'extras', 'ipam', 'secrets', 'tenancy', 'users', 'virtualization']
+APPS = [
+    "circuits",
+    "dcim",
+    "extras",
+    "ipam",
+    "secrets",
+    "tenancy",
+    "users",
+    "virtualization",
+]
 
 BANNER_TEXT = """### NetBox interactive shell ({node})
 ### Python {python} | Django {django} | NetBox {netbox}
@@ -17,7 +26,7 @@ BANNER_TEXT = """### NetBox interactive shell ({node})
     node=platform.node(),
     python=platform.python_version(),
     django=get_version(),
-    netbox=settings.VERSION
+    netbox=settings.VERSION,
 )
 
 
@@ -28,9 +37,9 @@ class Command(BaseCommand):
     def _lsmodels(self):
         for app, models in self.django_models.items():
             app_name = apps.get_app_config(app).verbose_name
-            print('{}:'.format(app_name))
+            print("{}:".format(app_name))
             for m in models:
-                print('  {}'.format(m))
+                print("  {}".format(m))
 
     def get_namespace(self):
         namespace = {}
@@ -46,20 +55,22 @@ class Command(BaseCommand):
 
             # Constants
             try:
-                app_constants = sys.modules['{}.constants'.format(app)]
+                app_constants = sys.modules["{}.constants".format(app)]
                 for name in dir(app_constants):
                     namespace[name] = getattr(app_constants, name)
             except KeyError:
                 pass
 
         # Additional objects to include
-        namespace['ContentType'] = ContentType
-        namespace['User'] = User
+        namespace["ContentType"] = ContentType
+        namespace["User"] = User
 
         # Load convenience commands
-        namespace.update({
-            'lsmodels': self._lsmodels,
-        })
+        namespace.update(
+            {
+                "lsmodels": self._lsmodels,
+            }
+        )
 
         return namespace
 

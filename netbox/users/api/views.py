@@ -13,22 +13,30 @@ class UsersRootView(APIRootView):
     """
     Users API root view
     """
+
     def get_view_name(self):
-        return 'Users'
+        return "Users"
 
 
 #
 # Users and groups
 #
 
+
 class UserViewSet(ModelViewSet):
-    queryset = RestrictedQuerySet(model=User).prefetch_related('groups').order_by('username')
+    queryset = (
+        RestrictedQuerySet(model=User).prefetch_related("groups").order_by("username")
+    )
     serializer_class = serializers.UserSerializer
     filterset_class = filters.UserFilterSet
 
 
 class GroupViewSet(ModelViewSet):
-    queryset = RestrictedQuerySet(model=Group).annotate(user_count=Count('user')).order_by('name')
+    queryset = (
+        RestrictedQuerySet(model=Group)
+        .annotate(user_count=Count("user"))
+        .order_by("name")
+    )
     serializer_class = serializers.GroupSerializer
     filterset_class = filters.GroupFilterSet
 
@@ -37,7 +45,10 @@ class GroupViewSet(ModelViewSet):
 # ObjectPermissions
 #
 
+
 class ObjectPermissionViewSet(ModelViewSet):
-    queryset = ObjectPermission.objects.prefetch_related('object_types', 'groups', 'users')
+    queryset = ObjectPermission.objects.prefetch_related(
+        "object_types", "groups", "users"
+    )
     serializer_class = serializers.ObjectPermissionSerializer
     filterset_class = filters.ObjectPermissionFilterSet

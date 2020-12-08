@@ -6,23 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcim', '0099_powerfeed_negative_voltage'),
+        ("dcim", "0099_powerfeed_negative_voltage"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='region',
-            name='level',
+            model_name="region",
+            name="level",
             field=models.PositiveIntegerField(editable=False),
         ),
         migrations.AlterField(
-            model_name='region',
-            name='lft',
+            model_name="region",
+            name="lft",
             field=models.PositiveIntegerField(editable=False),
         ),
         migrations.AlterField(
-            model_name='region',
-            name='rght',
+            model_name="region",
+            name="rght",
             field=models.PositiveIntegerField(editable=False),
         ),
     ]

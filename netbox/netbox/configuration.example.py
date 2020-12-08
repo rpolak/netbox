@@ -13,45 +13,45 @@ ALLOWED_HOSTS = []
 # PostgreSQL database configuration. See the Django documentation for a complete list of available parameters:
 #   https://docs.djangoproject.com/en/stable/ref/settings/#databases
 DATABASE = {
-    'NAME': 'netbox',         # Database name
-    'USER': '',               # PostgreSQL username
-    'PASSWORD': '',           # PostgreSQL password
-    'HOST': 'localhost',      # Database server
-    'PORT': '',               # Database port (leave blank for default)
-    'CONN_MAX_AGE': 300,      # Max database connection age
+    "NAME": "netbox",  # Database name
+    "USER": "",  # PostgreSQL username
+    "PASSWORD": "",  # PostgreSQL password
+    "HOST": "localhost",  # Database server
+    "PORT": "",  # Database port (leave blank for default)
+    "CONN_MAX_AGE": 300,  # Max database connection age
 }
 
 # Redis database settings. Redis is used for caching and for queuing background tasks such as webhook events. A separate
 # configuration exists for each. Full connection details are required in both sections, and it is strongly recommended
 # to use two separate database IDs.
 REDIS = {
-    'tasks': {
-        'HOST': 'localhost',
-        'PORT': 6379,
+    "tasks": {
+        "HOST": "localhost",
+        "PORT": 6379,
         # Comment out `HOST` and `PORT` lines and uncomment the following if using Redis Sentinel
         # 'SENTINELS': [('mysentinel.redis.example.com', 6379)],
         # 'SENTINEL_SERVICE': 'netbox',
-        'PASSWORD': '',
-        'DATABASE': 0,
-        'SSL': False,
+        "PASSWORD": "",
+        "DATABASE": 0,
+        "SSL": False,
     },
-    'caching': {
-        'HOST': 'localhost',
-        'PORT': 6379,
+    "caching": {
+        "HOST": "localhost",
+        "PORT": 6379,
         # Comment out `HOST` and `PORT` lines and uncomment the following if using Redis Sentinel
         # 'SENTINELS': [('mysentinel.redis.example.com', 6379)],
         # 'SENTINEL_SERVICE': 'netbox',
-        'PASSWORD': '',
-        'DATABASE': 1,
-        'SSL': False,
-    }
+        "PASSWORD": "",
+        "DATABASE": 1,
+        "SSL": False,
+    },
 }
 
 # This key is used for secure generation of random numbers and strings. It must never be exposed outside of this file.
 # For optimal security, SECRET_KEY should be at least 50 characters in length and contain a mix of letters, numbers, and
 # symbols. NetBox will not run without this defined. For more information, see
 # https://docs.djangoproject.com/en/stable/ref/settings/#std:setting-SECRET_KEY
-SECRET_KEY = ''
+SECRET_KEY = ""
 
 
 #########################
@@ -68,20 +68,33 @@ ADMINS = [
 
 # URL schemes that are allowed within links in NetBox
 ALLOWED_URL_SCHEMES = (
-    'file', 'ftp', 'ftps', 'http', 'https', 'irc', 'mailto', 'sftp', 'ssh', 'tel', 'telnet', 'tftp', 'vnc', 'xmpp',
+    "file",
+    "ftp",
+    "ftps",
+    "http",
+    "https",
+    "irc",
+    "mailto",
+    "sftp",
+    "ssh",
+    "tel",
+    "telnet",
+    "tftp",
+    "vnc",
+    "xmpp",
 )
 
 # Optionally display a persistent banner at the top and/or bottom of every page. HTML is allowed. To display the same
 # content in both banners, define BANNER_TOP and set BANNER_BOTTOM = BANNER_TOP.
-BANNER_TOP = ''
-BANNER_BOTTOM = ''
+BANNER_TOP = ""
+BANNER_BOTTOM = ""
 
 # Text to include on the login page above the login form. HTML is allowed.
-BANNER_LOGIN = ''
+BANNER_LOGIN = ""
 
 # Base URL path if accessing NetBox within a directory. For example, if installed at http://example.com/netbox/, set:
 # BASE_PATH = 'netbox/'
-BASE_PATH = ''
+BASE_PATH = ""
 
 # Cache timeout in seconds. Set to 0 to dissable caching. Defaults to 900 (15 minutes)
 CACHE_TIMEOUT = 900
@@ -107,14 +120,14 @@ DEBUG = False
 
 # Email settings
 EMAIL = {
-    'SERVER': 'localhost',
-    'PORT': 25,
-    'USERNAME': '',
-    'PASSWORD': '',
-    'USE_SSL': False,
-    'USE_TLS': False,
-    'TIMEOUT': 10,  # seconds
-    'FROM_EMAIL': '',
+    "SERVER": "localhost",
+    "PORT": 25,
+    "USERNAME": "",
+    "PASSWORD": "",
+    "USE_SSL": False,
+    "USE_TLS": False,
+    "TIMEOUT": 10,  # seconds
+    "FROM_EMAIL": "",
 }
 
 # Enforcement of unique IP space can be toggled on a per-VRF basis. To enforce unique IP space within the global table
@@ -137,7 +150,7 @@ EXEMPT_VIEW_PERMISSIONS = [
 
 # IP addresses recognized as internal to the system. The debugging toolbar will be available only to clients accessing
 # NetBox from an internal IP.
-INTERNAL_IPS = ('127.0.0.1', '::1')
+INTERNAL_IPS = ("127.0.0.1", "::1")
 
 # Enable custom logging. Please see the Django documentation for detailed guidance on configuring custom logs:
 #   https://docs.djangoproject.com/en/stable/topics/logging/
@@ -177,8 +190,8 @@ MAX_PAGE_SIZE = 1000
 METRICS_ENABLED = False
 
 # Credentials that NetBox will uses to authenticate to devices when connecting via NAPALM.
-NAPALM_USERNAME = ''
-NAPALM_PASSWORD = ''
+NAPALM_USERNAME = ""
+NAPALM_PASSWORD = ""
 
 # NAPALM timeout (in seconds). (Default: 30)
 NAPALM_TIMEOUT = 30
@@ -212,8 +225,8 @@ RACK_ELEVATION_DEFAULT_UNIT_WIDTH = 220
 
 # Remote authentication support
 REMOTE_AUTH_ENABLED = False
-REMOTE_AUTH_BACKEND = 'netbox.authentication.RemoteUserBackend'
-REMOTE_AUTH_HEADER = 'HTTP_REMOTE_USER'
+REMOTE_AUTH_BACKEND = "netbox.authentication.RemoteUserBackend"
+REMOTE_AUTH_HEADER = "HTTP_REMOTE_USER"
 REMOTE_AUTH_AUTO_CREATE_USER = True
 REMOTE_AUTH_DEFAULT_GROUPS = []
 REMOTE_AUTH_DEFAULT_PERMISSIONS = {}
@@ -243,13 +256,13 @@ RQ_DEFAULT_TIMEOUT = 300
 SESSION_FILE_PATH = None
 
 # Time zone (default: UTC)
-TIME_ZONE = 'UTC'
+TIME_ZONE = "UTC"
 
 # Date/time formatting. See the following link for supported formats:
 # https://docs.djangoproject.com/en/stable/ref/templates/builtins/#date
-DATE_FORMAT = 'N j, Y'
-SHORT_DATE_FORMAT = 'Y-m-d'
-TIME_FORMAT = 'g:i a'
-SHORT_TIME_FORMAT = 'H:i:s'
-DATETIME_FORMAT = 'N j, Y g:i a'
-SHORT_DATETIME_FORMAT = 'Y-m-d H:i'
+DATE_FORMAT = "N j, Y"
+SHORT_DATE_FORMAT = "Y-m-d"
+TIME_FORMAT = "g:i a"
+SHORT_TIME_FORMAT = "H:i:s"
+DATETIME_FORMAT = "N j, Y g:i a"
+SHORT_DATETIME_FORMAT = "Y-m-d H:i"

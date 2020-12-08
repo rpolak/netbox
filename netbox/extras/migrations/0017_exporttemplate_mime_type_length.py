@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('extras', '0016_exporttemplate_add_cable'),
+        ("extras", "0016_exporttemplate_add_cable"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='exporttemplate',
-            name='mime_type',
+            model_name="exporttemplate",
+            name="mime_type",
             field=models.CharField(blank=True, max_length=50),
         ),
     ]

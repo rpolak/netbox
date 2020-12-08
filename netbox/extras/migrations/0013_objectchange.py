@@ -10,29 +10,73 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('contenttypes', '0002_remove_content_type_name'),
-        ('extras', '0012_webhooks'),
+        ("contenttypes", "0002_remove_content_type_name"),
+        ("extras", "0012_webhooks"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ObjectChange',
+            name="ObjectChange",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('time', models.DateTimeField(auto_now_add=True)),
-                ('user_name', models.CharField(editable=False, max_length=150)),
-                ('request_id', models.UUIDField(editable=False)),
-                ('action', models.PositiveSmallIntegerField(choices=[(1, 'Created'), (2, 'Updated'), (3, 'Deleted')])),
-                ('changed_object_id', models.PositiveIntegerField()),
-                ('related_object_id', models.PositiveIntegerField(blank=True, null=True)),
-                ('object_repr', models.CharField(editable=False, max_length=200)),
-                ('object_data', django.contrib.postgres.fields.jsonb.JSONField(editable=False)),
-                ('changed_object_type', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to='contenttypes.ContentType')),
-                ('related_object_type', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='+', to='contenttypes.ContentType')),
-                ('user', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='changes', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("time", models.DateTimeField(auto_now_add=True)),
+                ("user_name", models.CharField(editable=False, max_length=150)),
+                ("request_id", models.UUIDField(editable=False)),
+                (
+                    "action",
+                    models.PositiveSmallIntegerField(
+                        choices=[(1, "Created"), (2, "Updated"), (3, "Deleted")]
+                    ),
+                ),
+                ("changed_object_id", models.PositiveIntegerField()),
+                (
+                    "related_object_id",
+                    models.PositiveIntegerField(blank=True, null=True),
+                ),
+                ("object_repr", models.CharField(editable=False, max_length=200)),
+                (
+                    "object_data",
+                    django.contrib.postgres.fields.jsonb.JSONField(editable=False),
+                ),
+                (
+                    "changed_object_type",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="+",
+                        to="contenttypes.ContentType",
+                    ),
+                ),
+                (
+                    "related_object_type",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="+",
+                        to="contenttypes.ContentType",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="changes",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-time'],
+                "ordering": ["-time"],
             },
         ),
     ]

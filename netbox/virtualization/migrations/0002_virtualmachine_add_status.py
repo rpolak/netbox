@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('virtualization', '0001_virtualization'),
+        ("virtualization", "0001_virtualization"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='virtualmachine',
-            name='status',
-            field=models.PositiveSmallIntegerField(choices=[[1, 'Active'], [0, 'Offline'], [3, 'Staged']], default=1, verbose_name='Status'),
+            model_name="virtualmachine",
+            name="status",
+            field=models.PositiveSmallIntegerField(
+                choices=[[1, "Active"], [0, "Offline"], [3, "Staged"]],
+                default=1,
+                verbose_name="Status",
+            ),
         ),
     ]

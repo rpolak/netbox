@@ -7,18 +7,28 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcim', '0028_device_copy_rack_to_site'),
+        ("dcim", "0028_device_copy_rack_to_site"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='device',
-            name='rack',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='devices', to='dcim.Rack'),
+            model_name="device",
+            name="rack",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="devices",
+                to="dcim.Rack",
+            ),
         ),
         migrations.AlterField(
-            model_name='device',
-            name='site',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='devices', to='dcim.Site'),
+            model_name="device",
+            name="site",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="devices",
+                to="dcim.Site",
+            ),
         ),
     ]

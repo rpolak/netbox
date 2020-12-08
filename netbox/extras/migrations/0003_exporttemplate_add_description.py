@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('extras', '0002_custom_fields'),
+        ("extras", "0002_custom_fields"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='exporttemplate',
-            name='description',
+            model_name="exporttemplate",
+            name="description",
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name='exporttemplate',
-            name='name',
+            model_name="exporttemplate",
+            name="name",
             field=models.CharField(max_length=100),
         ),
     ]

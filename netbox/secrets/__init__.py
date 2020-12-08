@@ -8,4 +8,5 @@ from hmac import compare_digest
 
 # Then, we instantiate SystemRandom and map its choice() function:
 from random import SystemRandom
+
 choice = SystemRandom().choice

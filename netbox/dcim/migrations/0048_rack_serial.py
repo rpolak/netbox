@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcim', '0047_more_100ge_form_factors'),
+        ("dcim", "0047_more_100ge_form_factors"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='rack',
-            name='serial',
-            field=models.CharField(blank=True, max_length=50, verbose_name='Serial number'),
+            model_name="rack",
+            name="serial",
+            field=models.CharField(
+                blank=True, max_length=50, verbose_name="Serial number"
+            ),
         ),
     ]

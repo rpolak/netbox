@@ -14,23 +14,25 @@ from extras.plugins.utils import import_object
 
 
 # Initialize plugin registry stores
-registry['plugin_template_extensions'] = collections.defaultdict(list)
-registry['plugin_menu_items'] = {}
+registry["plugin_template_extensions"] = collections.defaultdict(list)
+registry["plugin_menu_items"] = {}
 
 
 #
 # Plugin AppConfig class
 #
 
+
 class PluginConfig(AppConfig):
     """
     Subclass of Django's built-in AppConfig class, to be used for NetBox plugins.
     """
+
     # Plugin metadata
-    author = ''
-    author_email = ''
-    description = ''
-    version = ''
+    author = ""
+    author_email = ""
+    description = ""
+    version = ""
 
     # Root URL path under /plugins. If not set, the plugin's label will be used.
     base_url = None
@@ -50,18 +52,20 @@ class PluginConfig(AppConfig):
 
     # Cacheops configuration. Cache all operations by default.
     caching_config = {
-        '*': {'ops': 'all'},
+        "*": {"ops": "all"},
     }
 
     # Default integration paths. Plugin authors can override these to customize the paths to
     # integrated components.
-    template_extensions = 'template_content.template_extensions'
-    menu_items = 'navigation.menu_items'
+    template_extensions = "template_content.template_extensions"
+    menu_items = "navigation.menu_items"
 
     def ready(self):
 
         # Register template content
-        template_extensions = import_object(f"{self.__module__}.{self.template_extensions}")
+        template_extensions = import_object(
+            f"{self.__module__}.{self.template_extensions}"
+        )
         if template_extensions is not None:
             register_template_extensions(template_extensions)
 
@@ -106,6 +110,7 @@ class PluginConfig(AppConfig):
 # Template content injection
 #
 
+
 class PluginTemplateExtension:
     """
     This class is used to register plugin content to be injected into core NetBox templates. It contains methods
@@ -119,6 +124,7 @@ class PluginTemplateExtension:
     * settings - Global NetBox settings
     * config - Plugin-specific configuration parameters
     """
+
     model = None
 
     def __init__(self, context):
@@ -173,18 +179,27 @@ def register_template_extensions(class_list):
     # Validation
     for template_extension in class_list:
         if not inspect.isclass(template_extension):
-            raise TypeError(f"PluginTemplateExtension class {template_extension} was passes as an instance!")
+            raise TypeError(
+                f"PluginTemplateExtension class {template_extension} was passes as an instance!"
+            )
         if not issubclass(template_extension, PluginTemplateExtension):
-            raise TypeError(f"{template_extension} is not a subclass of extras.plugins.PluginTemplateExtension!")
+            raise TypeError(
+                f"{template_extension} is not a subclass of extras.plugins.PluginTemplateExtension!"
+            )
         if template_extension.model is None:
-            raise TypeError(f"PluginTemplateExtension class {template_extension} does not define a valid model!")
+            raise TypeError(
+                f"PluginTemplateExtension class {template_extension} does not define a valid model!"
+            )
 
-        registry['plugin_template_extensions'][template_extension.model].append(template_extension)
+        registry["plugin_template_extensions"][template_extension.model].append(
+            template_extension
+        )
 
 
 #
 # Navigation menu links
 #
+
 
 class PluginMenuItem:
     """
@@ -194,6 +209,7 @@ class PluginMenuItem:
     Links are specified as Django reverse URL strings.
     Buttons are each specified as a list of PluginMenuButton instances.
     """
+
     permissions = []
     buttons = []
 
@@ -215,6 +231,7 @@ class PluginMenuButton:
     This class represents a button within a PluginMenuItem. Note that button colors should come from
     ButtonColorChoices.
     """
+
     color = ButtonColorChoices.DEFAULT
     permissions = []
 
@@ -228,7 +245,9 @@ class PluginMenuButton:
             self.permissions = permissions
         if color is not None:
             if color not in ButtonColorChoices.values():
-                raise ValueError("Button color must be a choice within ButtonColorChoices.")
+                raise ValueError(
+                    "Button color must be a choice within ButtonColorChoices."
+                )
             self.color = color
 
 
@@ -239,9 +258,13 @@ def register_menu_items(section_name, class_list):
     # Validation
     for menu_link in class_list:
         if not isinstance(menu_link, PluginMenuItem):
-            raise TypeError(f"{menu_link} must be an instance of extras.plugins.PluginMenuItem")
+            raise TypeError(
+                f"{menu_link} must be an instance of extras.plugins.PluginMenuItem"
+            )
         for button in menu_link.buttons:
             if not isinstance(button, PluginMenuButton):
-                raise TypeError(f"{button} must be an instance of extras.plugins.PluginMenuButton")
+                raise TypeError(
+                    f"{button} must be an instance of extras.plugins.PluginMenuButton"
+                )
 
-    registry['plugin_menu_items'][section_name] = class_list
+    registry["plugin_menu_items"][section_name] = class_list

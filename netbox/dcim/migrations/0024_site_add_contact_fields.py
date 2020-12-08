@@ -6,23 +6,25 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcim', '0023_devicetype_comments'),
+        ("dcim", "0023_devicetype_comments"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='site',
-            name='contact_email',
-            field=models.EmailField(blank=True, max_length=254, verbose_name=b'Contact E-mail'),
+            model_name="site",
+            name="contact_email",
+            field=models.EmailField(
+                blank=True, max_length=254, verbose_name=b"Contact E-mail"
+            ),
         ),
         migrations.AddField(
-            model_name='site',
-            name='contact_name',
+            model_name="site",
+            name="contact_name",
             field=models.CharField(blank=True, max_length=50),
         ),
         migrations.AddField(
-            model_name='site',
-            name='contact_phone',
+            model_name="site",
+            name="contact_phone",
             field=models.CharField(blank=True, max_length=20),
         ),
     ]

@@ -6,38 +6,38 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('circuits', '0011_tags'),
+        ("circuits", "0011_tags"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='circuittype',
-            name='created',
+            model_name="circuittype",
+            name="created",
             field=models.DateField(auto_now_add=True, null=True),
         ),
         migrations.AddField(
-            model_name='circuittype',
-            name='last_updated',
+            model_name="circuittype",
+            name="last_updated",
             field=models.DateTimeField(auto_now=True, null=True),
         ),
         migrations.AlterField(
-            model_name='circuit',
-            name='created',
+            model_name="circuit",
+            name="created",
             field=models.DateField(auto_now_add=True, null=True),
         ),
         migrations.AlterField(
-            model_name='circuit',
-            name='last_updated',
+            model_name="circuit",
+            name="last_updated",
             field=models.DateTimeField(auto_now=True, null=True),
         ),
         migrations.AlterField(
-            model_name='provider',
-            name='created',
+            model_name="provider",
+            name="created",
             field=models.DateField(auto_now_add=True, null=True),
         ),
         migrations.AlterField(
-            model_name='provider',
-            name='last_updated',
+            model_name="provider",
+            name="last_updated",
             field=models.DateTimeField(auto_now=True, null=True),
         ),
     ]

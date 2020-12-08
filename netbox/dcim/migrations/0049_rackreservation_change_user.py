@@ -8,13 +8,15 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcim', '0048_rack_serial'),
+        ("dcim", "0048_rack_serial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='rackreservation',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL),
+            model_name="rackreservation",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL
+            ),
         ),
     ]

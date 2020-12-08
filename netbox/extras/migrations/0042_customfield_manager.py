@@ -7,14 +7,14 @@ import extras.models.customfields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('extras', '0041_tag_description'),
+        ("extras", "0041_tag_description"),
     ]
 
     operations = [
         migrations.AlterModelManagers(
-            name='customfield',
+            name="customfield",
             managers=[
-                ('objects', extras.models.customfields.CustomFieldManager()),
+                ("objects", extras.models.customfields.CustomFieldManager()),
             ],
         ),
     ]

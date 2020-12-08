@@ -61,34 +61,49 @@ POWERFEED_MAX_UTILIZATION_DEFAULT = 80  # Percentage
 
 # Console/power/interface connection statuses
 CONNECTION_STATUS_CHOICES = [
-    [False, 'Not Connected'],
-    [True, 'Connected'],
+    [False, "Not Connected"],
+    [True, "Connected"],
 ]
 
 # Cable endpoint types
 CABLE_TERMINATION_MODELS = Q(
-    Q(app_label='circuits', model__in=(
-        'circuittermination',
-    )) |
-    Q(app_label='dcim', model__in=(
-        'consoleport',
-        'consoleserverport',
-        'frontport',
-        'interface',
-        'powerfeed',
-        'poweroutlet',
-        'powerport',
-        'rearport',
-    ))
+    Q(app_label="circuits", model__in=("circuittermination",))
+    | Q(
+        app_label="dcim",
+        model__in=(
+            "consoleport",
+            "consoleserverport",
+            "frontport",
+            "interface",
+            "powerfeed",
+            "poweroutlet",
+            "powerport",
+            "rearport",
+        ),
+    )
 )
 
 COMPATIBLE_TERMINATION_TYPES = {
-    'consoleport': ['consoleserverport', 'frontport', 'rearport'],
-    'consoleserverport': ['consoleport', 'frontport', 'rearport'],
-    'powerport': ['poweroutlet', 'powerfeed'],
-    'poweroutlet': ['powerport'],
-    'interface': ['interface', 'circuittermination', 'frontport', 'rearport'],
-    'frontport': ['consoleport', 'consoleserverport', 'interface', 'frontport', 'rearport', 'circuittermination'],
-    'rearport': ['consoleport', 'consoleserverport', 'interface', 'frontport', 'rearport', 'circuittermination'],
-    'circuittermination': ['interface', 'frontport', 'rearport', 'circuittermination'],
+    "consoleport": ["consoleserverport", "frontport", "rearport"],
+    "consoleserverport": ["consoleport", "frontport", "rearport"],
+    "powerport": ["poweroutlet", "powerfeed"],
+    "poweroutlet": ["powerport"],
+    "interface": ["interface", "circuittermination", "frontport", "rearport"],
+    "frontport": [
+        "consoleport",
+        "consoleserverport",
+        "interface",
+        "frontport",
+        "rearport",
+        "circuittermination",
+    ],
+    "rearport": [
+        "consoleport",
+        "consoleserverport",
+        "interface",
+        "frontport",
+        "rearport",
+        "circuittermination",
+    ],
+    "circuittermination": ["interface", "frontport", "rearport", "circuittermination"],
 }

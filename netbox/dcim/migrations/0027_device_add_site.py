@@ -7,13 +7,19 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcim', '0026_add_rack_reservations'),
+        ("dcim", "0026_add_rack_reservations"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='device',
-            name='site',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='devices', to='dcim.Site'),
+            model_name="device",
+            name="site",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="devices",
+                to="dcim.Site",
+            ),
         ),
     ]

@@ -2,21 +2,27 @@ import logging
 from collections import defaultdict
 
 from django.conf import settings
-from django.contrib.auth.backends import ModelBackend, RemoteUserBackend as _RemoteUserBackend
+from django.contrib.auth.backends import (
+    ModelBackend,
+    RemoteUserBackend as _RemoteUserBackend,
+)
 from django.contrib.auth.models import Group
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
 
 from users.models import ObjectPermission
-from utilities.permissions import permission_is_exempt, resolve_permission, resolve_permission_ct
+from utilities.permissions import (
+    permission_is_exempt,
+    resolve_permission,
+    resolve_permission_ct,
+)
 
 
 class ObjectPermissionBackend(ModelBackend):
-
     def get_all_permissions(self, user_obj, obj=None):
         if not user_obj.is_active or user_obj.is_anonymous:
             return dict()
-        if not hasattr(user_obj, '_object_perm_cache'):
+        if not hasattr(user_obj, "_object_perm_cache"):
             user_obj._object_perm_cache = self.get_object_permissions(user_obj)
         return user_obj._object_perm_cache
 
@@ -26,9 +32,8 @@ class ObjectPermissionBackend(ModelBackend):
         """
         # Retrieve all assigned and enabled ObjectPermissions
         object_permissions = ObjectPermission.objects.filter(
-            Q(users=user_obj) | Q(groups__user=user_obj),
-            enabled=True
-        ).prefetch_related('object_types')
+            Q(users=user_obj) | Q(groups__user=user_obj), enabled=True
+        ).prefetch_related("object_types")
 
         # Create a dictionary mapping permissions to their constraints
         perms = defaultdict(list)
@@ -66,7 +71,7 @@ class ObjectPermissionBackend(ModelBackend):
 
         # Sanity check: Ensure that the requested permission applies to the specified object
         model = obj._meta.model
-        if model._meta.label_lower != '.'.join((app_label, model_name)):
+        if model._meta.label_lower != ".".join((app_label, model_name)):
             raise ValueError(f"Invalid permission {perm} for model {model}")
 
         # Compile a query filter that matches all instances of the specified model
@@ -90,12 +95,13 @@ class RemoteUserBackend(_RemoteUserBackend):
     """
     Custom implementation of Django's RemoteUserBackend which provides configuration hooks for basic customization.
     """
+
     @property
     def create_unknown_user(self):
         return settings.REMOTE_AUTH_AUTO_CREATE_USER
 
     def configure_user(self, request, user):
-        logger = logging.getLogger('netbox.authentication.RemoteUserBackend')
+        logger = logging.getLogger("netbox.authentication.RemoteUserBackend")
 
         # Assign default groups to the user
         group_list = []
@@ -103,14 +109,21 @@ class RemoteUserBackend(_RemoteUserBackend):
             try:
                 group_list.append(Group.objects.get(name=name))
             except Group.DoesNotExist:
-                logging.error(f"Could not assign group {name} to remotely-authenticated user {user}: Group not found")
+                logging.error(
+                    f"Could not assign group {name} to remotely-authenticated user {user}: Group not found"
+                )
         if group_list:
             user.groups.add(*group_list)
-            logger.debug(f"Assigned groups to remotely-authenticated user {user}: {group_list}")
+            logger.debug(
+                f"Assigned groups to remotely-authenticated user {user}: {group_list}"
+            )
 
         # Assign default object permissions to the user
         permissions_list = []
-        for permission_name, constraints in settings.REMOTE_AUTH_DEFAULT_PERMISSIONS.items():
+        for (
+            permission_name,
+            constraints,
+        ) in settings.REMOTE_AUTH_DEFAULT_PERMISSIONS.items():
             try:
                 object_type, action = resolve_permission_ct(permission_name)
                 # TODO: Merge multiple actions into a single ObjectPermission per content type
@@ -125,7 +138,9 @@ class RemoteUserBackend(_RemoteUserBackend):
                     "<app>.<action>_<model>. (Example: dcim.add_site)"
                 )
         if permissions_list:
-            logger.debug(f"Assigned permissions to remotely-authenticated user {user}: {permissions_list}")
+            logger.debug(
+                f"Assigned permissions to remotely-authenticated user {user}: {permissions_list}"
+            )
 
         return user
 
@@ -134,13 +149,15 @@ class RemoteUserBackend(_RemoteUserBackend):
 
 
 class LDAPBackend:
-
     def __new__(cls, *args, **kwargs):
         try:
-            from django_auth_ldap.backend import LDAPBackend as LDAPBackend_, LDAPSettings
+            from django_auth_ldap.backend import (
+                LDAPBackend as LDAPBackend_,
+                LDAPSettings,
+            )
             import ldap
         except ModuleNotFoundError as e:
-            if getattr(e, 'name') == 'django_auth_ldap':
+            if getattr(e, "name") == "django_auth_ldap":
                 raise ImproperlyConfigured(
                     "LDAP authentication has been configured, but django-auth-ldap is not installed."
                 )
@@ -149,7 +166,7 @@ class LDAPBackend:
         try:
             from netbox import ldap_config
         except ModuleNotFoundError as e:
-            if getattr(e, 'name') == 'ldap_config':
+            if getattr(e, "name") == "ldap_config":
                 raise ImproperlyConfigured(
                     "LDAP configuration file not found: Check that ldap_config.py has been created alongside "
                     "configuration.py."
@@ -157,7 +174,7 @@ class LDAPBackend:
             raise e
 
         try:
-            getattr(ldap_config, 'AUTH_LDAP_SERVER_URI')
+            getattr(ldap_config, "AUTH_LDAP_SERVER_URI")
         except AttributeError:
             raise ImproperlyConfigured(
                 "Required parameter AUTH_LDAP_SERVER_URI is missing from ldap_config.py."
@@ -174,7 +191,7 @@ class LDAPBackend:
         obj.settings = settings
 
         # Optionally disable strict certificate checking
-        if getattr(ldap_config, 'LDAP_IGNORE_CERT_ERRORS', False):
+        if getattr(ldap_config, "LDAP_IGNORE_CERT_ERRORS", False):
             ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
 
         return obj

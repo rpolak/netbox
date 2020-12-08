@@ -20,7 +20,7 @@ def csv_format(data):
 
         # Represent None or False with empty string
         if value is None or value is False:
-            csv.append('')
+            csv.append("")
             continue
 
         # Convert dates to ISO format
@@ -29,35 +29,35 @@ def csv_format(data):
 
         # Force conversion to string first so we can check for any commas
         if not isinstance(value, str):
-            value = '{}'.format(value)
+            value = "{}".format(value)
 
         # Double-quote the value if it contains a comma or line break
-        if ',' in value or '\n' in value:
+        if "," in value or "\n" in value:
             value = value.replace('"', '""')  # Escape double-quotes
             csv.append('"{}"'.format(value))
         else:
-            csv.append('{}'.format(value))
+            csv.append("{}".format(value))
 
-    return ','.join(csv)
+    return ",".join(csv)
 
 
 def foreground_color(bg_color):
     """
     Return the ideal foreground color (black or white) for a given background color in hexadecimal RGB format.
     """
-    bg_color = bg_color.strip('#')
-    r, g, b = [int(bg_color[c:c + 2], 16) for c in (0, 2, 4)]
+    bg_color = bg_color.strip("#")
+    r, g, b = [int(bg_color[c : c + 2], 16) for c in (0, 2, 4)]
     if r * 0.299 + g * 0.587 + b * 0.114 > 186:
-        return '000000'
+        return "000000"
     else:
-        return 'ffffff'
+        return "ffffff"
 
 
 def dynamic_import(name):
     """
     Dynamically import a class from an absolute path string
     """
-    components = name.split('.')
+    components = name.split(".")
     mod = __import__(components[0])
     for comp in components[1:]:
         mod = getattr(mod, comp)
@@ -69,13 +69,11 @@ def get_subquery(model, field):
     Return a Subquery suitable for annotating a child object count.
     """
     subquery = Subquery(
-        model.objects.filter(
-            **{field: OuterRef('pk')}
-        ).order_by().values(
-            field
-        ).annotate(
-            c=Count('*')
-        ).values('c')
+        model.objects.filter(**{field: OuterRef("pk")})
+        .order_by()
+        .values(field)
+        .annotate(c=Count("*"))
+        .values("c")
     )
 
     return subquery
@@ -88,19 +86,17 @@ def serialize_object(obj, extra=None, exclude=None):
     can be provided to exclude them from the returned dictionary. Private fields (prefaced with an underscore) are
     implicitly excluded.
     """
-    json_str = serialize('json', [obj])
-    data = json.loads(json_str)[0]['fields']
+    json_str = serialize("json", [obj])
+    data = json.loads(json_str)[0]["fields"]
 
     # Include any custom fields
-    if hasattr(obj, 'get_custom_fields'):
-        data['custom_fields'] = {
-            field: str(value) for field, value in obj.cf.items()
-        }
+    if hasattr(obj, "get_custom_fields"):
+        data["custom_fields"] = {field: str(value) for field, value in obj.cf.items()}
 
     # Include any tags. Check for tags cached on the instance; fall back to using the manager.
     if is_taggable(obj):
-        tags = getattr(obj, '_tags', obj.tags.all())
-        data['tags'] = [tag.name for tag in tags]
+        tags = getattr(obj, "_tags", obj.tags.all())
+        data["tags"] = [tag.name for tag in tags]
 
     # Append any extra data
     if extra is not None:
@@ -109,7 +105,7 @@ def serialize_object(obj, extra=None, exclude=None):
     # Copy keys to list to avoid 'dictionary changed size during iteration' exception
     for key in list(data):
         # Private fields shouldn't be logged in the object change
-        if isinstance(key, str) and key.startswith('_'):
+        if isinstance(key, str) and key.startswith("_"):
             data.pop(key)
 
         # Explicitly excluded keys
@@ -119,7 +115,7 @@ def serialize_object(obj, extra=None, exclude=None):
     return data
 
 
-def dict_to_filter_params(d, prefix=''):
+def dict_to_filter_params(d, prefix=""):
     """
     Translate a dictionary of attributes to a nested set of parameters suitable for QuerySet filtering. For example:
 
@@ -145,7 +141,7 @@ def dict_to_filter_params(d, prefix=''):
     for key, val in d.items():
         k = prefix + key
         if isinstance(val, dict):
-            params.update(dict_to_filter_params(val, k + '__'))
+            params.update(dict_to_filter_params(val, k + "__"))
         else:
             params[k] = val
     return params
@@ -164,9 +160,7 @@ def normalize_querydict(querydict):
     This function is necessary because QueryDict does not provide any built-in mechanism which preserves multiple
     values.
     """
-    return {
-        k: v if len(v) > 1 else v[0] for k, v in querydict.lists()
-    }
+    return {k: v if len(v) > 1 else v[0] for k, v in querydict.lists()}
 
 
 def deepmerge(original, new):
@@ -175,7 +169,11 @@ def deepmerge(original, new):
     """
     merged = OrderedDict(original)
     for key, val in new.items():
-        if key in original and isinstance(original[key], dict) and isinstance(val, dict):
+        if (
+            key in original
+            and isinstance(original[key], dict)
+            and isinstance(val, dict)
+        ):
             merged[key] = deepmerge(original[key], val)
         else:
             merged[key] = val
@@ -193,7 +191,9 @@ def to_meters(length, unit):
     valid_units = CableLengthUnitChoices.values()
     if unit not in valid_units:
         raise ValueError(
-            "Unknown unit {}. Must be one of the following: {}".format(unit, ', '.join(valid_units))
+            "Unknown unit {}. Must be one of the following: {}".format(
+                unit, ", ".join(valid_units)
+            )
         )
 
     if unit == CableLengthUnitChoices.UNIT_METER:
@@ -220,25 +220,25 @@ def prepare_cloned_fields(instance):
     applicable.
     """
     params = []
-    for field_name in getattr(instance, 'clone_fields', []):
+    for field_name in getattr(instance, "clone_fields", []):
         field = instance._meta.get_field(field_name)
         field_value = field.value_from_object(instance)
 
         # Swap out False with URL-friendly value
         if field_value is False:
-            field_value = ''
+            field_value = ""
 
         # Omit empty values
-        if field_value not in (None, ''):
+        if field_value not in (None, ""):
             params.append((field_name, field_value))
 
     # Copy tags
     if is_taggable(instance):
         for tag in instance.tags.all():
-            params.append(('tags', tag.pk))
+            params.append(("tags", tag.pk))
 
     # Concatenate parameters into a URL query string
-    param_string = '&'.join([f'{k}={v}' for k, v in params])
+    param_string = "&".join([f"{k}={v}" for k, v in params])
 
     return param_string
 
@@ -259,7 +259,7 @@ def shallow_compare_dict(source_dict, destination_dict, exclude=None):
     return difference
 
 
-def flatten_dict(d, prefix='', separator='.'):
+def flatten_dict(d, prefix="", separator="."):
     """
     Flatten netsted dictionaries into a single level by joining key names with a separator.
 
@@ -281,6 +281,7 @@ def flatten_dict(d, prefix='', separator='.'):
 def curry(_curried_func, *args, **kwargs):
     def _curried(*moreargs, **morekwargs):
         return _curried_func(*args, *moreargs, **{**kwargs, **morekwargs})
+
     return _curried
 
 
@@ -288,11 +289,13 @@ def curry(_curried_func, *args, **kwargs):
 # Fake request object
 #
 
+
 class NetBoxFakeRequest:
     """
     A fake request object which is explicitly defined at the module level so it is able to be pickled. It simply
     takes what is passed to it as kwargs on init and sets them as instance variables.
     """
+
     def __init__(self, _dict):
         self.__dict__ = _dict
 
@@ -307,12 +310,14 @@ def copy_safe_request(request):
         for k in HTTP_REQUEST_META_SAFE_COPY
         if k in request.META and isinstance(request.META[k], str)
     }
-    return NetBoxFakeRequest({
-        'META': meta,
-        'POST': request.POST,
-        'GET': request.GET,
-        'FILES': request.FILES,
-        'user': request.user,
-        'path': request.path,
-        'id': getattr(request, 'id', None),  # UUID assigned by middleware
-    })
+    return NetBoxFakeRequest(
+        {
+            "META": meta,
+            "POST": request.POST,
+            "GET": request.GET,
+            "FILES": request.FILES,
+            "user": request.user,
+            "path": request.path,
+            "id": getattr(request, "id", None),  # UUID assigned by middleware
+        }
+    )

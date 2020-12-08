@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('virtualization', '0016_replicate_interfaces'),
+        ("virtualization", "0016_replicate_interfaces"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='virtualmachine',
-            name='local_context_data',
+            model_name="virtualmachine",
+            name="local_context_data",
             field=models.JSONField(blank=True, null=True),
         ),
     ]

@@ -19,18 +19,18 @@ from .constants import *
 from .utils import expand_alphanumeric_pattern, expand_ipaddress_pattern
 
 __all__ = (
-    'CommentField',
-    'CSVChoiceField',
-    'CSVDataField',
-    'CSVModelChoiceField',
-    'DynamicModelChoiceField',
-    'DynamicModelMultipleChoiceField',
-    'ExpandableIPAddressField',
-    'ExpandableNameField',
-    'JSONField',
-    'LaxURLField',
-    'SlugField',
-    'TagFilterField',
+    "CommentField",
+    "CSVChoiceField",
+    "CSVDataField",
+    "CSVModelChoiceField",
+    "DynamicModelChoiceField",
+    "DynamicModelMultipleChoiceField",
+    "ExpandableIPAddressField",
+    "ExpandableNameField",
+    "JSONField",
+    "LaxURLField",
+    "SlugField",
+    "TagFilterField",
 )
 
 
@@ -42,6 +42,7 @@ class CSVDataField(forms.CharField):
 
     :param from_form: The form from which the field derives its validation rules.
     """
+
     widget = forms.Textarea
 
     def __init__(self, from_form, *args, **kwargs):
@@ -57,13 +58,15 @@ class CSVDataField(forms.CharField):
 
         self.strip = False
         if not self.label:
-            self.label = ''
+            self.label = ""
         if not self.initial:
-            self.initial = ','.join(self.required_fields) + '\n'
+            self.initial = ",".join(self.required_fields) + "\n"
         if not self.help_text:
-            self.help_text = 'Enter the list of column headers followed by one line per record to be imported, using ' \
-                             'commas to separate values. Multi-line data and values containing commas may be wrapped ' \
-                             'in double quotes.'
+            self.help_text = (
+                "Enter the list of column headers followed by one line per record to be imported, using "
+                "commas to separate values. Multi-line data and values containing commas may be wrapped "
+                "in double quotes."
+            )
 
     def to_python(self, value):
 
@@ -75,8 +78,8 @@ class CSVDataField(forms.CharField):
         # `site.slug` header, to indicate the related site is being referenced by its slug.
         headers = {}
         for header in next(reader):
-            if '.' in header:
-                field, to_field = header.split('.', 1)
+            if "." in header:
+                field, to_field = header.split(".", 1)
                 headers[field] = to_field
             else:
                 headers[header] = None
@@ -99,11 +102,17 @@ class CSVDataField(forms.CharField):
         # Validate provided column headers
         for field, to_field in headers.items():
             if field not in self.fields:
-                raise forms.ValidationError(f'Unexpected column header "{field}" found.')
-            if to_field and not hasattr(self.fields[field], 'to_field_name'):
-                raise forms.ValidationError(f'Column "{field}" is not a related object; cannot use dots')
+                raise forms.ValidationError(
+                    f'Unexpected column header "{field}" found.'
+                )
+            if to_field and not hasattr(self.fields[field], "to_field_name"):
+                raise forms.ValidationError(
+                    f'Column "{field}" is not a related object; cannot use dots'
+                )
             if to_field and not hasattr(self.fields[field].queryset.model, to_field):
-                raise forms.ValidationError(f'Invalid related object attribute for column "{field}": {to_field}')
+                raise forms.ValidationError(
+                    f'Invalid related object attribute for column "{field}": {to_field}'
+                )
 
         # Validate required fields
         for f in self.required_fields:
@@ -117,15 +126,20 @@ class CSVChoiceField(forms.ChoiceField):
     """
     Invert the provided set of choices to take the human-friendly label as input, and return the database value.
     """
+
     def __init__(self, choices, *args, **kwargs):
         super().__init__(choices=choices, *args, **kwargs)
-        self.choices = [(label, label) for value, label in unpack_grouped_choices(choices)]
-        self.choice_values = {label: value for value, label in unpack_grouped_choices(choices)}
+        self.choices = [
+            (label, label) for value, label in unpack_grouped_choices(choices)
+        ]
+        self.choice_values = {
+            label: value for value, label in unpack_grouped_choices(choices)
+        }
 
     def clean(self, value):
         value = super().clean(value)
         if not value:
-            return ''
+            return ""
         if value not in self.choice_values:
             raise forms.ValidationError("Invalid choice: {}".format(value))
         return self.choice_values[value]
@@ -135,8 +149,9 @@ class CSVModelChoiceField(forms.ModelChoiceField):
     """
     Provides additional validation for model choices entered as CSV data.
     """
+
     default_error_messages = {
-        'invalid_choice': 'Object not found.',
+        "invalid_choice": "Object not found.",
     }
 
     def to_python(self, value):
@@ -153,6 +168,7 @@ class ExpandableNameField(forms.CharField):
     A field which allows for numeric range expansion
       Example: 'Gi0/[1-3]' => ['Gi0/1', 'Gi0/2', 'Gi0/3']
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if not self.help_text:
@@ -167,7 +183,7 @@ class ExpandableNameField(forms.CharField):
 
     def to_python(self, value):
         if not value:
-            return ''
+            return ""
         if re.search(ALPHANUMERIC_EXPANSION_PATTERN, value):
             return list(expand_alphanumeric_pattern(value))
         return [value]
@@ -178,17 +194,20 @@ class ExpandableIPAddressField(forms.CharField):
     A field which allows for expansion of IP address ranges
       Example: '192.0.2.[1-254]/24' => ['192.0.2.1/24', '192.0.2.2/24', '192.0.2.3/24' ... '192.0.2.254/24']
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if not self.help_text:
-            self.help_text = 'Specify a numeric range to create multiple IPs.<br />'\
-                             'Example: <code>192.0.2.[1,5,100-254]/24</code>'
+            self.help_text = (
+                "Specify a numeric range to create multiple IPs.<br />"
+                "Example: <code>192.0.2.[1,5,100-254]/24</code>"
+            )
 
     def to_python(self, value):
         # Hackish address family detection but it's all we have to work with
-        if '.' in value and re.search(IP4_EXPANSION_PATTERN, value):
+        if "." in value and re.search(IP4_EXPANSION_PATTERN, value):
             return list(expand_ipaddress_pattern(value, 4))
-        elif ':' in value and re.search(IP6_EXPANSION_PATTERN, value):
+        elif ":" in value and re.search(IP6_EXPANSION_PATTERN, value):
             return list(expand_ipaddress_pattern(value, 6))
         return [value]
 
@@ -197,30 +216,38 @@ class CommentField(forms.CharField):
     """
     A textarea with support for Markdown rendering. Exists mostly just to add a standard help_text.
     """
+
     widget = forms.Textarea
-    default_label = ''
+    default_label = ""
     # TODO: Port Markdown cheat sheet to internal documentation
-    default_helptext = '<i class="fa fa-info-circle"></i> '\
-                       '<a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet" target="_blank">'\
-                       'Markdown</a> syntax is supported'
+    default_helptext = (
+        '<i class="fa fa-info-circle"></i> '
+        '<a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet" target="_blank">'
+        "Markdown</a> syntax is supported"
+    )
 
     def __init__(self, *args, **kwargs):
-        required = kwargs.pop('required', False)
-        label = kwargs.pop('label', self.default_label)
-        help_text = kwargs.pop('help_text', self.default_helptext)
-        super().__init__(required=required, label=label, help_text=help_text, *args, **kwargs)
+        required = kwargs.pop("required", False)
+        label = kwargs.pop("label", self.default_label)
+        help_text = kwargs.pop("help_text", self.default_helptext)
+        super().__init__(
+            required=required, label=label, help_text=help_text, *args, **kwargs
+        )
 
 
 class SlugField(forms.SlugField):
     """
     Extend the built-in SlugField to automatically populate from a field called `name` unless otherwise specified.
     """
-    def __init__(self, slug_source='name', *args, **kwargs):
-        label = kwargs.pop('label', "Slug")
-        help_text = kwargs.pop('help_text', "URL-friendly unique shorthand")
-        widget = kwargs.pop('widget', widgets.SlugWidget)
-        super().__init__(label=label, help_text=help_text, widget=widget, *args, **kwargs)
-        self.widget.attrs['slug-source'] = slug_source
+
+    def __init__(self, slug_source="name", *args, **kwargs):
+        label = kwargs.pop("label", "Slug")
+        help_text = kwargs.pop("help_text", "URL-friendly unique shorthand")
+        widget = kwargs.pop("widget", widgets.SlugWidget)
+        super().__init__(
+            label=label, help_text=help_text, widget=widget, *args, **kwargs
+        )
+        self.widget.attrs["slug-source"] = slug_source
 
 
 class TagFilterField(forms.MultipleChoiceField):
@@ -229,19 +256,22 @@ class TagFilterField(forms.MultipleChoiceField):
 
     :param model: The model of the filter
     """
+
     widget = widgets.StaticSelect2Multiple
 
     def __init__(self, model, *args, **kwargs):
         def get_choices():
-            tags = model.tags.annotate(
-                count=Count('extras_taggeditem_items')
-            ).order_by('name')
+            tags = model.tags.annotate(count=Count("extras_taggeditem_items")).order_by(
+                "name"
+            )
             return [
-                (str(tag.slug), '{} ({})'.format(tag.name, tag.count)) for tag in tags
+                (str(tag.slug), "{} ({})".format(tag.name, tag.count)) for tag in tags
             ]
 
         # Choices are fetched each time the form is initialized
-        super().__init__(label='Tags', choices=get_choices, required=False, *args, **kwargs)
+        super().__init__(
+            label="Tags", choices=get_choices, required=False, *args, **kwargs
+        )
 
 
 class DynamicModelChoiceMixin:
@@ -254,11 +284,21 @@ class DynamicModelChoiceMixin:
         choice (optional)
     :param brief_mode: Use the "brief" format (?brief=true) when making API requests (default)
     """
+
     filter = django_filters.ModelChoiceFilter
     widget = widgets.APISelect
 
-    def __init__(self, display_field='name', query_params=None, initial_params=None, null_option=None,
-                 disabled_indicator=None, brief_mode=True, *args, **kwargs):
+    def __init__(
+        self,
+        display_field="name",
+        query_params=None,
+        initial_params=None,
+        null_option=None,
+        disabled_indicator=None,
+        brief_mode=True,
+        *args,
+        **kwargs,
+    ):
         self.display_field = display_field
         self.query_params = query_params or {}
         self.initial_params = initial_params or {}
@@ -268,30 +308,30 @@ class DynamicModelChoiceMixin:
 
         # to_field_name is set by ModelChoiceField.__init__(), but we need to set it early for reference
         # by widget_attrs()
-        self.to_field_name = kwargs.get('to_field_name')
+        self.to_field_name = kwargs.get("to_field_name")
 
         super().__init__(*args, **kwargs)
 
     def widget_attrs(self, widget):
         attrs = {
-            'display-field': self.display_field,
+            "display-field": self.display_field,
         }
 
         # Set value-field attribute if the field specifies to_field_name
         if self.to_field_name:
-            attrs['value-field'] = self.to_field_name
+            attrs["value-field"] = self.to_field_name
 
         # Set the string used to represent a null option
         if self.null_option is not None:
-            attrs['data-null-option'] = self.null_option
+            attrs["data-null-option"] = self.null_option
 
         # Set the disabled indicator, if any
         if self.disabled_indicator is not None:
-            attrs['disabled-indicator'] = self.disabled_indicator
+            attrs["disabled-indicator"] = self.disabled_indicator
 
         # Toggle brief mode
         if not self.brief_mode:
-            attrs['data-full'] = 'true'
+            attrs["data-full"] = "true"
 
         # Attach any static query parameters
         for key, value in self.query_params.items():
@@ -306,7 +346,7 @@ class DynamicModelChoiceMixin:
         if not self.initial and self.initial_params:
             filter_kwargs = {}
             for kwarg, child_field in self.initial_params.items():
-                value = form.initial.get(child_field.lstrip('$'))
+                value = form.initial.get(child_field.lstrip("$"))
                 if value:
                     filter_kwargs[kwarg] = value
             if filter_kwargs:
@@ -316,7 +356,7 @@ class DynamicModelChoiceMixin:
         # will be populated on-demand via the APISelect widget.
         data = bound_field.value()
         if data:
-            field_name = getattr(self, 'to_field_name') or 'pk'
+            field_name = getattr(self, "to_field_name") or "pk"
             filter = self.filter(field_name=field_name)
             try:
                 self.queryset = filter.filter(self.queryset, data)
@@ -328,11 +368,11 @@ class DynamicModelChoiceMixin:
 
         # Set the data URL on the APISelect widget (if not already set)
         widget = bound_field.field.widget
-        if not widget.attrs.get('data-url'):
+        if not widget.attrs.get("data-url"):
             app_label = self.queryset.model._meta.app_label
             model_name = self.queryset.model._meta.model_name
-            data_url = reverse('{}-api:{}-list'.format(app_label, model_name))
-            widget.attrs['data-url'] = data_url
+            data_url = reverse("{}-api:{}-list".format(app_label, model_name))
+            widget.attrs["data-url"] = data_url
 
         return bound_field
 
@@ -342,13 +382,17 @@ class DynamicModelChoiceField(DynamicModelChoiceMixin, forms.ModelChoiceField):
     Override get_bound_field() to avoid pre-populating field choices with a SQL query. The field will be
     rendered only with choices set via bound data. Choices are populated on-demand via the APISelect widget.
     """
+
     pass
 
 
-class DynamicModelMultipleChoiceField(DynamicModelChoiceMixin, forms.ModelMultipleChoiceField):
+class DynamicModelMultipleChoiceField(
+    DynamicModelChoiceMixin, forms.ModelMultipleChoiceField
+):
     """
     A multiple-choice version of DynamicModelChoiceField.
     """
+
     filter = django_filters.ModelMultipleChoiceFilter
     widget = widgets.APISelectMultiple
 
@@ -358,6 +402,7 @@ class LaxURLField(forms.URLField):
     Modifies Django's built-in URLField to remove the requirement for fully-qualified domain names
     (e.g. http://myserver/ is valid)
     """
+
     default_validators = [EnhancedURLValidator()]
 
 
@@ -365,15 +410,18 @@ class JSONField(_JSONField):
     """
     Custom wrapper around Django's built-in JSONField to avoid presenting "null" as the default text.
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if not self.help_text:
-            self.help_text = 'Enter context data in <a href="https://json.org/">JSON</a> format.'
-            self.widget.attrs['placeholder'] = ''
+            self.help_text = (
+                'Enter context data in <a href="https://json.org/">JSON</a> format.'
+            )
+            self.widget.attrs["placeholder"] = ""
 
     def prepare_value(self, value):
         if isinstance(value, InvalidJSONInput):
             return value
         if value is None:
-            return ''
+            return ""
         return json.dumps(value, sort_keys=True, indent=4)

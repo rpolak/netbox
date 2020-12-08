@@ -7,13 +7,15 @@ import utilities.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcim', '0031_regions'),
+        ("dcim", "0031_regions"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='device',
-            name='name',
-            field=utilities.fields.NullableCharField(blank=True, max_length=64, null=True, unique=True),
+            model_name="device",
+            name="name",
+            field=utilities.fields.NullableCharField(
+                blank=True, max_length=64, null=True, unique=True
+            ),
         ),
     ]

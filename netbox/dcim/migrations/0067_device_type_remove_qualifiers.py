@@ -6,24 +6,24 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcim', '0066_cables'),
+        ("dcim", "0066_cables"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='devicetype',
-            name='is_console_server',
+            model_name="devicetype",
+            name="is_console_server",
         ),
         migrations.RemoveField(
-            model_name='devicetype',
-            name='is_network_device',
+            model_name="devicetype",
+            name="is_network_device",
         ),
         migrations.RemoveField(
-            model_name='devicetype',
-            name='is_pdu',
+            model_name="devicetype",
+            name="is_pdu",
         ),
         migrations.RemoveField(
-            model_name='devicetype',
-            name='interface_ordering',
+            model_name="devicetype",
+            name="interface_ordering",
         ),
     ]

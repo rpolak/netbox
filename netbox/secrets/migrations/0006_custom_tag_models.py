@@ -7,14 +7,16 @@ import taggit.managers
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('secrets', '0005_change_logging'),
-        ('extras', '0019_tag_taggeditem'),
+        ("secrets", "0005_change_logging"),
+        ("extras", "0019_tag_taggeditem"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='secret',
-            name='tags',
-            field=taggit.managers.TaggableManager(through='extras.TaggedItem', to='extras.Tag'),
+            model_name="secret",
+            name="tags",
+            field=taggit.managers.TaggableManager(
+                through="extras.TaggedItem", to="extras.Tag"
+            ),
         ),
     ]

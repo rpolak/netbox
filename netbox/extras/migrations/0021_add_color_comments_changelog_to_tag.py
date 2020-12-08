@@ -7,28 +7,28 @@ import utilities.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('extras', '0020_tag_data'),
+        ("extras", "0020_tag_data"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='tag',
-            name='color',
-            field=utilities.fields.ColorField(max_length=6, default='9e9e9e'),
+            model_name="tag",
+            name="color",
+            field=utilities.fields.ColorField(max_length=6, default="9e9e9e"),
         ),
         migrations.AddField(
-            model_name='tag',
-            name='comments',
-            field=models.TextField(blank=True, default=''),
+            model_name="tag",
+            name="comments",
+            field=models.TextField(blank=True, default=""),
         ),
         migrations.AddField(
-            model_name='tag',
-            name='created',
+            model_name="tag",
+            name="created",
             field=models.DateField(auto_now_add=True, null=True),
         ),
         migrations.AddField(
-            model_name='tag',
-            name='last_updated',
+            model_name="tag",
+            name="last_updated",
             field=models.DateTimeField(auto_now=True, null=True),
         ),
     ]

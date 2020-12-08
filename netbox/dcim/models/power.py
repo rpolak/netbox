@@ -14,8 +14,8 @@ from utilities.validators import ExclusionValidator
 from .device_components import CableTermination
 
 __all__ = (
-    'PowerFeed',
-    'PowerPanel',
+    "PowerFeed",
+    "PowerPanel",
 )
 
 
@@ -23,39 +23,33 @@ __all__ = (
 # Power
 #
 
-@extras_features('custom_links', 'export_templates', 'webhooks')
+
+@extras_features("custom_links", "export_templates", "webhooks")
 class PowerPanel(ChangeLoggedModel):
     """
     A distribution point for electrical power; e.g. a data center RPP.
     """
-    site = models.ForeignKey(
-        to='Site',
-        on_delete=models.PROTECT
-    )
+
+    site = models.ForeignKey(to="Site", on_delete=models.PROTECT)
     rack_group = models.ForeignKey(
-        to='RackGroup',
-        on_delete=models.PROTECT,
-        blank=True,
-        null=True
+        to="RackGroup", on_delete=models.PROTECT, blank=True, null=True
     )
-    name = models.CharField(
-        max_length=50
-    )
+    name = models.CharField(max_length=50)
     tags = TaggableManager(through=TaggedItem)
 
     objects = RestrictedQuerySet.as_manager()
 
-    csv_headers = ['site', 'rack_group', 'name']
+    csv_headers = ["site", "rack_group", "name"]
 
     class Meta:
-        ordering = ['site', 'name']
-        unique_together = ['site', 'name']
+        ordering = ["site", "name"]
+        unique_together = ["site", "name"]
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('dcim:powerpanel', args=[self.pk])
+        return reverse("dcim:powerpanel", args=[self.pk])
 
     def to_csv(self):
         return (
@@ -68,121 +62,125 @@ class PowerPanel(ChangeLoggedModel):
 
         # RackGroup must belong to assigned Site
         if self.rack_group and self.rack_group.site != self.site:
-            raise ValidationError("Rack group {} ({}) is in a different site than {}".format(
-                self.rack_group, self.rack_group.site, self.site
-            ))
+            raise ValidationError(
+                "Rack group {} ({}) is in a different site than {}".format(
+                    self.rack_group, self.rack_group.site, self.site
+                )
+            )
 
 
-@extras_features('custom_fields', 'custom_links', 'export_templates', 'webhooks')
+@extras_features("custom_fields", "custom_links", "export_templates", "webhooks")
 class PowerFeed(ChangeLoggedModel, CableTermination, CustomFieldModel):
     """
     An electrical circuit delivered from a PowerPanel.
     """
+
     power_panel = models.ForeignKey(
-        to='PowerPanel',
-        on_delete=models.PROTECT,
-        related_name='powerfeeds'
+        to="PowerPanel", on_delete=models.PROTECT, related_name="powerfeeds"
     )
-    rack = models.ForeignKey(
-        to='Rack',
-        on_delete=models.PROTECT,
-        blank=True,
-        null=True
-    )
+    rack = models.ForeignKey(to="Rack", on_delete=models.PROTECT, blank=True, null=True)
     connected_endpoint = models.OneToOneField(
-        to='dcim.PowerPort',
+        to="dcim.PowerPort",
         on_delete=models.SET_NULL,
-        related_name='+',
+        related_name="+",
         blank=True,
-        null=True
+        null=True,
     )
     connection_status = models.BooleanField(
-        choices=CONNECTION_STATUS_CHOICES,
-        blank=True,
-        null=True
+        choices=CONNECTION_STATUS_CHOICES, blank=True, null=True
     )
-    name = models.CharField(
-        max_length=50
-    )
+    name = models.CharField(max_length=50)
     status = models.CharField(
         max_length=50,
         choices=PowerFeedStatusChoices,
-        default=PowerFeedStatusChoices.STATUS_ACTIVE
+        default=PowerFeedStatusChoices.STATUS_ACTIVE,
     )
     type = models.CharField(
         max_length=50,
         choices=PowerFeedTypeChoices,
-        default=PowerFeedTypeChoices.TYPE_PRIMARY
+        default=PowerFeedTypeChoices.TYPE_PRIMARY,
     )
     supply = models.CharField(
         max_length=50,
         choices=PowerFeedSupplyChoices,
-        default=PowerFeedSupplyChoices.SUPPLY_AC
+        default=PowerFeedSupplyChoices.SUPPLY_AC,
     )
     phase = models.CharField(
         max_length=50,
         choices=PowerFeedPhaseChoices,
-        default=PowerFeedPhaseChoices.PHASE_SINGLE
+        default=PowerFeedPhaseChoices.PHASE_SINGLE,
     )
     voltage = models.SmallIntegerField(
-        default=POWERFEED_VOLTAGE_DEFAULT,
-        validators=[ExclusionValidator([0])]
+        default=POWERFEED_VOLTAGE_DEFAULT, validators=[ExclusionValidator([0])]
     )
     amperage = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1)],
-        default=POWERFEED_AMPERAGE_DEFAULT
+        validators=[MinValueValidator(1)], default=POWERFEED_AMPERAGE_DEFAULT
     )
     max_utilization = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(100)],
         default=POWERFEED_MAX_UTILIZATION_DEFAULT,
-        help_text="Maximum permissible draw (percentage)"
+        help_text="Maximum permissible draw (percentage)",
     )
-    available_power = models.PositiveIntegerField(
-        default=0,
-        editable=False
-    )
-    comments = models.TextField(
-        blank=True
-    )
+    available_power = models.PositiveIntegerField(default=0, editable=False)
+    comments = models.TextField(blank=True)
     custom_field_values = GenericRelation(
-        to='extras.CustomFieldValue',
-        content_type_field='obj_type',
-        object_id_field='obj_id'
+        to="extras.CustomFieldValue",
+        content_type_field="obj_type",
+        object_id_field="obj_id",
     )
     tags = TaggableManager(through=TaggedItem)
 
     objects = RestrictedQuerySet.as_manager()
 
     csv_headers = [
-        'site', 'power_panel', 'rack_group', 'rack', 'name', 'status', 'type', 'supply', 'phase', 'voltage',
-        'amperage', 'max_utilization', 'comments',
+        "site",
+        "power_panel",
+        "rack_group",
+        "rack",
+        "name",
+        "status",
+        "type",
+        "supply",
+        "phase",
+        "voltage",
+        "amperage",
+        "max_utilization",
+        "comments",
     ]
     clone_fields = [
-        'power_panel', 'rack', 'status', 'type', 'supply', 'phase', 'voltage', 'amperage', 'max_utilization',
-        'available_power',
+        "power_panel",
+        "rack",
+        "status",
+        "type",
+        "supply",
+        "phase",
+        "voltage",
+        "amperage",
+        "max_utilization",
+        "available_power",
     ]
 
     STATUS_CLASS_MAP = {
-        PowerFeedStatusChoices.STATUS_OFFLINE: 'warning',
-        PowerFeedStatusChoices.STATUS_ACTIVE: 'success',
-        PowerFeedStatusChoices.STATUS_PLANNED: 'info',
-        PowerFeedStatusChoices.STATUS_FAILED: 'danger',
+        PowerFeedStatusChoices.STATUS_OFFLINE: "warning",
+        PowerFeedStatusChoices.STATUS_ACTIVE: "success",
+        PowerFeedStatusChoices.STATUS_PLANNED: "info",
+        PowerFeedStatusChoices.STATUS_FAILED: "danger",
     }
 
     TYPE_CLASS_MAP = {
-        PowerFeedTypeChoices.TYPE_PRIMARY: 'success',
-        PowerFeedTypeChoices.TYPE_REDUNDANT: 'info',
+        PowerFeedTypeChoices.TYPE_PRIMARY: "success",
+        PowerFeedTypeChoices.TYPE_REDUNDANT: "info",
     }
 
     class Meta:
-        ordering = ['power_panel', 'name']
-        unique_together = ['power_panel', 'name']
+        ordering = ["power_panel", "name"]
+        unique_together = ["power_panel", "name"]
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('dcim:powerfeed', args=[self.pk])
+        return reverse("dcim:powerfeed", args=[self.pk])
 
     def to_csv(self):
         return (
@@ -205,15 +203,17 @@ class PowerFeed(ChangeLoggedModel, CableTermination, CustomFieldModel):
 
         # Rack must belong to same Site as PowerPanel
         if self.rack and self.rack.site != self.power_panel.site:
-            raise ValidationError("Rack {} ({}) and power panel {} ({}) are in different sites".format(
-                self.rack, self.rack.site, self.power_panel, self.power_panel.site
-            ))
+            raise ValidationError(
+                "Rack {} ({}) and power panel {} ({}) are in different sites".format(
+                    self.rack, self.rack.site, self.power_panel, self.power_panel.site
+                )
+            )
 
         # AC voltage cannot be negative
         if self.voltage < 0 and self.supply == PowerFeedSupplyChoices.SUPPLY_AC:
-            raise ValidationError({
-                "voltage": "Voltage cannot be negative for AC supply"
-            })
+            raise ValidationError(
+                {"voltage": "Voltage cannot be negative for AC supply"}
+            )
 
     def save(self, *args, **kwargs):
 

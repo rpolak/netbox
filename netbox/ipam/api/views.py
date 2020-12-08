@@ -9,7 +9,17 @@ from rest_framework.routers import APIRootView
 
 from extras.api.views import CustomFieldModelViewSet
 from ipam import filters
-from ipam.models import Aggregate, IPAddress, Prefix, RIR, Role, Service, VLAN, VLANGroup, VRF
+from ipam.models import (
+    Aggregate,
+    IPAddress,
+    Prefix,
+    RIR,
+    Role,
+    Service,
+    VLAN,
+    VLANGroup,
+    VRF,
+)
 from utilities.api import ModelViewSet
 from utilities.constants import ADVISORY_LOCK_KEYS
 from utilities.utils import get_subquery
@@ -20,18 +30,24 @@ class IPAMRootView(APIRootView):
     """
     IPAM API root view
     """
+
     def get_view_name(self):
-        return 'IPAM'
+        return "IPAM"
 
 
 #
 # VRFs
 #
 
+
 class VRFViewSet(CustomFieldModelViewSet):
-    queryset = VRF.objects.prefetch_related('tenant').prefetch_related('tags').annotate(
-        ipaddress_count=get_subquery(IPAddress, 'vrf'),
-        prefix_count=get_subquery(Prefix, 'vrf')
+    queryset = (
+        VRF.objects.prefetch_related("tenant")
+        .prefetch_related("tags")
+        .annotate(
+            ipaddress_count=get_subquery(IPAddress, "vrf"),
+            prefix_count=get_subquery(Prefix, "vrf"),
+        )
     )
     serializer_class = serializers.VRFSerializer
     filterset_class = filters.VRFFilterSet
@@ -41,10 +57,9 @@ class VRFViewSet(CustomFieldModelViewSet):
 # RIRs
 #
 
+
 class RIRViewSet(ModelViewSet):
-    queryset = RIR.objects.annotate(
-        aggregate_count=get_subquery(Aggregate, 'rir')
-    )
+    queryset = RIR.objects.annotate(aggregate_count=get_subquery(Aggregate, "rir"))
     serializer_class = serializers.RIRSerializer
     filterset_class = filters.RIRFilterSet
 
@@ -53,8 +68,9 @@ class RIRViewSet(ModelViewSet):
 # Aggregates
 #
 
+
 class AggregateViewSet(CustomFieldModelViewSet):
-    queryset = Aggregate.objects.prefetch_related('rir').prefetch_related('tags')
+    queryset = Aggregate.objects.prefetch_related("rir").prefetch_related("tags")
     serializer_class = serializers.AggregateSerializer
     filterset_class = filters.AggregateFilterSet
 
@@ -63,10 +79,10 @@ class AggregateViewSet(CustomFieldModelViewSet):
 # Roles
 #
 
+
 class RoleViewSet(ModelViewSet):
     queryset = Role.objects.annotate(
-        prefix_count=get_subquery(Prefix, 'role'),
-        vlan_count=get_subquery(VLAN, 'role')
+        prefix_count=get_subquery(Prefix, "role"), vlan_count=get_subquery(VLAN, "role")
     )
     serializer_class = serializers.RoleSerializer
     filterset_class = filters.RoleFilterSet
@@ -76,9 +92,10 @@ class RoleViewSet(ModelViewSet):
 # Prefixes
 #
 
+
 class PrefixViewSet(CustomFieldModelViewSet):
     queryset = Prefix.objects.prefetch_related(
-        'site', 'vrf__tenant', 'tenant', 'vlan', 'role', 'tags'
+        "site", "vrf__tenant", "tenant", "vlan", "role", "tags"
     )
     serializer_class = serializers.PrefixSerializer
     filterset_class = filters.PrefixFilterSet
@@ -88,10 +105,14 @@ class PrefixViewSet(CustomFieldModelViewSet):
             return serializers.PrefixLengthSerializer
         return super().get_serializer_class()
 
-    @swagger_auto_schema(method='get', responses={200: serializers.AvailablePrefixSerializer(many=True)})
-    @swagger_auto_schema(method='post', responses={201: serializers.PrefixSerializer(many=False)})
-    @action(detail=True, url_path='available-prefixes', methods=['get', 'post'])
-    @advisory_lock(ADVISORY_LOCK_KEYS['available-prefixes'])
+    @swagger_auto_schema(
+        method="get", responses={200: serializers.AvailablePrefixSerializer(many=True)}
+    )
+    @swagger_auto_schema(
+        method="post", responses={201: serializers.PrefixSerializer(many=False)}
+    )
+    @action(detail=True, url_path="available-prefixes", methods=["get", "post"])
+    @advisory_lock(ADVISORY_LOCK_KEYS["available-prefixes"])
     def available_prefixes(self, request, pk=None):
         """
         A convenience method for returning available child prefixes within a parent.
@@ -102,22 +123,19 @@ class PrefixViewSet(CustomFieldModelViewSet):
         prefix = get_object_or_404(self.queryset, pk=pk)
         available_prefixes = prefix.get_available_prefixes()
 
-        if request.method == 'POST':
+        if request.method == "POST":
 
             # Validate Requested Prefixes' length
             serializer = serializers.PrefixLengthSerializer(
                 data=request.data if isinstance(request.data, list) else [request.data],
                 many=True,
                 context={
-                    'request': request,
-                    'prefix': prefix,
-                }
+                    "request": request,
+                    "prefix": prefix,
+                },
             )
             if not serializer.is_valid():
-                return Response(
-                    serializer.errors,
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
             requested_prefixes = serializer.validated_data
             # Allocate prefixes to the requested objects based on availability within the parent
@@ -125,28 +143,34 @@ class PrefixViewSet(CustomFieldModelViewSet):
 
                 # Find the first available prefix equal to or larger than the requested size
                 for available_prefix in available_prefixes.iter_cidrs():
-                    if requested_prefix['prefix_length'] >= available_prefix.prefixlen:
-                        allocated_prefix = '{}/{}'.format(available_prefix.network, requested_prefix['prefix_length'])
-                        requested_prefix['prefix'] = allocated_prefix
-                        requested_prefix['vrf'] = prefix.vrf.pk if prefix.vrf else None
+                    if requested_prefix["prefix_length"] >= available_prefix.prefixlen:
+                        allocated_prefix = "{}/{}".format(
+                            available_prefix.network, requested_prefix["prefix_length"]
+                        )
+                        requested_prefix["prefix"] = allocated_prefix
+                        requested_prefix["vrf"] = prefix.vrf.pk if prefix.vrf else None
                         break
                 else:
                     return Response(
                         {
                             "detail": "Insufficient space is available to accommodate the requested prefix size(s)"
                         },
-                        status=status.HTTP_204_NO_CONTENT
+                        status=status.HTTP_204_NO_CONTENT,
                     )
 
                 # Remove the allocated prefix from the list of available prefixes
                 available_prefixes.remove(allocated_prefix)
 
             # Initialize the serializer with a list or a single object depending on what was requested
-            context = {'request': request}
+            context = {"request": request}
             if isinstance(request.data, list):
-                serializer = serializers.PrefixSerializer(data=requested_prefixes, many=True, context=context)
+                serializer = serializers.PrefixSerializer(
+                    data=requested_prefixes, many=True, context=context
+                )
             else:
-                serializer = serializers.PrefixSerializer(data=requested_prefixes[0], context=context)
+                serializer = serializers.PrefixSerializer(
+                    data=requested_prefixes[0], context=context
+                )
 
             # Create the new Prefix(es)
             if serializer.is_valid():
@@ -157,18 +181,32 @@ class PrefixViewSet(CustomFieldModelViewSet):
 
         else:
 
-            serializer = serializers.AvailablePrefixSerializer(available_prefixes.iter_cidrs(), many=True, context={
-                'request': request,
-                'vrf': prefix.vrf,
-            })
+            serializer = serializers.AvailablePrefixSerializer(
+                available_prefixes.iter_cidrs(),
+                many=True,
+                context={
+                    "request": request,
+                    "vrf": prefix.vrf,
+                },
+            )
 
             return Response(serializer.data)
 
-    @swagger_auto_schema(method='get', responses={200: serializers.AvailableIPSerializer(many=True)})
-    @swagger_auto_schema(method='post', responses={201: serializers.AvailableIPSerializer(many=True)},
-                         request_body=serializers.AvailableIPSerializer(many=False))
-    @action(detail=True, url_path='available-ips', methods=['get', 'post'], queryset=IPAddress.objects.all())
-    @advisory_lock(ADVISORY_LOCK_KEYS['available-ips'])
+    @swagger_auto_schema(
+        method="get", responses={200: serializers.AvailableIPSerializer(many=True)}
+    )
+    @swagger_auto_schema(
+        method="post",
+        responses={201: serializers.AvailableIPSerializer(many=True)},
+        request_body=serializers.AvailableIPSerializer(many=False),
+    )
+    @action(
+        detail=True,
+        url_path="available-ips",
+        methods=["get", "post"],
+        queryset=IPAddress.objects.all(),
+    )
+    @advisory_lock(ADVISORY_LOCK_KEYS["available-ips"])
     def available_ips(self, request, pk=None):
         """
         A convenience method for returning available IP addresses within a prefix. By default, the number of IPs
@@ -181,10 +219,12 @@ class PrefixViewSet(CustomFieldModelViewSet):
         prefix = get_object_or_404(Prefix.objects.restrict(request.user), pk=pk)
 
         # Create the next available IP within the prefix
-        if request.method == 'POST':
+        if request.method == "POST":
 
             # Normalize to a list of objects
-            requested_ips = request.data if isinstance(request.data, list) else [request.data]
+            requested_ips = (
+                request.data if isinstance(request.data, list) else [request.data]
+            )
 
             # Determine if the requested number of IPs is available
             available_ips = prefix.get_available_ips()
@@ -192,24 +232,32 @@ class PrefixViewSet(CustomFieldModelViewSet):
                 return Response(
                     {
                         "detail": "An insufficient number of IP addresses are available within the prefix {} ({} "
-                                  "requested, {} available)".format(prefix, len(requested_ips), len(available_ips))
+                        "requested, {} available)".format(
+                            prefix, len(requested_ips), len(available_ips)
+                        )
                     },
-                    status=status.HTTP_204_NO_CONTENT
+                    status=status.HTTP_204_NO_CONTENT,
                 )
 
             # Assign addresses from the list of available IPs and copy VRF assignment from the parent prefix
             available_ips = iter(available_ips)
             prefix_length = prefix.prefix.prefixlen
             for requested_ip in requested_ips:
-                requested_ip['address'] = '{}/{}'.format(next(available_ips), prefix_length)
-                requested_ip['vrf'] = prefix.vrf.pk if prefix.vrf else None
+                requested_ip["address"] = "{}/{}".format(
+                    next(available_ips), prefix_length
+                )
+                requested_ip["vrf"] = prefix.vrf.pk if prefix.vrf else None
 
             # Initialize the serializer with a list or a single object depending on what was requested
-            context = {'request': request}
+            context = {"request": request}
             if isinstance(request.data, list):
-                serializer = serializers.IPAddressSerializer(data=requested_ips, many=True, context=context)
+                serializer = serializers.IPAddressSerializer(
+                    data=requested_ips, many=True, context=context
+                )
             else:
-                serializer = serializers.IPAddressSerializer(data=requested_ips[0], context=context)
+                serializer = serializers.IPAddressSerializer(
+                    data=requested_ips[0], context=context
+                )
 
             # Create the new IP address(es)
             if serializer.is_valid():
@@ -221,7 +269,7 @@ class PrefixViewSet(CustomFieldModelViewSet):
         # Determine the maximum number of IPs to return
         else:
             try:
-                limit = int(request.query_params.get('limit', settings.PAGINATE_COUNT))
+                limit = int(request.query_params.get("limit", settings.PAGINATE_COUNT))
             except ValueError:
                 limit = settings.PAGINATE_COUNT
             if settings.MAX_PAGE_SIZE:
@@ -233,11 +281,15 @@ class PrefixViewSet(CustomFieldModelViewSet):
                 ip_list.append(ip)
                 if index == limit:
                     break
-            serializer = serializers.AvailableIPSerializer(ip_list, many=True, context={
-                'request': request,
-                'prefix': prefix.prefix,
-                'vrf': prefix.vrf,
-            })
+            serializer = serializers.AvailableIPSerializer(
+                ip_list,
+                many=True,
+                context={
+                    "request": request,
+                    "prefix": prefix.prefix,
+                    "vrf": prefix.vrf,
+                },
+            )
 
             return Response(serializer.data)
 
@@ -246,9 +298,10 @@ class PrefixViewSet(CustomFieldModelViewSet):
 # IP addresses
 #
 
+
 class IPAddressViewSet(CustomFieldModelViewSet):
     queryset = IPAddress.objects.prefetch_related(
-        'vrf__tenant', 'tenant', 'nat_inside', 'nat_outside', 'tags', 'assigned_object'
+        "vrf__tenant", "tenant", "nat_inside", "nat_outside", "tags", "assigned_object"
     )
     serializer_class = serializers.IPAddressSerializer
     filterset_class = filters.IPAddressFilterSet
@@ -258,9 +311,10 @@ class IPAddressViewSet(CustomFieldModelViewSet):
 # VLAN groups
 #
 
+
 class VLANGroupViewSet(ModelViewSet):
-    queryset = VLANGroup.objects.prefetch_related('site').annotate(
-        vlan_count=get_subquery(VLAN, 'group')
+    queryset = VLANGroup.objects.prefetch_related("site").annotate(
+        vlan_count=get_subquery(VLAN, "group")
     )
     serializer_class = serializers.VLANGroupSerializer
     filterset_class = filters.VLANGroupFilterSet
@@ -270,12 +324,11 @@ class VLANGroupViewSet(ModelViewSet):
 # VLANs
 #
 
+
 class VLANViewSet(CustomFieldModelViewSet):
     queryset = VLAN.objects.prefetch_related(
-        'site', 'group', 'tenant', 'role', 'tags'
-    ).annotate(
-        prefix_count=get_subquery(Prefix, 'vlan')
-    )
+        "site", "group", "tenant", "role", "tags"
+    ).annotate(prefix_count=get_subquery(Prefix, "vlan"))
     serializer_class = serializers.VLANSerializer
     filterset_class = filters.VLANFilterSet
 
@@ -284,9 +337,10 @@ class VLANViewSet(CustomFieldModelViewSet):
 # Services
 #
 
+
 class ServiceViewSet(ModelViewSet):
     queryset = Service.objects.prefetch_related(
-        'device', 'virtual_machine', 'tags', 'ipaddresses'
+        "device", "virtual_machine", "tags", "ipaddresses"
     )
     serializer_class = serializers.ServiceSerializer
     filterset_class = filters.ServiceFilterSet

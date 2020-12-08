@@ -6,17 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('extras', '0023_fix_tag_sequences'),
+        ("extras", "0023_fix_tag_sequences"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Script',
+            name="Script",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True, primary_key=True, serialize=False
+                    ),
+                ),
             ],
             options={
-                'managed': False,
+                "managed": False,
             },
         ),
     ]

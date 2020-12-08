@@ -4,7 +4,12 @@ from collections import OrderedDict
 import pytz
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import FieldError, MultipleObjectsReturned, ObjectDoesNotExist, PermissionDenied
+from django.core.exceptions import (
+    FieldError,
+    MultipleObjectsReturned,
+    ObjectDoesNotExist,
+    PermissionDenied,
+)
 from django.db import transaction
 from django.db.models import ManyToManyField, ProtectedError
 from django.urls import reverse
@@ -19,13 +24,13 @@ from rest_framework.viewsets import ModelViewSet as _ModelViewSet
 from .utils import dict_to_filter_params, dynamic_import
 
 HTTP_ACTIONS = {
-    'GET': 'view',
-    'OPTIONS': None,
-    'HEAD': 'view',
-    'POST': 'add',
-    'PUT': 'change',
-    'PATCH': 'change',
-    'DELETE': 'delete',
+    "GET": "view",
+    "OPTIONS": None,
+    "HEAD": "view",
+    "POST": "add",
+    "PUT": "change",
+    "PATCH": "change",
+    "DELETE": "delete",
 }
 
 
@@ -38,20 +43,22 @@ class SerializerNotFound(Exception):
     pass
 
 
-def get_serializer_for_model(model, prefix=''):
+def get_serializer_for_model(model, prefix=""):
     """
     Dynamically resolve and return the appropriate serializer for a model.
     """
-    app_name, model_name = model._meta.label.split('.')
+    app_name, model_name = model._meta.label.split(".")
     # Serializers for Django's auth models are in the users app
-    if app_name == 'auth':
-        app_name = 'users'
-    serializer_name = f'{app_name}.api.serializers.{prefix}{model_name}Serializer'
+    if app_name == "auth":
+        app_name = "users"
+    serializer_name = f"{app_name}.api.serializers.{prefix}{model_name}Serializer"
     try:
         return dynamic_import(serializer_name)
     except AttributeError:
         raise SerializerNotFound(
-            "Could not determine serializer for {}.{} with prefix '{}'".format(app_name, model_name, prefix)
+            "Could not determine serializer for {}.{} with prefix '{}'".format(
+                app_name, model_name, prefix
+            )
         )
 
 
@@ -59,7 +66,7 @@ def is_api_request(request):
     """
     Return True of the request is being made via the REST API.
     """
-    api_path = reverse('api-root')
+    api_path = reverse("api-root")
     return request.path_info.startswith(api_path)
 
 
@@ -67,10 +74,12 @@ def is_api_request(request):
 # Authentication
 #
 
+
 class IsAuthenticatedOrLoginNotRequired(BasePermission):
     """
     Returns True if the user is authenticated or LOGIN_REQUIRED is False.
     """
+
     def has_permission(self, request, view):
         if not settings.LOGIN_REQUIRED:
             return True
@@ -81,6 +90,7 @@ class IsAuthenticatedOrLoginNotRequired(BasePermission):
 # Fields
 #
 
+
 class ChoiceField(serializers.Field):
     """
     Represent a ChoiceField as {'value': <DB value>, 'label': <string>}. Accepts a single value on write.
@@ -88,6 +98,7 @@ class ChoiceField(serializers.Field):
     :param choices: An iterable of choices in the form (value, key).
     :param allow_blank: Allow blank values in addition to the listed choices.
     """
+
     def __init__(self, choices, allow_blank=False, **kwargs):
         self.choiceset = choices
         self.allow_blank = allow_blank
@@ -109,32 +120,31 @@ class ChoiceField(serializers.Field):
             if self.allow_null:
                 return True, None
             else:
-                data = ''
+                data = ""
         return super().validate_empty_values(data)
 
     def to_representation(self, obj):
-        if obj is '':
+        if obj is "":
             return None
-        return OrderedDict([
-            ('value', obj),
-            ('label', self._choices[obj])
-        ])
+        return OrderedDict([("value", obj), ("label", self._choices[obj])])
 
     def to_internal_value(self, data):
-        if data is '':
+        if data is "":
             if self.allow_blank:
                 return data
             raise ValidationError("This field may not be blank.")
 
         # Provide an explicit error message if the request is trying to write a dict or list
         if isinstance(data, (dict, list)):
-            raise ValidationError('Value must be passed directly (e.g. "foo": 123); do not use a dictionary or list.')
+            raise ValidationError(
+                'Value must be passed directly (e.g. "foo": 123); do not use a dictionary or list.'
+            )
 
         # Check for string representations of boolean/integer values
-        if hasattr(data, 'lower'):
-            if data.lower() == 'true':
+        if hasattr(data, "lower"):
+            if data.lower() == "true":
                 data = True
-            elif data.lower() == 'false':
+            elif data.lower() == "false":
                 data = False
             else:
                 try:
@@ -159,6 +169,7 @@ class ContentTypeField(RelatedField):
     """
     Represent a ContentType as '<app_label>.<model>'
     """
+
     default_error_messages = {
         "does_not_exist": "Invalid content type: {content_type}",
         "invalid": "Invalid value. Specify a content type as '<app_label>.<model_name>'.",
@@ -166,12 +177,14 @@ class ContentTypeField(RelatedField):
 
     def to_internal_value(self, data):
         try:
-            app_label, model = data.split('.')
-            return ContentType.objects.get_by_natural_key(app_label=app_label, model=model)
+            app_label, model = data.split(".")
+            return ContentType.objects.get_by_natural_key(
+                app_label=app_label, model=model
+            )
         except ObjectDoesNotExist:
-            self.fail('does_not_exist', content_type=data)
+            self.fail("does_not_exist", content_type=data)
         except (TypeError, ValueError):
-            self.fail('invalid')
+            self.fail("invalid")
 
     def to_representation(self, obj):
         return "{}.{}".format(obj.app_label, obj.model)
@@ -181,6 +194,7 @@ class TimeZoneField(serializers.Field):
     """
     Represent a pytz time zone.
     """
+
     def to_representation(self, obj):
         return obj.zone if obj else None
 
@@ -188,7 +202,11 @@ class TimeZoneField(serializers.Field):
         if not data:
             return ""
         if data not in pytz.common_timezones:
-            raise ValidationError('Unknown time zone "{}" (see pytz.common_timezones for all options)'.format(data))
+            raise ValidationError(
+                'Unknown time zone "{}" (see pytz.common_timezones for all options)'.format(
+                    data
+                )
+            )
         return pytz.timezone(data)
 
 
@@ -197,13 +215,14 @@ class SerializedPKRelatedField(PrimaryKeyRelatedField):
     Extends PrimaryKeyRelatedField to return a serialized object on read. This is useful for representing related
     objects in a ManyToManyField while still allowing a set of primary keys to be written.
     """
+
     def __init__(self, serializer, **kwargs):
         self.serializer = serializer
-        self.pk_field = kwargs.pop('pk_field', None)
+        self.pk_field = kwargs.pop("pk_field", None)
         super().__init__(**kwargs)
 
     def to_representation(self, value):
-        return self.serializer(value, context={'request': self.context['request']}).data
+        return self.serializer(value, context={"request": self.context["request"]}).data
 
 
 #
@@ -216,12 +235,13 @@ class ValidatedModelSerializer(serializers.ModelSerializer):
     """
     Extends the built-in ModelSerializer to enforce calling clean() on the associated model during validation.
     """
+
     def validate(self, data):
 
         # Remove custom fields data and tags (if any) prior to model validation
         attrs = data.copy()
-        attrs.pop('custom_fields', None)
-        attrs.pop('tags', None)
+        attrs.pop("custom_fields", None)
+        attrs.pop("tags", None)
 
         # Skip ManyToManyFields
         for field in self.Meta.model._meta.get_fields():
@@ -259,7 +279,9 @@ class WritableNestedSerializer(serializers.ModelSerializer):
                 return queryset.get(**params)
             except ObjectDoesNotExist:
                 raise ValidationError(
-                    "Related object not found using the provided attributes: {}".format(params)
+                    "Related object not found using the provided attributes: {}".format(
+                        params
+                    )
                 )
             except MultipleObjectsReturned:
                 raise ValidationError(
@@ -295,28 +317,34 @@ class WritableNestedSerializer(serializers.ModelSerializer):
 # Viewsets
 #
 
+
 class ModelViewSet(_ModelViewSet):
     """
     Accept either a single object or a list of objects to create.
     """
+
     def get_serializer(self, *args, **kwargs):
 
         # If a list of objects has been provided, initialize the serializer with many=True
-        if isinstance(kwargs.get('data', {}), list):
-            kwargs['many'] = True
+        if isinstance(kwargs.get("data", {}), list):
+            kwargs["many"] = True
 
         return super().get_serializer(*args, **kwargs)
 
     def get_serializer_class(self):
-        logger = logging.getLogger('netbox.api.views.ModelViewSet')
+        logger = logging.getLogger("netbox.api.views.ModelViewSet")
 
         # If 'brief' has been passed as a query param, find and return the nested serializer for this model, if one
         # exists
-        request = self.get_serializer_context()['request']
-        if request.query_params.get('brief'):
-            logger.debug("Request is for 'brief' format; initializing nested serializer")
+        request = self.get_serializer_context()["request"]
+        if request.query_params.get("brief"):
+            logger.debug(
+                "Request is for 'brief' format; initializing nested serializer"
+            )
             try:
-                serializer = get_serializer_for_model(self.queryset.model, prefix='Nested')
+                serializer = get_serializer_for_model(
+                    self.queryset.model, prefix="Nested"
+                )
                 logger.debug(f"Using serializer {serializer}")
                 return serializer
             except SerializerNotFound:
@@ -338,20 +366,17 @@ class ModelViewSet(_ModelViewSet):
             self.queryset = self.queryset.restrict(request.user, action)
 
     def dispatch(self, request, *args, **kwargs):
-        logger = logging.getLogger('netbox.api.views.ModelViewSet')
+        logger = logging.getLogger("netbox.api.views.ModelViewSet")
 
         try:
             return super().dispatch(request, *args, **kwargs)
         except ProtectedError as e:
             protected_objects = list(e.protected_objects)
-            msg = f'Unable to delete object. {len(protected_objects)} dependent objects were found: '
-            msg += ', '.join([f'{obj} ({obj.pk})' for obj in protected_objects])
+            msg = f"Unable to delete object. {len(protected_objects)} dependent objects were found: "
+            msg += ", ".join([f"{obj} ({obj.pk})" for obj in protected_objects])
             logger.warning(msg)
             return self.finalize_response(
-                request,
-                Response({'detail': msg}, status=409),
-                *args,
-                **kwargs
+                request, Response({"detail": msg}, status=409), *args, **kwargs
             )
 
     def _validate_objects(self, instance):
@@ -361,7 +386,9 @@ class ModelViewSet(_ModelViewSet):
         """
         if type(instance) is list:
             # Check that all instances are still included in the view's queryset
-            conforming_count = self.queryset.filter(pk__in=[obj.pk for obj in instance]).count()
+            conforming_count = self.queryset.filter(
+                pk__in=[obj.pk for obj in instance]
+            ).count()
             if conforming_count != len(instance):
                 raise ObjectDoesNotExist
         else:
@@ -370,7 +397,7 @@ class ModelViewSet(_ModelViewSet):
 
     def perform_create(self, serializer):
         model = self.queryset.model
-        logger = logging.getLogger('netbox.api.views.ModelViewSet')
+        logger = logging.getLogger("netbox.api.views.ModelViewSet")
         logger.info(f"Creating new {model._meta.verbose_name}")
 
         # Enforce object-level permissions on save()
@@ -383,8 +410,10 @@ class ModelViewSet(_ModelViewSet):
 
     def perform_update(self, serializer):
         model = self.queryset.model
-        logger = logging.getLogger('netbox.api.views.ModelViewSet')
-        logger.info(f"Updating {model._meta.verbose_name} {serializer.instance} (PK: {serializer.instance.pk})")
+        logger = logging.getLogger("netbox.api.views.ModelViewSet")
+        logger.info(
+            f"Updating {model._meta.verbose_name} {serializer.instance} (PK: {serializer.instance.pk})"
+        )
 
         # Enforce object-level permissions on save()
         try:
@@ -396,8 +425,10 @@ class ModelViewSet(_ModelViewSet):
 
     def perform_destroy(self, instance):
         model = self.queryset.model
-        logger = logging.getLogger('netbox.api.views.ModelViewSet')
-        logger.info(f"Deleting {model._meta.verbose_name} {instance} (PK: {instance.pk})")
+        logger = logging.getLogger("netbox.api.views.ModelViewSet")
+        logger.info(
+            f"Deleting {model._meta.verbose_name} {instance} (PK: {instance.pk})"
+        )
 
         return super().perform_destroy(instance)
 
@@ -406,8 +437,8 @@ class ModelViewSet(_ModelViewSet):
 # Routers
 #
 
-class OrderedDefaultRouter(DefaultRouter):
 
+class OrderedDefaultRouter(DefaultRouter):
     def get_api_root_view(self, api_urls=None):
         """
         Wrap DRF's DefaultRouter to return an alphabetized list of endpoints.

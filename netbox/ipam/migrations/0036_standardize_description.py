@@ -6,53 +6,53 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ipam', '0035_drop_ip_family'),
+        ("ipam", "0035_drop_ip_family"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='rir',
-            name='description',
+            model_name="rir",
+            name="description",
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AddField(
-            model_name='vlangroup',
-            name='description',
+            model_name="vlangroup",
+            name="description",
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name='aggregate',
-            name='description',
+            model_name="aggregate",
+            name="description",
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name='ipaddress',
-            name='description',
+            model_name="ipaddress",
+            name="description",
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name='prefix',
-            name='description',
+            model_name="prefix",
+            name="description",
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name='role',
-            name='description',
+            model_name="role",
+            name="description",
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name='service',
-            name='description',
+            model_name="service",
+            name="description",
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name='vlan',
-            name='description',
+            model_name="vlan",
+            name="description",
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name='vrf',
-            name='description',
+            model_name="vrf",
+            name="description",
             field=models.CharField(blank=True, max_length=200),
         ),
     ]

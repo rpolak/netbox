@@ -8,39 +8,37 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('auth', '0011_update_proxy_permissions'),
-        ('users', '0006_create_userconfigs'),
+        ("auth", "0011_update_proxy_permissions"),
+        ("users", "0006_create_userconfigs"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='AdminGroup',
-            fields=[
-            ],
+            name="AdminGroup",
+            fields=[],
             options={
-                'proxy': True,
-                'indexes': [],
-                'constraints': [],
-                'verbose_name': 'Group',
+                "proxy": True,
+                "indexes": [],
+                "constraints": [],
+                "verbose_name": "Group",
             },
-            bases=('auth.group',),
+            bases=("auth.group",),
             managers=[
-                ('objects', django.contrib.auth.models.GroupManager()),
+                ("objects", django.contrib.auth.models.GroupManager()),
             ],
         ),
         migrations.CreateModel(
-            name='AdminUser',
-            fields=[
-            ],
+            name="AdminUser",
+            fields=[],
             options={
-                'proxy': True,
-                'indexes': [],
-                'constraints': [],
-                'verbose_name': 'User',
+                "proxy": True,
+                "indexes": [],
+                "constraints": [],
+                "verbose_name": "User",
             },
-            bases=('auth.user',),
+            bases=("auth.user",),
             managers=[
-                ('objects', django.contrib.auth.models.UserManager()),
+                ("objects", django.contrib.auth.models.UserManager()),
             ],
         ),
     ]

@@ -7,13 +7,20 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('virtualization', '0004_virtualmachine_add_role'),
+        ("virtualization", "0004_virtualmachine_add_role"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='virtualmachine',
-            name='role',
-            field=models.ForeignKey(blank=True, limit_choices_to={'vm_role': True}, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='virtual_machines', to='dcim.DeviceRole'),
+            model_name="virtualmachine",
+            name="role",
+            field=models.ForeignKey(
+                blank=True,
+                limit_choices_to={"vm_role": True},
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="virtual_machines",
+                to="dcim.DeviceRole",
+            ),
         ),
     ]

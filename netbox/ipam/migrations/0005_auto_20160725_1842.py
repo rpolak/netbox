@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ipam', '0004_ipam_vlangroup_uniqueness'),
+        ("ipam", "0004_ipam_vlangroup_uniqueness"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='vlan',
-            name='description',
+            model_name="vlan",
+            name="description",
             field=models.CharField(blank=True, max_length=100),
         ),
         migrations.AlterField(
-            model_name='vlan',
-            name='name',
+            model_name="vlan",
+            name="name",
             field=models.CharField(max_length=64),
         ),
     ]

@@ -7,18 +7,30 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcim', '0052_virtual_chassis'),
+        ("dcim", "0052_virtual_chassis"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='platform',
-            name='manufacturer',
-            field=models.ForeignKey(blank=True, help_text='Optionally limit this platform to devices of a certain manufacturer', null=True, on_delete=django.db.models.deletion.CASCADE, related_name='platforms', to='dcim.Manufacturer'),
+            model_name="platform",
+            name="manufacturer",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="Optionally limit this platform to devices of a certain manufacturer",
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="platforms",
+                to="dcim.Manufacturer",
+            ),
         ),
         migrations.AlterField(
-            model_name='platform',
-            name='napalm_driver',
-            field=models.CharField(blank=True, help_text='The name of the NAPALM driver to use when interacting with devices', max_length=50, verbose_name='NAPALM driver'),
+            model_name="platform",
+            name="napalm_driver",
+            field=models.CharField(
+                blank=True,
+                help_text="The name of the NAPALM driver to use when interacting with devices",
+                max_length=50,
+                verbose_name="NAPALM driver",
+            ),
         ),
     ]

@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcim', '0010_devicebay_installed_device_set_null'),
+        ("dcim", "0010_devicebay_installed_device_set_null"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='devicetype',
-            name='part_number',
-            field=models.CharField(blank=True, help_text=b'Discrete part number (optional)', max_length=50),
+            model_name="devicetype",
+            name="part_number",
+            field=models.CharField(
+                blank=True, help_text=b"Discrete part number (optional)", max_length=50
+            ),
         ),
     ]

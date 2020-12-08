@@ -1,1 +1,1 @@
-default_app_config = 'extras.apps.ExtrasConfig'
+default_app_config = "extras.apps.ExtrasConfig"

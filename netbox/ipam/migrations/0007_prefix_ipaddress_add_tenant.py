@@ -7,19 +7,31 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('tenancy', '0001_initial'),
-        ('ipam', '0006_vrf_vlan_add_tenant'),
+        ("tenancy", "0001_initial"),
+        ("ipam", "0006_vrf_vlan_add_tenant"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='ipaddress',
-            name='tenant',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='ip_addresses', to='tenancy.Tenant'),
+            model_name="ipaddress",
+            name="tenant",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="ip_addresses",
+                to="tenancy.Tenant",
+            ),
         ),
         migrations.AddField(
-            model_name='prefix',
-            name='tenant',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='prefixes', to='tenancy.Tenant'),
+            model_name="prefix",
+            name="tenant",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="prefixes",
+                to="tenancy.Tenant",
+            ),
         ),
     ]

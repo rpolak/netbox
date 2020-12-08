@@ -6,17 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('extras', '0042_customfield_manager'),
+        ("extras", "0042_customfield_manager"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Report',
+            name="Report",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True, primary_key=True, serialize=False
+                    ),
+                ),
             ],
             options={
-                'managed': False,
+                "managed": False,
             },
         )
     ]
