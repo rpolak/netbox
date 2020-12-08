@@ -19,3 +19,4 @@ netbox.pid
 .idea
 .coverage
 .vscode
+db-dump.sql
