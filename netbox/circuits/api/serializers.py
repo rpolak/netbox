@@ -2,20 +2,12 @@ from rest_framework import serializers
 
 from circuits.choices import CircuitStatusChoices
 from circuits.models import Provider, Circuit, CircuitTermination, CircuitType
-from dcim.api.nested_serializers import (
-    NestedCableSerializer,
-    NestedInterfaceSerializer,
-    NestedSiteSerializer,
-)
-from dcim.api.serializers import ConnectedEndpointSerializer
+from dcim.api.nested_serializers import NestedCableSerializer, NestedInterfaceSerializer, NestedSiteSerializer
+from dcim.api.serializers import CableTerminationSerializer, ConnectedEndpointSerializer
 from extras.api.customfields import CustomFieldModelSerializer
 from extras.api.serializers import TaggedObjectSerializer
+from netbox.api import ChoiceField, ValidatedModelSerializer, WritableNestedSerializer
 from tenancy.api.nested_serializers import NestedTenantSerializer
-from utilities.api import (
-    ChoiceField,
-    ValidatedModelSerializer,
-    WritableNestedSerializer,
-)
 from .nested_serializers import *
 
 
@@ -65,23 +57,15 @@ class CircuitTypeSerializer(ValidatedModelSerializer):
         fields = ["id", "url", "name", "slug", "description", "circuit_count"]
 
 
-class CircuitCircuitTerminationSerializer(WritableNestedSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name="circuits-api:circuittermination-detail"
-    )
+class CircuitCircuitTerminationSerializer(WritableNestedSerializer, ConnectedEndpointSerializer):
+    url = serializers.HyperlinkedIdentityField(view_name='circuits-api:circuittermination-detail')
     site = NestedSiteSerializer()
-    connected_endpoint = NestedInterfaceSerializer()
 
     class Meta:
         model = CircuitTermination
         fields = [
-            "id",
-            "url",
-            "site",
-            "connected_endpoint",
-            "port_speed",
-            "upstream_speed",
-            "xconnect_id",
+            'id', 'url', 'site', 'port_speed', 'upstream_speed', 'xconnect_id', 'connected_endpoint',
+            'connected_endpoint_type', 'connected_endpoint_reachable',
         ]
 
 
@@ -117,10 +101,8 @@ class CircuitSerializer(TaggedObjectSerializer, CustomFieldModelSerializer):
         ]
 
 
-class CircuitTerminationSerializer(ConnectedEndpointSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name="circuits-api:circuittermination-detail"
-    )
+class CircuitTerminationSerializer(CableTerminationSerializer, ConnectedEndpointSerializer):
+    url = serializers.HyperlinkedIdentityField(view_name='circuits-api:circuittermination-detail')
     circuit = NestedCircuitSerializer()
     site = NestedSiteSerializer()
     cable = NestedCableSerializer(read_only=True)
@@ -128,18 +110,7 @@ class CircuitTerminationSerializer(ConnectedEndpointSerializer):
     class Meta:
         model = CircuitTermination
         fields = [
-            "id",
-            "url",
-            "circuit",
-            "term_side",
-            "site",
-            "port_speed",
-            "upstream_speed",
-            "xconnect_id",
-            "pp_info",
-            "description",
-            "connected_endpoint_type",
-            "connected_endpoint",
-            "connection_status",
-            "cable",
+            'id', 'url', 'circuit', 'term_side', 'site', 'port_speed', 'upstream_speed', 'xconnect_id', 'pp_info',
+            'description', 'cable', 'cable_peer', 'cable_peer_type', 'connected_endpoint', 'connected_endpoint_type',
+            'connected_endpoint_reachable'
         ]

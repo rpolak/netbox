@@ -16,7 +16,7 @@ from django.core.validators import URLValidator
 # Environment setup
 #
 
-VERSION = "2.9.11-dev"
+VERSION = '2.10.6-dev'
 
 # Hostname
 HOSTNAME = platform.node()
@@ -174,28 +174,6 @@ if RELEASE_CHECK_TIMEOUT < 3600:
         "RELEASE_CHECK_TIMEOUT has to be at least 3600 seconds (1 hour)"
     )
 
-# TODO: Remove in v2.10
-# Backward compatibility for REMOTE_AUTH_DEFAULT_PERMISSIONS
-if type(REMOTE_AUTH_DEFAULT_PERMISSIONS) is not dict:
-    try:
-        REMOTE_AUTH_DEFAULT_PERMISSIONS = {
-            perm: None for perm in REMOTE_AUTH_DEFAULT_PERMISSIONS
-        }
-        warnings.warn(
-            "REMOTE_AUTH_DEFAULT_PERMISSIONS should be a dictionary. Backward compatibility will be removed in v2.10."
-        )
-    except TypeError:
-        raise ImproperlyConfigured(
-            "REMOTE_AUTH_DEFAULT_PERMISSIONS must be a dictionary."
-        )
-# Backward compatibility for REMOTE_AUTH_BACKEND
-if REMOTE_AUTH_BACKEND == "utilities.auth_backends.RemoteUserBackend":
-    warnings.warn(
-        "RemoteUserBackend has moved! Please update your configuration to:\n"
-        "    REMOTE_AUTH_BACKEND='netbox.authentication.RemoteUserBackend'"
-    )
-    REMOTE_AUTH_BACKEND = "netbox.authentication.RemoteUserBackend"
-
 
 #
 # Database
@@ -256,23 +234,19 @@ if "tasks" not in REDIS:
     raise ImproperlyConfigured(
         "REDIS section in configuration.py is missing the 'tasks' subsection."
     )
-TASKS_REDIS = REDIS["tasks"]
-TASKS_REDIS_HOST = TASKS_REDIS.get("HOST", "localhost")
-TASKS_REDIS_PORT = TASKS_REDIS.get("PORT", 6379)
-TASKS_REDIS_SENTINELS = TASKS_REDIS.get("SENTINELS", [])
-TASKS_REDIS_USING_SENTINEL = all(
-    [isinstance(TASKS_REDIS_SENTINELS, (list, tuple)), len(TASKS_REDIS_SENTINELS) > 0]
-)
-TASKS_REDIS_SENTINEL_SERVICE = TASKS_REDIS.get("SENTINEL_SERVICE", "default")
-TASKS_REDIS_SENTINEL_TIMEOUT = TASKS_REDIS.get("SENTINEL_TIMEOUT", 10)
-TASKS_REDIS_PASSWORD = TASKS_REDIS.get("PASSWORD", "")
-TASKS_REDIS_DATABASE = TASKS_REDIS.get("DATABASE", 0)
-TASKS_REDIS_SSL = TASKS_REDIS.get("SSL", False)
-# TODO: Remove in v2.10 (see #5171)
-if "DEFAULT_TIMEOUT" in TASKS_REDIS:
-    warnings.warn(
-        "DEFAULT_TIMEOUT is no longer supported under REDIS configuration. Set RQ_DEFAULT_TIMEOUT instead."
-    )
+TASKS_REDIS = REDIS['tasks']
+TASKS_REDIS_HOST = TASKS_REDIS.get('HOST', 'localhost')
+TASKS_REDIS_PORT = TASKS_REDIS.get('PORT', 6379)
+TASKS_REDIS_SENTINELS = TASKS_REDIS.get('SENTINELS', [])
+TASKS_REDIS_USING_SENTINEL = all([
+    isinstance(TASKS_REDIS_SENTINELS, (list, tuple)),
+    len(TASKS_REDIS_SENTINELS) > 0
+])
+TASKS_REDIS_SENTINEL_SERVICE = TASKS_REDIS.get('SENTINEL_SERVICE', 'default')
+TASKS_REDIS_SENTINEL_TIMEOUT = TASKS_REDIS.get('SENTINEL_TIMEOUT', 10)
+TASKS_REDIS_PASSWORD = TASKS_REDIS.get('PASSWORD', '')
+TASKS_REDIS_DATABASE = TASKS_REDIS.get('DATABASE', 0)
+TASKS_REDIS_SSL = TASKS_REDIS.get('SSL', False)
 
 # Caching
 if "caching" not in REDIS:
@@ -360,22 +334,22 @@ INSTALLED_APPS = [
 
 # Middleware
 MIDDLEWARE = [
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
-    "django_prometheus.middleware.PrometheusBeforeMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "django.middleware.security.SecurityMiddleware",
-    "utilities.middleware.ExceptionHandlingMiddleware",
-    "utilities.middleware.RemoteUserMiddleware",
-    "utilities.middleware.LoginRequiredMiddleware",
-    "utilities.middleware.APIVersionMiddleware",
-    "extras.middleware.ObjectChangeMiddleware",
-    "django_prometheus.middleware.PrometheusAfterMiddleware",
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'django_prometheus.middleware.PrometheusBeforeMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'netbox.middleware.ExceptionHandlingMiddleware',
+    'netbox.middleware.RemoteUserMiddleware',
+    'netbox.middleware.LoginRequiredMiddleware',
+    'netbox.middleware.APIVersionMiddleware',
+    'netbox.middleware.ObjectChangeMiddleware',
+    'django_prometheus.middleware.PrometheusAfterMiddleware',
 ]
 
 ROOT_URLCONF = "netbox.urls"
@@ -383,17 +357,17 @@ ROOT_URLCONF = "netbox.urls"
 TEMPLATES_DIR = BASE_DIR + "/templates"
 TEMPLATES = [
     {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [TEMPLATES_DIR],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.template.context_processors.media",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-                "utilities.context_processors.settings_and_registry",
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [TEMPLATES_DIR],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.template.context_processors.media',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+                'netbox.context_processors.settings_and_registry',
             ],
         },
     },
@@ -450,9 +424,10 @@ EXEMPT_EXCLUDE_MODELS = (
 #
 if CACHING_REDIS_USING_SENTINEL:
     CACHEOPS_SENTINEL = {
-        "locations": CACHING_REDIS_SENTINELS,
-        "service_name": CACHING_REDIS_SENTINEL_SERVICE,
-        "db": CACHING_REDIS_DATABASE,
+        'locations': CACHING_REDIS_SENTINELS,
+        'service_name': CACHING_REDIS_SENTINEL_SERVICE,
+        'db': CACHING_REDIS_DATABASE,
+        'password': CACHING_REDIS_PASSWORD,
     }
 else:
     if CACHING_REDIS_SSL:
@@ -481,20 +456,21 @@ else:
 
 CACHEOPS_DEFAULTS = {"timeout": CACHE_TIMEOUT}
 CACHEOPS = {
-    "auth.user": {"ops": "get", "timeout": 60 * 15},
-    "auth.*": {"ops": ("fetch", "get")},
-    "auth.permission": {"ops": "all"},
-    "circuits.*": {"ops": "all"},
-    "dcim.region": None,  # MPTT models are exempt due to raw sql
-    "dcim.rackgroup": None,  # MPTT models are exempt due to raw sql
-    "dcim.*": {"ops": "all"},
-    "ipam.*": {"ops": "all"},
-    "extras.*": {"ops": "all"},
-    "secrets.*": {"ops": "all"},
-    "users.*": {"ops": "all"},
-    "tenancy.tenantgroup": None,  # MPTT models are exempt due to raw sql
-    "tenancy.*": {"ops": "all"},
-    "virtualization.*": {"ops": "all"},
+    'auth.user': {'ops': 'get', 'timeout': 60 * 15},
+    'auth.*': {'ops': ('fetch', 'get')},
+    'auth.permission': {'ops': 'all'},
+    'circuits.*': {'ops': 'all'},
+    'dcim.inventoryitem': None,  # MPTT models are exempt due to raw SQL
+    'dcim.region': None,  # MPTT models are exempt due to raw SQL
+    'dcim.rackgroup': None,  # MPTT models are exempt due to raw SQL
+    'dcim.*': {'ops': 'all'},
+    'ipam.*': {'ops': 'all'},
+    'extras.*': {'ops': 'all'},
+    'secrets.*': {'ops': 'all'},
+    'users.*': {'ops': 'all'},
+    'tenancy.tenantgroup': None,  # MPTT models are exempt due to raw SQL
+    'tenancy.*': {'ops': 'all'},
+    'virtualization.*': {'ops': 'all'},
 }
 CACHEOPS_DEGRADE_ON_FAILURE = True
 
@@ -520,10 +496,10 @@ FILTERS_NULL_CHOICE_VALUE = "null"
 
 REST_FRAMEWORK_VERSION = VERSION.rsplit(".", 1)[0]  # Use major.minor as API version
 REST_FRAMEWORK = {
-    "ALLOWED_VERSIONS": [REST_FRAMEWORK_VERSION],
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework.authentication.SessionAuthentication",
-        "netbox.api.TokenAuthentication",
+    'ALLOWED_VERSIONS': [REST_FRAMEWORK_VERSION],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+        'netbox.api.authentication.TokenAuthentication',
     ),
     "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
     "DEFAULT_PAGINATION_CLASS": "netbox.api.OptionalLimitOffsetPagination",
@@ -532,10 +508,26 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.JSONRenderer",
         "netbox.api.FormlessBrowsableAPIRenderer",
     ),
-    "DEFAULT_VERSION": REST_FRAMEWORK_VERSION,
-    "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.AcceptHeaderVersioning",
-    "PAGE_SIZE": PAGINATE_COUNT,
-    "VIEW_NAME_FUNCTION": "netbox.api.get_view_name",
+    'DEFAULT_METADATA_CLASS': 'netbox.api.metadata.BulkOperationMetadata',
+    'DEFAULT_PAGINATION_CLASS': 'netbox.api.pagination.OptionalLimitOffsetPagination',
+    'DEFAULT_PERMISSION_CLASSES': (
+        'netbox.api.authentication.TokenPermissions',
+    ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+        'netbox.api.renderers.FormlessBrowsableAPIRenderer',
+    ),
+    'DEFAULT_VERSION': REST_FRAMEWORK_VERSION,
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.AcceptHeaderVersioning',
+    'PAGE_SIZE': PAGINATE_COUNT,
+    'SCHEMA_COERCE_METHOD_NAMES': {
+        # Default mappings
+        'retrieve': 'read',
+        'destroy': 'delete',
+        # Custom operations
+        'bulk_destroy': 'bulk_delete',
+    },
+    'VIEW_NAME_FUNCTION': 'utilities.api.get_view_name',
 }
 
 
@@ -544,21 +536,22 @@ REST_FRAMEWORK = {
 #
 
 SWAGGER_SETTINGS = {
-    "DEFAULT_AUTO_SCHEMA_CLASS": "utilities.custom_inspectors.NetBoxSwaggerAutoSchema",
-    "DEFAULT_FIELD_INSPECTORS": [
-        "utilities.custom_inspectors.JSONFieldInspector",
-        "utilities.custom_inspectors.NullableBooleanFieldInspector",
-        "utilities.custom_inspectors.CustomChoiceFieldInspector",
-        "utilities.custom_inspectors.SerializedPKRelatedFieldInspector",
-        "drf_yasg.inspectors.CamelCaseJSONFilter",
-        "drf_yasg.inspectors.ReferencingSerializerInspector",
-        "drf_yasg.inspectors.RelatedFieldInspector",
-        "drf_yasg.inspectors.ChoiceFieldInspector",
-        "drf_yasg.inspectors.FileFieldInspector",
-        "drf_yasg.inspectors.DictFieldInspector",
-        "drf_yasg.inspectors.SerializerMethodFieldInspector",
-        "drf_yasg.inspectors.SimpleFieldInspector",
-        "drf_yasg.inspectors.StringDefaultFieldInspector",
+    'DEFAULT_AUTO_SCHEMA_CLASS': 'utilities.custom_inspectors.NetBoxSwaggerAutoSchema',
+    'DEFAULT_FIELD_INSPECTORS': [
+        'utilities.custom_inspectors.CustomFieldsDataFieldInspector',
+        'utilities.custom_inspectors.JSONFieldInspector',
+        'utilities.custom_inspectors.NullableBooleanFieldInspector',
+        'utilities.custom_inspectors.ChoiceFieldInspector',
+        'utilities.custom_inspectors.SerializedPKRelatedFieldInspector',
+        'drf_yasg.inspectors.CamelCaseJSONFilter',
+        'drf_yasg.inspectors.ReferencingSerializerInspector',
+        'drf_yasg.inspectors.RelatedFieldInspector',
+        'drf_yasg.inspectors.ChoiceFieldInspector',
+        'drf_yasg.inspectors.FileFieldInspector',
+        'drf_yasg.inspectors.DictFieldInspector',
+        'drf_yasg.inspectors.SerializerMethodFieldInspector',
+        'drf_yasg.inspectors.SimpleFieldInspector',
+        'drf_yasg.inspectors.StringDefaultFieldInspector',
     ],
     "DEFAULT_FILTER_INSPECTORS": [
         "drf_yasg.inspectors.CoreAPICompatInspector",
@@ -656,7 +649,7 @@ for plugin_name in PLUGINS:
     # Validate user-provided configuration settings and assign defaults
     if plugin_name not in PLUGINS_CONFIG:
         PLUGINS_CONFIG[plugin_name] = {}
-    plugin_config.validate(PLUGINS_CONFIG[plugin_name])
+    plugin_config.validate(PLUGINS_CONFIG[plugin_name], VERSION)
 
     # Add middleware
     plugin_middleware = plugin_config.middleware

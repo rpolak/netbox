@@ -185,8 +185,10 @@ class ObjectPermissionForm(forms.ModelForm):
                     self.instance.actions.remove(action)
 
     def clean(self):
-        object_types = self.cleaned_data.get("object_types")
-        constraints = self.cleaned_data.get("constraints")
+        super().clean()
+
+        object_types = self.cleaned_data.get('object_types')
+        constraints = self.cleaned_data.get('constraints')
 
         # Append any of the selected CRUD checkboxes to the actions list
         if not self.cleaned_data.get("actions"):

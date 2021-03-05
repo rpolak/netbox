@@ -1,10 +1,7 @@
 from django.contrib.auth.models import User
-from django.contrib.contenttypes.models import ContentType
-from django.test import override_settings
 from django.urls import reverse
 from rest_framework import status
 
-from circuits.models import Circuit, CircuitTermination, CircuitType, Provider
 from dcim.choices import *
 from dcim.constants import *
 from dcim.models import (
@@ -42,7 +39,6 @@ from dcim.models import (
     VirtualChassis,
 )
 from ipam.models import VLAN
-from extras.models import Graph
 from utilities.testing import APITestCase, APIViewTestCases
 from virtualization.models import Cluster, ClusterType
 
@@ -110,6 +106,9 @@ class RegionTest(APIViewTestCases.APIViewTestCase):
             "slug": "region-6",
         },
     ]
+    bulk_update_data = {
+        'description': 'New description',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -121,7 +120,10 @@ class RegionTest(APIViewTestCases.APIViewTestCase):
 
 class SiteTest(APIViewTestCases.APIViewTestCase):
     model = Site
-    brief_fields = ["id", "name", "slug", "url"]
+    brief_fields = ['id', 'name', 'slug', 'url']
+    bulk_update_data = {
+        'status': 'planned',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -159,45 +161,13 @@ class SiteTest(APIViewTestCases.APIViewTestCase):
             },
         ]
 
-    @override_settings(EXEMPT_VIEW_PERMISSIONS=["*"])
-    def test_get_site_graphs(self):
-        """
-        Test retrieval of Graphs assigned to Sites.
-        """
-        ct = ContentType.objects.get_for_model(Site)
-        graphs = (
-            Graph(
-                type=ct,
-                name="Graph 1",
-                source="http://example.com/graphs.py?site={{ obj.slug }}&foo=1",
-            ),
-            Graph(
-                type=ct,
-                name="Graph 2",
-                source="http://example.com/graphs.py?site={{ obj.slug }}&foo=2",
-            ),
-            Graph(
-                type=ct,
-                name="Graph 3",
-                source="http://example.com/graphs.py?site={{ obj.slug }}&foo=3",
-            ),
-        )
-        Graph.objects.bulk_create(graphs)
-
-        self.add_permissions("dcim.view_site")
-        url = reverse("dcim-api:site-graphs", kwargs={"pk": Site.objects.first().pk})
-        response = self.client.get(url, **self.header)
-
-        self.assertEqual(len(response.data), 3)
-        self.assertEqual(
-            response.data[0]["embed_url"],
-            "http://example.com/graphs.py?site=site-1&foo=1",
-        )
-
 
 class RackGroupTest(APIViewTestCases.APIViewTestCase):
     model = RackGroup
-    brief_fields = ["_depth", "id", "name", "rack_count", "slug", "url"]
+    brief_fields = ['_depth', 'id', 'name', 'rack_count', 'slug', 'url']
+    bulk_update_data = {
+        'description': 'New description',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -278,6 +248,9 @@ class RackRoleTest(APIViewTestCases.APIViewTestCase):
             "color": "ffff00",
         },
     ]
+    bulk_update_data = {
+        'description': 'New description',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -292,7 +265,10 @@ class RackRoleTest(APIViewTestCases.APIViewTestCase):
 
 class RackTest(APIViewTestCases.APIViewTestCase):
     model = Rack
-    brief_fields = ["device_count", "display_name", "id", "name", "url"]
+    brief_fields = ['device_count', 'display_name', 'id', 'name', 'url']
+    bulk_update_data = {
+        'status': 'planned',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -389,7 +365,10 @@ class RackTest(APIViewTestCases.APIViewTestCase):
 
 class RackReservationTest(APIViewTestCases.APIViewTestCase):
     model = RackReservation
-    brief_fields = ["id", "units", "url", "user"]
+    brief_fields = ['id', 'units', 'url', 'user']
+    bulk_update_data = {
+        'description': 'New description',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -467,6 +446,9 @@ class ManufacturerTest(APIViewTestCases.APIViewTestCase):
             "slug": "manufacturer-6",
         },
     ]
+    bulk_update_data = {
+        'description': 'New description',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -481,15 +463,10 @@ class ManufacturerTest(APIViewTestCases.APIViewTestCase):
 
 class DeviceTypeTest(APIViewTestCases.APIViewTestCase):
     model = DeviceType
-    brief_fields = [
-        "device_count",
-        "display_name",
-        "id",
-        "manufacturer",
-        "model",
-        "slug",
-        "url",
-    ]
+    brief_fields = ['device_count', 'display_name', 'id', 'manufacturer', 'model', 'slug', 'url']
+    bulk_update_data = {
+        'part_number': 'ABC123',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -540,7 +517,10 @@ class DeviceTypeTest(APIViewTestCases.APIViewTestCase):
 
 class ConsolePortTemplateTest(APIViewTestCases.APIViewTestCase):
     model = ConsolePortTemplate
-    brief_fields = ["id", "name", "url"]
+    brief_fields = ['id', 'name', 'url']
+    bulk_update_data = {
+        'description': 'New description',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -576,7 +556,10 @@ class ConsolePortTemplateTest(APIViewTestCases.APIViewTestCase):
 
 class ConsoleServerPortTemplateTest(APIViewTestCases.APIViewTestCase):
     model = ConsoleServerPortTemplate
-    brief_fields = ["id", "name", "url"]
+    brief_fields = ['id', 'name', 'url']
+    bulk_update_data = {
+        'description': 'New description',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -618,7 +601,10 @@ class ConsoleServerPortTemplateTest(APIViewTestCases.APIViewTestCase):
 
 class PowerPortTemplateTest(APIViewTestCases.APIViewTestCase):
     model = PowerPortTemplate
-    brief_fields = ["id", "name", "url"]
+    brief_fields = ['id', 'name', 'url']
+    bulk_update_data = {
+        'description': 'New description',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -654,7 +640,10 @@ class PowerPortTemplateTest(APIViewTestCases.APIViewTestCase):
 
 class PowerOutletTemplateTest(APIViewTestCases.APIViewTestCase):
     model = PowerOutletTemplate
-    brief_fields = ["id", "name", "url"]
+    brief_fields = ['id', 'name', 'url']
+    bulk_update_data = {
+        'description': 'New description',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -690,7 +679,10 @@ class PowerOutletTemplateTest(APIViewTestCases.APIViewTestCase):
 
 class InterfaceTemplateTest(APIViewTestCases.APIViewTestCase):
     model = InterfaceTemplate
-    brief_fields = ["id", "name", "url"]
+    brief_fields = ['id', 'name', 'url']
+    bulk_update_data = {
+        'description': 'New description',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -735,7 +727,10 @@ class InterfaceTemplateTest(APIViewTestCases.APIViewTestCase):
 
 class FrontPortTemplateTest(APIViewTestCases.APIViewTestCase):
     model = FrontPortTemplate
-    brief_fields = ["id", "name", "url"]
+    brief_fields = ['id', 'name', 'url']
+    bulk_update_data = {
+        'description': 'New description',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -804,32 +799,35 @@ class FrontPortTemplateTest(APIViewTestCases.APIViewTestCase):
 
         cls.create_data = [
             {
-                "device_type": devicetype.pk,
-                "name": "Front Port Template 4",
-                "type": PortTypeChoices.TYPE_8P8C,
-                "rear_port": rear_port_templates[3].pk,
-                "position": 1,
+                'device_type': devicetype.pk,
+                'name': 'Front Port Template 4',
+                'type': PortTypeChoices.TYPE_8P8C,
+                'rear_port': rear_port_templates[3].pk,
+                'rear_port_position': 1,
             },
             {
-                "device_type": devicetype.pk,
-                "name": "Front Port Template 5",
-                "type": PortTypeChoices.TYPE_8P8C,
-                "rear_port": rear_port_templates[4].pk,
-                "position": 1,
+                'device_type': devicetype.pk,
+                'name': 'Front Port Template 5',
+                'type': PortTypeChoices.TYPE_8P8C,
+                'rear_port': rear_port_templates[4].pk,
+                'rear_port_position': 1,
             },
             {
-                "device_type": devicetype.pk,
-                "name": "Front Port Template 6",
-                "type": PortTypeChoices.TYPE_8P8C,
-                "rear_port": rear_port_templates[5].pk,
-                "position": 1,
+                'device_type': devicetype.pk,
+                'name': 'Front Port Template 6',
+                'type': PortTypeChoices.TYPE_8P8C,
+                'rear_port': rear_port_templates[5].pk,
+                'rear_port_position': 1,
             },
         ]
 
 
 class RearPortTemplateTest(APIViewTestCases.APIViewTestCase):
     model = RearPortTemplate
-    brief_fields = ["id", "name", "url"]
+    brief_fields = ['id', 'name', 'url']
+    bulk_update_data = {
+        'description': 'New description',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -880,7 +878,10 @@ class RearPortTemplateTest(APIViewTestCases.APIViewTestCase):
 
 class DeviceBayTemplateTest(APIViewTestCases.APIViewTestCase):
     model = DeviceBayTemplate
-    brief_fields = ["id", "name", "url"]
+    brief_fields = ['id', 'name', 'url']
+    bulk_update_data = {
+        'description': 'New description',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -888,7 +889,10 @@ class DeviceBayTemplateTest(APIViewTestCases.APIViewTestCase):
             name="Test Manufacturer 1", slug="test-manufacturer-1"
         )
         devicetype = DeviceType.objects.create(
-            manufacturer=manufacturer, model="Device Type 1", slug="device-type-1"
+            manufacturer=manufacturer,
+            model='Device Type 1',
+            slug='device-type-1',
+            subdevice_role=SubdeviceRoleChoices.ROLE_PARENT
         )
 
         device_bay_templates = (
@@ -934,6 +938,9 @@ class DeviceRoleTest(APIViewTestCases.APIViewTestCase):
             "color": "ffff00",
         },
     ]
+    bulk_update_data = {
+        'description': 'New description',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -963,6 +970,9 @@ class PlatformTest(APIViewTestCases.APIViewTestCase):
             "slug": "platform-6",
         },
     ]
+    bulk_update_data = {
+        'description': 'New description',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -977,7 +987,10 @@ class PlatformTest(APIViewTestCases.APIViewTestCase):
 
 class DeviceTest(APIViewTestCases.APIViewTestCase):
     model = Device
-    brief_fields = ["display_name", "id", "name", "url"]
+    brief_fields = ['display_name', 'id', 'name', 'url']
+    bulk_update_data = {
+        'status': 'failed',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -1082,43 +1095,6 @@ class DeviceTest(APIViewTestCases.APIViewTestCase):
             },
         ]
 
-    @override_settings(EXEMPT_VIEW_PERMISSIONS=["*"])
-    def test_get_device_graphs(self):
-        """
-        Test retrieval of Graphs assigned to Devices.
-        """
-        ct = ContentType.objects.get_for_model(Device)
-        graphs = (
-            Graph(
-                type=ct,
-                name="Graph 1",
-                source="http://example.com/graphs.py?device={{ obj.name }}&foo=1",
-            ),
-            Graph(
-                type=ct,
-                name="Graph 2",
-                source="http://example.com/graphs.py?device={{ obj.name }}&foo=2",
-            ),
-            Graph(
-                type=ct,
-                name="Graph 3",
-                source="http://example.com/graphs.py?device={{ obj.name }}&foo=3",
-            ),
-        )
-        Graph.objects.bulk_create(graphs)
-
-        self.add_permissions("dcim.view_device")
-        url = reverse(
-            "dcim-api:device-graphs", kwargs={"pk": Device.objects.first().pk}
-        )
-        response = self.client.get(url, **self.header)
-
-        self.assertEqual(len(response.data), 3)
-        self.assertEqual(
-            response.data[0]["embed_url"],
-            "http://example.com/graphs.py?device=Device 1&foo=1",
-        )
-
     def test_config_context_included_by_default_in_list_view(self):
         """
         Check that config context data is included by default in the devices list.
@@ -1162,7 +1138,10 @@ class DeviceTest(APIViewTestCases.APIViewTestCase):
 
 class ConsolePortTest(Mixins.ComponentTraceMixin, APIViewTestCases.APIViewTestCase):
     model = ConsolePort
-    brief_fields = ["cable", "connection_status", "device", "id", "name", "url"]
+    brief_fields = ['cable', 'device', 'id', 'name', 'url']
+    bulk_update_data = {
+        'description': 'New description',
+    }
     peer_termination_type = ConsoleServerPort
 
     @classmethod
@@ -1208,7 +1187,10 @@ class ConsoleServerPortTest(
     Mixins.ComponentTraceMixin, APIViewTestCases.APIViewTestCase
 ):
     model = ConsoleServerPort
-    brief_fields = ["cable", "connection_status", "device", "id", "name", "url"]
+    brief_fields = ['cable', 'device', 'id', 'name', 'url']
+    bulk_update_data = {
+        'description': 'New description',
+    }
     peer_termination_type = ConsolePort
 
     @classmethod
@@ -1252,7 +1234,10 @@ class ConsoleServerPortTest(
 
 class PowerPortTest(Mixins.ComponentTraceMixin, APIViewTestCases.APIViewTestCase):
     model = PowerPort
-    brief_fields = ["cable", "connection_status", "device", "id", "name", "url"]
+    brief_fields = ['cable', 'device', 'id', 'name', 'url']
+    bulk_update_data = {
+        'description': 'New description',
+    }
     peer_termination_type = PowerOutlet
 
     @classmethod
@@ -1296,7 +1281,10 @@ class PowerPortTest(Mixins.ComponentTraceMixin, APIViewTestCases.APIViewTestCase
 
 class PowerOutletTest(Mixins.ComponentTraceMixin, APIViewTestCases.APIViewTestCase):
     model = PowerOutlet
-    brief_fields = ["cable", "connection_status", "device", "id", "name", "url"]
+    brief_fields = ['cable', 'device', 'id', 'name', 'url']
+    bulk_update_data = {
+        'description': 'New description',
+    }
     peer_termination_type = PowerPort
 
     @classmethod
@@ -1340,7 +1328,10 @@ class PowerOutletTest(Mixins.ComponentTraceMixin, APIViewTestCases.APIViewTestCa
 
 class InterfaceTest(Mixins.ComponentTraceMixin, APIViewTestCases.APIViewTestCase):
     model = Interface
-    brief_fields = ["cable", "connection_status", "device", "id", "name", "url"]
+    brief_fields = ['cable', 'device', 'id', 'name', 'url']
+    bulk_update_data = {
+        'description': 'New description',
+    }
     peer_termination_type = Interface
 
     @classmethod
@@ -1400,47 +1391,13 @@ class InterfaceTest(Mixins.ComponentTraceMixin, APIViewTestCases.APIViewTestCase
             },
         ]
 
-    @override_settings(EXEMPT_VIEW_PERMISSIONS=["*"])
-    def test_get_interface_graphs(self):
-        """
-        Test retrieval of Graphs assigned to Devices.
-        """
-        ct = ContentType.objects.get_for_model(Interface)
-        graphs = (
-            Graph(
-                type=ct,
-                name="Graph 1",
-                source="http://example.com/graphs.py?interface={{ obj.name }}&foo=1",
-            ),
-            Graph(
-                type=ct,
-                name="Graph 2",
-                source="http://example.com/graphs.py?interface={{ obj.name }}&foo=2",
-            ),
-            Graph(
-                type=ct,
-                name="Graph 3",
-                source="http://example.com/graphs.py?interface={{ obj.name }}&foo=3",
-            ),
-        )
-        Graph.objects.bulk_create(graphs)
 
-        self.add_permissions("dcim.view_interface")
-        url = reverse(
-            "dcim-api:interface-graphs", kwargs={"pk": Interface.objects.first().pk}
-        )
-        response = self.client.get(url, **self.header)
-
-        self.assertEqual(len(response.data), 3)
-        self.assertEqual(
-            response.data[0]["embed_url"],
-            "http://example.com/graphs.py?interface=Interface 1&foo=1",
-        )
-
-
-class FrontPortTest(Mixins.ComponentTraceMixin, APIViewTestCases.APIViewTestCase):
+class FrontPortTest(APIViewTestCases.APIViewTestCase):
     model = FrontPort
-    brief_fields = ["cable", "device", "id", "name", "url"]
+    brief_fields = ['cable', 'device', 'id', 'name', 'url']
+    bulk_update_data = {
+        'description': 'New description',
+    }
     peer_termination_type = Interface
 
     @classmethod
@@ -1516,9 +1473,12 @@ class FrontPortTest(Mixins.ComponentTraceMixin, APIViewTestCases.APIViewTestCase
         ]
 
 
-class RearPortTest(Mixins.ComponentTraceMixin, APIViewTestCases.APIViewTestCase):
+class RearPortTest(APIViewTestCases.APIViewTestCase):
     model = RearPort
-    brief_fields = ["cable", "device", "id", "name", "url"]
+    brief_fields = ['cable', 'device', 'id', 'name', 'url']
+    bulk_update_data = {
+        'description': 'New description',
+    }
     peer_termination_type = Interface
 
     @classmethod
@@ -1565,7 +1525,10 @@ class RearPortTest(Mixins.ComponentTraceMixin, APIViewTestCases.APIViewTestCase)
 
 class DeviceBayTest(APIViewTestCases.APIViewTestCase):
     model = DeviceBay
-    brief_fields = ["device", "id", "name", "url"]
+    brief_fields = ['device', 'id', 'name', 'url']
+    bulk_update_data = {
+        'description': 'New description',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -1649,7 +1612,10 @@ class DeviceBayTest(APIViewTestCases.APIViewTestCase):
 
 class InventoryItemTest(APIViewTestCases.APIViewTestCase):
     model = InventoryItem
-    brief_fields = ["device", "id", "name", "url"]
+    brief_fields = ['_depth', 'device', 'id', 'name', 'url']
+    bulk_update_data = {
+        'description': 'New description',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -1667,18 +1633,9 @@ class InventoryItemTest(APIViewTestCases.APIViewTestCase):
             device_type=devicetype, device_role=devicerole, name="Device 1", site=site
         )
 
-        inventory_items = (
-            InventoryItem(
-                device=device, name="Inventory Item 1", manufacturer=manufacturer
-            ),
-            InventoryItem(
-                device=device, name="Inventory Item 2", manufacturer=manufacturer
-            ),
-            InventoryItem(
-                device=device, name="Inventory Item 3", manufacturer=manufacturer
-            ),
-        )
-        InventoryItem.objects.bulk_create(inventory_items)
+        InventoryItem.objects.create(device=device, name='Inventory Item 1', manufacturer=manufacturer)
+        InventoryItem.objects.create(device=device, name='Inventory Item 2', manufacturer=manufacturer)
+        InventoryItem.objects.create(device=device, name='Inventory Item 3', manufacturer=manufacturer)
 
         cls.create_data = [
             {
@@ -1701,7 +1658,11 @@ class InventoryItemTest(APIViewTestCases.APIViewTestCase):
 
 class CableTest(APIViewTestCases.APIViewTestCase):
     model = Cable
-    brief_fields = ["id", "label", "url"]
+    brief_fields = ['id', 'label', 'url']
+    bulk_update_data = {
+        'length': 100,
+        'length_unit': 'm',
+    }
 
     # TODO: Allow updating cable terminations
     test_update_object = None
@@ -1790,406 +1751,6 @@ class CableTest(APIViewTestCases.APIViewTestCase):
                 "label": "Cable 6",
             },
         ]
-
-
-class ConnectionTest(APITestCase):
-    def setUp(self):
-
-        super().setUp()
-
-        self.site = Site.objects.create(name="Test Site 1", slug="test-site-1")
-        manufacturer = Manufacturer.objects.create(
-            name="Test Manufacturer 1", slug="test-manufacturer-1"
-        )
-        devicetype = DeviceType.objects.create(
-            manufacturer=manufacturer,
-            model="Test Device Type 1",
-            slug="test-device-type-1",
-        )
-        devicerole = DeviceRole.objects.create(
-            name="Test Device Role 1", slug="test-device-role-1", color="ff0000"
-        )
-        self.device1 = Device.objects.create(
-            device_type=devicetype,
-            device_role=devicerole,
-            name="Test Device 1",
-            site=self.site,
-        )
-        self.device2 = Device.objects.create(
-            device_type=devicetype,
-            device_role=devicerole,
-            name="Test Device 2",
-            site=self.site,
-        )
-        self.panel1 = Device.objects.create(
-            device_type=devicetype,
-            device_role=devicerole,
-            name="Test Panel 1",
-            site=self.site,
-        )
-        self.panel2 = Device.objects.create(
-            device_type=devicetype,
-            device_role=devicerole,
-            name="Test Panel 2",
-            site=self.site,
-        )
-
-    def test_create_direct_console_connection(self):
-
-        consoleport1 = ConsolePort.objects.create(
-            device=self.device1, name="Test Console Port 1"
-        )
-        consoleserverport1 = ConsoleServerPort.objects.create(
-            device=self.device2, name="Test Console Server Port 1"
-        )
-
-        data = {
-            "termination_a_type": "dcim.consoleport",
-            "termination_a_id": consoleport1.pk,
-            "termination_b_type": "dcim.consoleserverport",
-            "termination_b_id": consoleserverport1.pk,
-        }
-
-        self.add_permissions("dcim.add_cable")
-        url = reverse("dcim-api:cable-list")
-        response = self.client.post(url, data, format="json", **self.header)
-
-        self.assertHttpStatus(response, status.HTTP_201_CREATED)
-        self.assertEqual(Cable.objects.count(), 1)
-
-        cable = Cable.objects.get(pk=response.data["id"])
-        consoleport1 = ConsolePort.objects.get(pk=consoleport1.pk)
-        consoleserverport1 = ConsoleServerPort.objects.get(pk=consoleserverport1.pk)
-
-        self.assertEqual(cable.termination_a, consoleport1)
-        self.assertEqual(cable.termination_b, consoleserverport1)
-        self.assertEqual(consoleport1.cable, cable)
-        self.assertEqual(consoleserverport1.cable, cable)
-        self.assertEqual(consoleport1.connected_endpoint, consoleserverport1)
-        self.assertEqual(consoleserverport1.connected_endpoint, consoleport1)
-
-    def test_create_patched_console_connection(self):
-
-        consoleport1 = ConsolePort.objects.create(
-            device=self.device1, name="Test Console Port 1"
-        )
-        consoleserverport1 = ConsoleServerPort.objects.create(
-            device=self.device2, name="Test Console Server Port 1"
-        )
-        rearport1 = RearPort.objects.create(
-            device=self.panel1, name="Test Rear Port 1", type=PortTypeChoices.TYPE_8P8C
-        )
-        frontport1 = FrontPort.objects.create(
-            device=self.panel1,
-            name="Test Front Port 1",
-            type=PortTypeChoices.TYPE_8P8C,
-            rear_port=rearport1,
-        )
-        rearport2 = RearPort.objects.create(
-            device=self.panel2, name="Test Rear Port 2", type=PortTypeChoices.TYPE_8P8C
-        )
-        frontport2 = FrontPort.objects.create(
-            device=self.panel2,
-            name="Test Front Port 2",
-            type=PortTypeChoices.TYPE_8P8C,
-            rear_port=rearport2,
-        )
-
-        self.add_permissions("dcim.add_cable")
-        url = reverse("dcim-api:cable-list")
-        cables = [
-            # Console port to panel1 front
-            {
-                "termination_a_type": "dcim.consoleport",
-                "termination_a_id": consoleport1.pk,
-                "termination_b_type": "dcim.frontport",
-                "termination_b_id": frontport1.pk,
-            },
-            # Panel1 rear to panel2 rear
-            {
-                "termination_a_type": "dcim.rearport",
-                "termination_a_id": rearport1.pk,
-                "termination_b_type": "dcim.rearport",
-                "termination_b_id": rearport2.pk,
-            },
-            # Panel2 front to console server port
-            {
-                "termination_a_type": "dcim.frontport",
-                "termination_a_id": frontport2.pk,
-                "termination_b_type": "dcim.consoleserverport",
-                "termination_b_id": consoleserverport1.pk,
-            },
-        ]
-
-        for data in cables:
-
-            response = self.client.post(url, data, format="json", **self.header)
-            self.assertHttpStatus(response, status.HTTP_201_CREATED)
-
-            cable = Cable.objects.get(pk=response.data["id"])
-            self.assertEqual(cable.termination_a.cable, cable)
-            self.assertEqual(cable.termination_b.cable, cable)
-
-        consoleport1 = ConsolePort.objects.get(pk=consoleport1.pk)
-        consoleserverport1 = ConsoleServerPort.objects.get(pk=consoleserverport1.pk)
-        self.assertEqual(consoleport1.connected_endpoint, consoleserverport1)
-        self.assertEqual(consoleserverport1.connected_endpoint, consoleport1)
-
-    def test_create_direct_power_connection(self):
-
-        powerport1 = PowerPort.objects.create(
-            device=self.device1, name="Test Power Port 1"
-        )
-        poweroutlet1 = PowerOutlet.objects.create(
-            device=self.device2, name="Test Power Outlet 1"
-        )
-
-        data = {
-            "termination_a_type": "dcim.powerport",
-            "termination_a_id": powerport1.pk,
-            "termination_b_type": "dcim.poweroutlet",
-            "termination_b_id": poweroutlet1.pk,
-        }
-
-        self.add_permissions("dcim.add_cable")
-        url = reverse("dcim-api:cable-list")
-        response = self.client.post(url, data, format="json", **self.header)
-
-        self.assertHttpStatus(response, status.HTTP_201_CREATED)
-        self.assertEqual(Cable.objects.count(), 1)
-
-        cable = Cable.objects.get(pk=response.data["id"])
-        powerport1 = PowerPort.objects.get(pk=powerport1.pk)
-        poweroutlet1 = PowerOutlet.objects.get(pk=poweroutlet1.pk)
-
-        self.assertEqual(cable.termination_a, powerport1)
-        self.assertEqual(cable.termination_b, poweroutlet1)
-        self.assertEqual(powerport1.cable, cable)
-        self.assertEqual(poweroutlet1.cable, cable)
-        self.assertEqual(powerport1.connected_endpoint, poweroutlet1)
-        self.assertEqual(poweroutlet1.connected_endpoint, powerport1)
-
-    # Note: Power connections via patch ports are not supported.
-
-    def test_create_direct_interface_connection(self):
-
-        interface1 = Interface.objects.create(
-            device=self.device1, name="Test Interface 1"
-        )
-        interface2 = Interface.objects.create(
-            device=self.device2, name="Test Interface 2"
-        )
-
-        data = {
-            "termination_a_type": "dcim.interface",
-            "termination_a_id": interface1.pk,
-            "termination_b_type": "dcim.interface",
-            "termination_b_id": interface2.pk,
-        }
-
-        self.add_permissions("dcim.add_cable")
-        url = reverse("dcim-api:cable-list")
-        response = self.client.post(url, data, format="json", **self.header)
-
-        self.assertHttpStatus(response, status.HTTP_201_CREATED)
-        self.assertEqual(Cable.objects.count(), 1)
-
-        cable = Cable.objects.get(pk=response.data["id"])
-        interface1 = Interface.objects.get(pk=interface1.pk)
-        interface2 = Interface.objects.get(pk=interface2.pk)
-
-        self.assertEqual(cable.termination_a, interface1)
-        self.assertEqual(cable.termination_b, interface2)
-        self.assertEqual(interface1.cable, cable)
-        self.assertEqual(interface2.cable, cable)
-        self.assertEqual(interface1.connected_endpoint, interface2)
-        self.assertEqual(interface2.connected_endpoint, interface1)
-
-    def test_create_patched_interface_connection(self):
-
-        interface1 = Interface.objects.create(
-            device=self.device1, name="Test Interface 1"
-        )
-        interface2 = Interface.objects.create(
-            device=self.device2, name="Test Interface 2"
-        )
-        rearport1 = RearPort.objects.create(
-            device=self.panel1, name="Test Rear Port 1", type=PortTypeChoices.TYPE_8P8C
-        )
-        frontport1 = FrontPort.objects.create(
-            device=self.panel1,
-            name="Test Front Port 1",
-            type=PortTypeChoices.TYPE_8P8C,
-            rear_port=rearport1,
-        )
-        rearport2 = RearPort.objects.create(
-            device=self.panel2, name="Test Rear Port 2", type=PortTypeChoices.TYPE_8P8C
-        )
-        frontport2 = FrontPort.objects.create(
-            device=self.panel2,
-            name="Test Front Port 2",
-            type=PortTypeChoices.TYPE_8P8C,
-            rear_port=rearport2,
-        )
-
-        self.add_permissions("dcim.add_cable")
-        url = reverse("dcim-api:cable-list")
-        cables = [
-            # Interface1 to panel1 front
-            {
-                "termination_a_type": "dcim.interface",
-                "termination_a_id": interface1.pk,
-                "termination_b_type": "dcim.frontport",
-                "termination_b_id": frontport1.pk,
-            },
-            # Panel1 rear to panel2 rear
-            {
-                "termination_a_type": "dcim.rearport",
-                "termination_a_id": rearport1.pk,
-                "termination_b_type": "dcim.rearport",
-                "termination_b_id": rearport2.pk,
-            },
-            # Panel2 front to interface2
-            {
-                "termination_a_type": "dcim.frontport",
-                "termination_a_id": frontport2.pk,
-                "termination_b_type": "dcim.interface",
-                "termination_b_id": interface2.pk,
-            },
-        ]
-
-        for data in cables:
-
-            response = self.client.post(url, data, format="json", **self.header)
-            self.assertHttpStatus(response, status.HTTP_201_CREATED)
-
-            cable = Cable.objects.get(pk=response.data["id"])
-            self.assertEqual(cable.termination_a.cable, cable)
-            self.assertEqual(cable.termination_b.cable, cable)
-
-        interface1 = Interface.objects.get(pk=interface1.pk)
-        interface2 = Interface.objects.get(pk=interface2.pk)
-        self.assertEqual(interface1.connected_endpoint, interface2)
-        self.assertEqual(interface2.connected_endpoint, interface1)
-
-    def test_create_direct_circuittermination_connection(self):
-
-        provider = Provider.objects.create(
-            name="Test Provider 1", slug="test-provider-1"
-        )
-        circuittype = CircuitType.objects.create(
-            name="Test Circuit Type 1", slug="test-circuit-type-1"
-        )
-        circuit = Circuit.objects.create(
-            provider=provider, type=circuittype, cid="Test Circuit 1"
-        )
-        interface1 = Interface.objects.create(
-            device=self.device1, name="Test Interface 1"
-        )
-        circuittermination1 = CircuitTermination.objects.create(
-            circuit=circuit, term_side="A", site=self.site, port_speed=10000
-        )
-
-        data = {
-            "termination_a_type": "dcim.interface",
-            "termination_a_id": interface1.pk,
-            "termination_b_type": "circuits.circuittermination",
-            "termination_b_id": circuittermination1.pk,
-        }
-
-        self.add_permissions("dcim.add_cable")
-        url = reverse("dcim-api:cable-list")
-        response = self.client.post(url, data, format="json", **self.header)
-
-        self.assertHttpStatus(response, status.HTTP_201_CREATED)
-        self.assertEqual(Cable.objects.count(), 1)
-
-        cable = Cable.objects.get(pk=response.data["id"])
-        interface1 = Interface.objects.get(pk=interface1.pk)
-        circuittermination1 = CircuitTermination.objects.get(pk=circuittermination1.pk)
-
-        self.assertEqual(cable.termination_a, interface1)
-        self.assertEqual(cable.termination_b, circuittermination1)
-        self.assertEqual(interface1.cable, cable)
-        self.assertEqual(circuittermination1.cable, cable)
-        self.assertEqual(interface1.connected_endpoint, circuittermination1)
-        self.assertEqual(circuittermination1.connected_endpoint, interface1)
-
-    def test_create_patched_circuittermination_connection(self):
-
-        provider = Provider.objects.create(
-            name="Test Provider 1", slug="test-provider-1"
-        )
-        circuittype = CircuitType.objects.create(
-            name="Test Circuit Type 1", slug="test-circuit-type-1"
-        )
-        circuit = Circuit.objects.create(
-            provider=provider, type=circuittype, cid="Test Circuit 1"
-        )
-        interface1 = Interface.objects.create(
-            device=self.device1, name="Test Interface 1"
-        )
-        circuittermination1 = CircuitTermination.objects.create(
-            circuit=circuit, term_side="A", site=self.site, port_speed=10000
-        )
-        rearport1 = RearPort.objects.create(
-            device=self.panel1, name="Test Rear Port 1", type=PortTypeChoices.TYPE_8P8C
-        )
-        frontport1 = FrontPort.objects.create(
-            device=self.panel1,
-            name="Test Front Port 1",
-            type=PortTypeChoices.TYPE_8P8C,
-            rear_port=rearport1,
-        )
-        rearport2 = RearPort.objects.create(
-            device=self.panel2, name="Test Rear Port 2", type=PortTypeChoices.TYPE_8P8C
-        )
-        frontport2 = FrontPort.objects.create(
-            device=self.panel2,
-            name="Test Front Port 2",
-            type=PortTypeChoices.TYPE_8P8C,
-            rear_port=rearport2,
-        )
-
-        self.add_permissions("dcim.add_cable")
-        url = reverse("dcim-api:cable-list")
-        cables = [
-            # Interface to panel1 front
-            {
-                "termination_a_type": "dcim.interface",
-                "termination_a_id": interface1.pk,
-                "termination_b_type": "dcim.frontport",
-                "termination_b_id": frontport1.pk,
-            },
-            # Panel1 rear to panel2 rear
-            {
-                "termination_a_type": "dcim.rearport",
-                "termination_a_id": rearport1.pk,
-                "termination_b_type": "dcim.rearport",
-                "termination_b_id": rearport2.pk,
-            },
-            # Panel2 front to circuit termination
-            {
-                "termination_a_type": "dcim.frontport",
-                "termination_a_id": frontport2.pk,
-                "termination_b_type": "circuits.circuittermination",
-                "termination_b_id": circuittermination1.pk,
-            },
-        ]
-
-        for data in cables:
-
-            response = self.client.post(url, data, format="json", **self.header)
-            self.assertHttpStatus(response, status.HTTP_201_CREATED)
-
-            cable = Cable.objects.get(pk=response.data["id"])
-            self.assertEqual(cable.termination_a.cable, cable)
-            self.assertEqual(cable.termination_b.cable, cable)
-
-        interface1 = Interface.objects.get(pk=interface1.pk)
-        circuittermination1 = CircuitTermination.objects.get(pk=circuittermination1.pk)
-        self.assertEqual(interface1.connected_endpoint, circuittermination1)
-        self.assertEqual(circuittermination1.connected_endpoint, interface1)
 
 
 class ConnectedDeviceTest(APITestCase):
@@ -2367,24 +1928,15 @@ class VirtualChassisTest(APIViewTestCases.APIViewTestCase):
             ),
         )
         VirtualChassis.objects.bulk_create(virtual_chassis)
-        Device.objects.filter(pk=devices[1].pk).update(
-            virtual_chassis=virtual_chassis[0], vc_position=2
-        )
-        Device.objects.filter(pk=devices[2].pk).update(
-            virtual_chassis=virtual_chassis[0], vc_position=3
-        )
-        Device.objects.filter(pk=devices[4].pk).update(
-            virtual_chassis=virtual_chassis[1], vc_position=2
-        )
-        Device.objects.filter(pk=devices[5].pk).update(
-            virtual_chassis=virtual_chassis[1], vc_position=3
-        )
-        Device.objects.filter(pk=devices[7].pk).update(
-            virtual_chassis=virtual_chassis[2], vc_position=2
-        )
-        Device.objects.filter(pk=devices[8].pk).update(
-            virtual_chassis=virtual_chassis[2], vc_position=3
-        )
+        Device.objects.filter(pk=devices[0].pk).update(virtual_chassis=virtual_chassis[0], vc_position=1)
+        Device.objects.filter(pk=devices[1].pk).update(virtual_chassis=virtual_chassis[0], vc_position=2)
+        Device.objects.filter(pk=devices[2].pk).update(virtual_chassis=virtual_chassis[0], vc_position=3)
+        Device.objects.filter(pk=devices[3].pk).update(virtual_chassis=virtual_chassis[1], vc_position=1)
+        Device.objects.filter(pk=devices[4].pk).update(virtual_chassis=virtual_chassis[1], vc_position=2)
+        Device.objects.filter(pk=devices[5].pk).update(virtual_chassis=virtual_chassis[1], vc_position=3)
+        Device.objects.filter(pk=devices[6].pk).update(virtual_chassis=virtual_chassis[2], vc_position=1)
+        Device.objects.filter(pk=devices[7].pk).update(virtual_chassis=virtual_chassis[2], vc_position=2)
+        Device.objects.filter(pk=devices[8].pk).update(virtual_chassis=virtual_chassis[2], vc_position=3)
 
         cls.update_data = {
             "name": "Virtual Chassis X",
@@ -2407,6 +1959,10 @@ class VirtualChassisTest(APIViewTestCases.APIViewTestCase):
             },
         ]
 
+        cls.bulk_update_data = {
+            'domain': 'newdomain',
+        }
+
 
 class PowerPanelTest(APIViewTestCases.APIViewTestCase):
     model = PowerPanel
@@ -2414,49 +1970,55 @@ class PowerPanelTest(APIViewTestCases.APIViewTestCase):
 
     @classmethod
     def setUpTestData(cls):
-        site = Site.objects.create(name="Site 1", slug="site-1")
+        sites = (
+            Site.objects.create(name='Site 1', slug='site-1'),
+            Site.objects.create(name='Site 2', slug='site-2'),
+        )
 
         rack_groups = (
-            RackGroup.objects.create(
-                name="Rack Group 1", slug="rack-group-1", site=site
-            ),
-            RackGroup.objects.create(
-                name="Rack Group 2", slug="rack-group-2", site=site
-            ),
-            RackGroup.objects.create(
-                name="Rack Group 3", slug="rack-group-3", site=site
-            ),
+            RackGroup.objects.create(name='Rack Group 1', slug='rack-group-1', site=sites[0]),
+            RackGroup.objects.create(name='Rack Group 2', slug='rack-group-2', site=sites[0]),
+            RackGroup.objects.create(name='Rack Group 3', slug='rack-group-3', site=sites[0]),
+            RackGroup.objects.create(name='Rack Group 4', slug='rack-group-3', site=sites[1]),
         )
 
         power_panels = (
-            PowerPanel(site=site, rack_group=rack_groups[0], name="Power Panel 1"),
-            PowerPanel(site=site, rack_group=rack_groups[1], name="Power Panel 2"),
-            PowerPanel(site=site, rack_group=rack_groups[2], name="Power Panel 3"),
+            PowerPanel(site=sites[0], rack_group=rack_groups[0], name='Power Panel 1'),
+            PowerPanel(site=sites[0], rack_group=rack_groups[1], name='Power Panel 2'),
+            PowerPanel(site=sites[0], rack_group=rack_groups[2], name='Power Panel 3'),
         )
         PowerPanel.objects.bulk_create(power_panels)
 
         cls.create_data = [
             {
-                "name": "Power Panel 4",
-                "site": site.pk,
-                "rack_group": rack_groups[0].pk,
+                'name': 'Power Panel 4',
+                'site': sites[0].pk,
+                'rack_group': rack_groups[0].pk,
             },
             {
-                "name": "Power Panel 5",
-                "site": site.pk,
-                "rack_group": rack_groups[1].pk,
+                'name': 'Power Panel 5',
+                'site': sites[0].pk,
+                'rack_group': rack_groups[1].pk,
             },
             {
-                "name": "Power Panel 6",
-                "site": site.pk,
-                "rack_group": rack_groups[2].pk,
+                'name': 'Power Panel 6',
+                'site': sites[0].pk,
+                'rack_group': rack_groups[2].pk,
             },
         ]
+
+        cls.bulk_update_data = {
+            'site': sites[1].pk,
+            'rack_group': rack_groups[3].pk
+        }
 
 
 class PowerFeedTest(APIViewTestCases.APIViewTestCase):
     model = PowerFeed
-    brief_fields = ["cable", "id", "name", "url"]
+    brief_fields = ['cable', 'id', 'name', 'url']
+    bulk_update_data = {
+        'status': 'planned',
+    }
 
     @classmethod
     def setUpTestData(cls):

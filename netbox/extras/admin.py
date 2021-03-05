@@ -2,15 +2,7 @@ from django import forms
 from django.contrib import admin
 
 from utilities.forms import LaxURLField
-from .models import (
-    CustomField,
-    CustomFieldChoice,
-    CustomLink,
-    Graph,
-    ExportTemplate,
-    JobResult,
-    Webhook,
-)
+from .models import CustomField, CustomLink, ExportTemplate, JobResult, Webhook
 
 
 def order_content_types(field):
@@ -38,8 +30,8 @@ class WebhookForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        if "obj_type" in self.fields:
-            order_content_types(self.fields["obj_type"])
+        if 'content_types' in self.fields:
+            order_content_types(self.fields['content_types'])
 
 
 @admin.register(Webhook)
@@ -56,35 +48,29 @@ class WebhookAdmin(admin.ModelAdmin):
         "ssl_verification",
     ]
     list_filter = [
-        "enabled",
-        "type_create",
-        "type_update",
-        "type_delete",
-        "obj_type",
+        'enabled', 'type_create', 'type_update', 'type_delete', 'content_types',
     ]
     form = WebhookForm
     fieldsets = (
-        (None, {"fields": ("name", "obj_type", "enabled")}),
-        ("Events", {"fields": ("type_create", "type_update", "type_delete")}),
-        (
-            "HTTP Request",
-            {
-                "fields": (
-                    "payload_url",
-                    "http_method",
-                    "http_content_type",
-                    "additional_headers",
-                    "body_template",
-                    "secret",
-                ),
-                "classes": ("monospace",),
-            },
-        ),
-        ("SSL", {"fields": ("ssl_verification", "ca_file_path")}),
+        (None, {
+            'fields': ('name', 'content_types', 'enabled')
+        }),
+        ('Events', {
+            'fields': ('type_create', 'type_update', 'type_delete')
+        }),
+        ('HTTP Request', {
+            'fields': (
+                'payload_url', 'http_method', 'http_content_type', 'additional_headers', 'body_template', 'secret',
+            ),
+            'classes': ('monospace',)
+        }),
+        ('SSL', {
+            'fields': ('ssl_verification', 'ca_file_path')
+        })
     )
 
     def models(self, obj):
-        return ", ".join([ct.name for ct in obj.obj_type.all()])
+        return ', '.join([ct.name for ct in obj.content_types.all()])
 
 
 #
@@ -96,21 +82,26 @@ class CustomFieldForm(forms.ModelForm):
     class Meta:
         model = CustomField
         exclude = []
+        widgets = {
+            'default': forms.TextInput(),
+            'validation_regex': forms.Textarea(
+                attrs={
+                    'cols': 80,
+                    'rows': 3,
+                }
+            )
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        order_content_types(self.fields["obj_type"])
-
-
-class CustomFieldChoiceAdmin(admin.TabularInline):
-    model = CustomFieldChoice
-    extra = 5
+        order_content_types(self.fields['content_types'])
 
 
 @admin.register(CustomField)
 class CustomFieldAdmin(admin.ModelAdmin):
-    inlines = [CustomFieldChoiceAdmin]
+    actions = None
+    form = CustomFieldForm
     list_display = [
         "name",
         "models",
@@ -122,14 +113,28 @@ class CustomFieldAdmin(admin.ModelAdmin):
         "description",
     ]
     list_filter = [
-        "type",
-        "required",
-        "obj_type",
+        'type', 'required', 'content_types',
     ]
-    form = CustomFieldForm
+    fieldsets = (
+        ('Custom Field', {
+            'fields': ('type', 'name', 'weight', 'label', 'description', 'required', 'default', 'filter_logic')
+        }),
+        ('Assignment', {
+            'description': 'A custom field must be assigned to one or more object types.',
+            'fields': ('content_types',)
+        }),
+        ('Validation Rules', {
+            'fields': ('validation_minimum', 'validation_maximum', 'validation_regex'),
+            'classes': ('monospace',)
+        }),
+        ('Choices', {
+            'description': 'A selection field must have two or more choices assigned to it.',
+            'fields': ('choices',)
+        })
+    )
 
     def models(self, obj):
-        return ", ".join([ct.name for ct in obj.obj_type.all()])
+        return ', '.join([ct.name for ct in obj.content_types.all()])
 
 
 #
@@ -192,51 +197,6 @@ class CustomLinkAdmin(admin.ModelAdmin):
 
 
 #
-# Graphs
-#
-
-
-class GraphForm(forms.ModelForm):
-    class Meta:
-        model = Graph
-        exclude = ()
-        help_texts = {
-            "template_language": '<a href="https://jinja.palletsprojects.com">Jinja2</a> is strongly recommended for '
-            "new graphs."
-        }
-        widgets = {
-            "source": forms.Textarea,
-            "link": forms.Textarea,
-        }
-
-
-@admin.register(Graph)
-class GraphAdmin(admin.ModelAdmin):
-    fieldsets = (
-        ("Graph", {"fields": ("type", "name", "weight")}),
-        (
-            "Templates",
-            {
-                "fields": ("template_language", "source", "link"),
-                "classes": ("monospace",),
-            },
-        ),
-    )
-    form = GraphForm
-    list_display = [
-        "name",
-        "type",
-        "weight",
-        "template_language",
-        "source",
-    ]
-    list_filter = [
-        "type",
-        "template_language",
-    ]
-
-
-#
 # Export templates
 #
 
@@ -245,11 +205,6 @@ class ExportTemplateForm(forms.ModelForm):
     class Meta:
         model = ExportTemplate
         exclude = []
-        help_texts = {
-            "template_language": "<strong>Warning:</strong> Support for Django templating will be dropped in NetBox "
-            'v2.10. <a href="https://jinja.palletsprojects.com">Jinja2</a> is strongly '
-            "recommended."
-        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -262,25 +217,13 @@ class ExportTemplateForm(forms.ModelForm):
 @admin.register(ExportTemplate)
 class ExportTemplateAdmin(admin.ModelAdmin):
     fieldsets = (
-        (
-            "Export Template",
-            {
-                "fields": (
-                    "content_type",
-                    "name",
-                    "description",
-                    "mime_type",
-                    "file_extension",
-                )
-            },
-        ),
-        (
-            "Content",
-            {
-                "fields": ("template_language", "template_code"),
-                "classes": ("monospace",),
-            },
-        ),
+        ('Export Template', {
+            'fields': ('content_type', 'name', 'description', 'mime_type', 'file_extension')
+        }),
+        ('Content', {
+            'fields': ('template_code',),
+            'classes': ('monospace',)
+        })
     )
     list_display = [
         "name",

@@ -141,6 +141,15 @@ class PowerPortTemplate(ComponentTemplateModel):
             allocated_draw=self.allocated_draw,
         )
 
+    def clean(self):
+        super().clean()
+
+        if self.maximum_draw is not None and self.allocated_draw is not None:
+            if self.allocated_draw > self.maximum_draw:
+                raise ValidationError({
+                    'allocated_draw': f"Allocated draw cannot exceed the maximum draw ({self.maximum_draw}W)."
+                })
+
 
 class PowerOutletTemplate(ComponentTemplateModel):
     """
@@ -167,6 +176,7 @@ class PowerOutletTemplate(ComponentTemplateModel):
         unique_together = ("device_type", "name")
 
     def clean(self):
+        super().clean()
 
         # Validate power port assignment
         if self.power_port and self.power_port.device_type != self.device_type:
@@ -247,6 +257,7 @@ class FrontPortTemplate(ComponentTemplateModel):
         )
 
     def clean(self):
+        super().clean()
 
         # Validate rear port assignment
         if self.rear_port.device_type != self.device_type:
@@ -319,4 +330,14 @@ class DeviceBayTemplate(ComponentTemplateModel):
         unique_together = ("device_type", "name")
 
     def instantiate(self, device):
-        return DeviceBay(device=device, name=self.name, label=self.label)
+        return DeviceBay(
+            device=device,
+            name=self.name,
+            label=self.label
+        )
+
+    def clean(self):
+        if self.device_type and self.device_type.subdevice_role != SubdeviceRoleChoices.ROLE_PARENT:
+            raise ValidationError(
+                f"Subdevice role of device type ({self.device_type}) must be set to \"parent\" to allow device bays."
+            )

@@ -1,30 +1,8 @@
-from collections import OrderedDict
-
 from django.db.models import OuterRef, Subquery, Q
 
+from extras.models.tags import TaggedItem
 from utilities.query_functions import EmptyGroupByJSONBAgg, OrderableJSONBAgg
 from utilities.querysets import RestrictedQuerySet
-
-
-class CustomFieldQueryset:
-    """
-    Annotate custom fields on objects within a QuerySet.
-    """
-
-    def __init__(self, queryset, custom_fields):
-        self.queryset = queryset
-        self.model = queryset.model
-        self.custom_fields = custom_fields
-
-    def __iter__(self):
-        for obj in self.queryset:
-            values_dict = {
-                cfv.field_id: cfv.value for cfv in obj.custom_field_values.all()
-            }
-            obj.custom_fields = OrderedDict(
-                [(field, values_dict.get(field.pk)) for field in self.custom_fields]
-            )
-            yield obj
 
 
 class ConfigContextQuerySet(RestrictedQuerySet):
@@ -110,11 +88,27 @@ class ConfigContextModelQuerySet(RestrictedQuerySet):
 
     def _get_config_context_filters(self):
         # Construct the set of Q objects for the specific object types
+        tag_query_filters = {
+            "object_id": OuterRef(OuterRef('pk')),
+            "content_type__app_label": self.model._meta.app_label,
+            "content_type__model": self.model._meta.model_name
+        }
         base_query = Q(
-            Q(platforms=OuterRef("platform")) | Q(platforms=None),
-            Q(tenant_groups=OuterRef("tenant__group")) | Q(tenant_groups=None),
-            Q(tenants=OuterRef("tenant")) | Q(tenants=None),
-            Q(tags=OuterRef("tags")) | Q(tags=None),
+            Q(platforms=OuterRef('platform')) | Q(platforms=None),
+            Q(cluster_groups=OuterRef('cluster__group')) | Q(cluster_groups=None),
+            Q(clusters=OuterRef('cluster')) | Q(clusters=None),
+            Q(tenant_groups=OuterRef('tenant__group')) | Q(tenant_groups=None),
+            Q(tenants=OuterRef('tenant')) | Q(tenants=None),
+            Q(
+                tags__pk__in=Subquery(
+                    TaggedItem.objects.filter(
+                        **tag_query_filters
+                    ).values_list(
+                        'tag_id',
+                        flat=True
+                    )
+                )
+            ) | Q(tags=None),
             is_active=True,
         )
 
@@ -123,15 +117,10 @@ class ConfigContextModelQuerySet(RestrictedQuerySet):
             base_query.add((Q(sites=OuterRef("site")) | Q(sites=None)), Q.AND)
             region_field = "site__region"
 
-        elif self.model._meta.model_name == "virtualmachine":
-            base_query.add((Q(roles=OuterRef("role")) | Q(roles=None)), Q.AND)
-            base_query.add(
-                (Q(cluster_groups=OuterRef("cluster__group")) | Q(cluster_groups=None)),
-                Q.AND,
-            )
-            base_query.add((Q(clusters=OuterRef("cluster")) | Q(clusters=None)), Q.AND)
-            base_query.add((Q(sites=OuterRef("cluster__site")) | Q(sites=None)), Q.AND)
-            region_field = "cluster__site__region"
+        elif self.model._meta.model_name == 'virtualmachine':
+            base_query.add((Q(roles=OuterRef('role')) | Q(roles=None)), Q.AND)
+            base_query.add((Q(sites=OuterRef('cluster__site')) | Q(sites=None)), Q.AND)
+            region_field = 'cluster__site__region'
 
         base_query.add(
             (

@@ -31,6 +31,13 @@ class PrefixStatusChoices(ChoiceSet):
         (STATUS_DEPRECATED, "Deprecated"),
     )
 
+    CSS_CLASSES = {
+        STATUS_CONTAINER: 'default',
+        STATUS_ACTIVE: 'primary',
+        STATUS_RESERVED: 'info',
+        STATUS_DEPRECATED: 'danger',
+    }
+
 
 #
 # IPAddresses
@@ -52,6 +59,14 @@ class IPAddressStatusChoices(ChoiceSet):
         (STATUS_DHCP, "DHCP"),
         (STATUS_SLAAC, "SLAAC"),
     )
+
+    CSS_CLASSES = {
+        STATUS_ACTIVE: 'primary',
+        STATUS_RESERVED: 'info',
+        STATUS_DEPRECATED: 'danger',
+        STATUS_DHCP: 'success',
+        STATUS_SLAAC: 'success',
+    }
 
 
 class IPAddressRoleChoices(ChoiceSet):
@@ -76,6 +91,17 @@ class IPAddressRoleChoices(ChoiceSet):
         (ROLE_CARP, "CARP"),
     )
 
+    CSS_CLASSES = {
+        ROLE_LOOPBACK: 'default',
+        ROLE_SECONDARY: 'primary',
+        ROLE_ANYCAST: 'warning',
+        ROLE_VIP: 'success',
+        ROLE_VRRP: 'success',
+        ROLE_HSRP: 'success',
+        ROLE_GLBP: 'success',
+        ROLE_CARP: 'success',
+    }
+
 
 #
 # VLANs
@@ -93,6 +119,12 @@ class VLANStatusChoices(ChoiceSet):
         (STATUS_RESERVED, "Reserved"),
         (STATUS_DEPRECATED, "Deprecated"),
     )
+
+    CSS_CLASSES = {
+        STATUS_ACTIVE: 'primary',
+        STATUS_RESERVED: 'info',
+        STATUS_DEPRECATED: 'danger',
+    }
 
 
 #

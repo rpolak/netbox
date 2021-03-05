@@ -1,14 +1,8 @@
-from django.shortcuts import get_object_or_404
-from rest_framework.decorators import action
-from rest_framework.response import Response
 from rest_framework.routers import APIRootView
 
 from dcim.models import Device
-from extras.api.serializers import RenderedGraphSerializer
-from extras.api.views import ConfigContextQuerySetMixin, CustomFieldModelViewSet
-from extras.models import Graph
-from utilities.api import ModelViewSet
-from utilities.utils import get_subquery
+from extras.api.views import ConfigContextQuerySetMixin, CustomFieldModelViewSet, ModelViewSet
+from utilities.utils import count_related
 from virtualization import filters
 from virtualization.models import (
     Cluster,
@@ -35,14 +29,16 @@ class VirtualizationRootView(APIRootView):
 
 
 class ClusterTypeViewSet(ModelViewSet):
-    queryset = ClusterType.objects.annotate(cluster_count=get_subquery(Cluster, "type"))
+    queryset = ClusterType.objects.annotate(
+        cluster_count=count_related(Cluster, 'type')
+    )
     serializer_class = serializers.ClusterTypeSerializer
     filterset_class = filters.ClusterTypeFilterSet
 
 
 class ClusterGroupViewSet(ModelViewSet):
     queryset = ClusterGroup.objects.annotate(
-        cluster_count=get_subquery(Cluster, "group")
+        cluster_count=count_related(Cluster, 'group')
     )
     serializer_class = serializers.ClusterGroupSerializer
     filterset_class = filters.ClusterGroupFilterSet
@@ -52,8 +48,8 @@ class ClusterViewSet(CustomFieldModelViewSet):
     queryset = Cluster.objects.prefetch_related(
         "type", "group", "tenant", "site", "tags"
     ).annotate(
-        device_count=get_subquery(Device, "cluster"),
-        virtualmachine_count=get_subquery(VirtualMachine, "cluster"),
+        device_count=count_related(Device, 'cluster'),
+        virtualmachine_count=count_related(VirtualMachine, 'cluster')
     )
     serializer_class = serializers.ClusterSerializer
     filterset_class = filters.ClusterFilterSet
@@ -63,8 +59,7 @@ class ClusterViewSet(CustomFieldModelViewSet):
 # Virtual machines
 #
 
-
-class VirtualMachineViewSet(CustomFieldModelViewSet, ConfigContextQuerySetMixin):
+class VirtualMachineViewSet(ConfigContextQuerySetMixin, CustomFieldModelViewSet):
     queryset = VirtualMachine.objects.prefetch_related(
         "cluster__site",
         "role",
@@ -103,17 +98,4 @@ class VMInterfaceViewSet(ModelViewSet):
     )
     serializer_class = serializers.VMInterfaceSerializer
     filterset_class = filters.VMInterfaceFilterSet
-
-    @action(detail=True)
-    def graphs(self, request, pk):
-        """
-        A convenience method for rendering graphs for a particular VM interface.
-        """
-        vminterface = get_object_or_404(self.queryset, pk=pk)
-        queryset = Graph.objects.restrict(request.user).filter(
-            type__model="vminterface"
-        )
-        serializer = RenderedGraphSerializer(
-            queryset, many=True, context={"graphed_object": vminterface}
-        )
-        return Response(serializer.data)
+    brief_prefetch_fields = ['virtual_machine']

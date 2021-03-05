@@ -7,14 +7,14 @@ menu_items = (
         link_text="Item 1",
         buttons=(
             PluginMenuButton(
-                link="admin:dummy_plugin_dummymodel_add",
-                title="Add a new dummy model",
-                icon_class="fa fa-plus",
+                link='admin:dummy_plugin_dummymodel_add',
+                title='Add a new dummy model',
+                icon_class='mdi mdi-plus-thick',
             ),
             PluginMenuButton(
-                link="admin:dummy_plugin_dummymodel_add",
-                title="Add a new dummy model",
-                icon_class="fa fa-plus",
+                link='admin:dummy_plugin_dummymodel_add',
+                title='Add a new dummy model',
+                icon_class='mdi mdi-plus-thick',
             ),
         ),
     ),

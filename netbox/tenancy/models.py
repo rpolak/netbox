@@ -1,4 +1,3 @@
-from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.urls import reverse
 from mptt.models import MPTTModel, TreeForeignKey
@@ -21,9 +20,14 @@ class TenantGroup(MPTTModel, ChangeLoggedModel):
     """
     An arbitrary collection of Tenants.
     """
-
-    name = models.CharField(max_length=50, unique=True)
-    slug = models.SlugField(unique=True)
+    name = models.CharField(
+        max_length=100,
+        unique=True
+    )
+    slug = models.SlugField(
+        max_length=100,
+        unique=True
+    )
     parent = TreeForeignKey(
         to="self",
         on_delete=models.CASCADE,
@@ -76,22 +80,20 @@ class Tenant(ChangeLoggedModel, CustomFieldModel):
     A Tenant represents an organization served by the NetBox owner. This is typically a customer or an internal
     department.
     """
-
-    name = models.CharField(max_length=30, unique=True)
-    slug = models.SlugField(unique=True)
+    name = models.CharField(
+        max_length=100,
+        unique=True
+    )
+    slug = models.SlugField(
+        max_length=100,
+        unique=True
+    )
     group = models.ForeignKey(
         to="tenancy.TenantGroup",
         on_delete=models.SET_NULL,
         related_name="tenants",
         blank=True,
         null=True,
-    )
-    description = models.CharField(max_length=200, blank=True)
-    comments = models.TextField(blank=True)
-    custom_field_values = GenericRelation(
-        to="extras.CustomFieldValue",
-        content_type_field="obj_type",
-        object_id_field="obj_id",
     )
     tags = TaggableManager(through=TaggedItem)
 

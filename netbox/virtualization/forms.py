@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 
 from dcim.choices import InterfaceModeChoices
 from dcim.constants import INTERFACE_MTU_MAX, INTERFACE_MTU_MIN
-from dcim.forms import INTERFACE_MODE_HELP_TEXT
+from dcim.forms import InterfaceCommonForm, INTERFACE_MODE_HELP_TEXT
 from dcim.models import Device, DeviceRole, Platform, Rack, Region, Site
 from extras.forms import (
     AddRemoveTagsForm,
@@ -518,12 +518,12 @@ class VirtualMachineFilterForm(
 # VM interfaces
 #
 
-
-class VMInterfaceForm(BootstrapMixin, forms.ModelForm):
+class VMInterfaceForm(BootstrapMixin, InterfaceCommonForm, forms.ModelForm):
     untagged_vlan = DynamicModelChoiceField(
         queryset=VLAN.objects.all(),
         required=False,
-        display_field="display_name",
+        label='Untagged VLAN',
+        display_field='display_name',
         brief_mode=False,
         query_params={
             "site_id": "null",
@@ -532,7 +532,8 @@ class VMInterfaceForm(BootstrapMixin, forms.ModelForm):
     tagged_vlans = DynamicModelMultipleChoiceField(
         queryset=VLAN.objects.all(),
         required=False,
-        display_field="display_name",
+        label='Tagged VLANs',
+        display_field='display_name',
         brief_mode=False,
         query_params={
             "site_id": "null",
@@ -575,30 +576,18 @@ class VMInterfaceForm(BootstrapMixin, forms.ModelForm):
             self.fields["untagged_vlan"].widget.add_query_param("site_id", site.pk)
             self.fields["tagged_vlans"].widget.add_query_param("site_id", site.pk)
 
-    def clean(self):
-        super().clean()
 
-        # Validate VLAN assignments
-        tagged_vlans = self.cleaned_data["tagged_vlans"]
-
-        # Untagged interfaces cannot be assigned tagged VLANs
-        if (
-            self.cleaned_data["mode"] == InterfaceModeChoices.MODE_ACCESS
-            and tagged_vlans
-        ):
-            raise forms.ValidationError(
-                {"mode": "An access interface cannot have tagged VLANs assigned."}
-            )
-
-        # Remove all tagged VLAN assignments from "tagged all" interfaces
-        elif self.cleaned_data["mode"] == InterfaceModeChoices.MODE_TAGGED_ALL:
-            self.cleaned_data["tagged_vlans"] = []
-
-
-class VMInterfaceCreateForm(BootstrapMixin, forms.Form):
-    virtual_machine = DynamicModelChoiceField(queryset=VirtualMachine.objects.all())
-    name_pattern = ExpandableNameField(label="Name")
-    enabled = forms.BooleanField(required=False, initial=True)
+class VMInterfaceCreateForm(BootstrapMixin, InterfaceCommonForm):
+    virtual_machine = DynamicModelChoiceField(
+        queryset=VirtualMachine.objects.all()
+    )
+    name_pattern = ExpandableNameField(
+        label='Name'
+    )
+    enabled = forms.BooleanField(
+        required=False,
+        initial=True
+    )
     mtu = forms.IntegerField(
         required=False,
         min_value=INTERFACE_MTU_MIN,

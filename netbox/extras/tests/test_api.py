@@ -2,6 +2,7 @@ import datetime
 from unittest import skipIf
 
 from django.contrib.contenttypes.models import ContentType
+from django.test import override_settings
 from django.urls import reverse
 from django.utils.timezone import make_aware
 from django_rq.queues import get_connection
@@ -19,7 +20,7 @@ from dcim.models import (
     Site,
 )
 from extras.api.views import ReportViewSet, ScriptViewSet
-from extras.models import ConfigContext, ExportTemplate, Graph, ImageAttachment, Tag
+from extras.models import ConfigContext, CustomField, ExportTemplate, ImageAttachment, Tag
 from extras.reports import Report
 from extras.scripts import BooleanVar, IntegerVar, Script, StringVar
 from utilities.testing import APITestCase, APIViewTestCases
@@ -37,49 +38,51 @@ class AppTest(APITestCase):
         self.assertEqual(response.status_code, 200)
 
 
-class GraphTest(APIViewTestCases.APIViewTestCase):
-    model = Graph
-    brief_fields = ["id", "name", "url"]
+class CustomFieldTest(APIViewTestCases.APIViewTestCase):
+    model = CustomField
+    brief_fields = ['id', 'name', 'url']
     create_data = [
         {
-            "type": "dcim.site",
-            "name": "Graph 4",
-            "source": "http://example.com/graphs.py?site={{ obj.name }}&foo=4",
+            'content_types': ['dcim.site'],
+            'name': 'cf4',
+            'type': 'date',
         },
         {
-            "type": "dcim.site",
-            "name": "Graph 5",
-            "source": "http://example.com/graphs.py?site={{ obj.name }}&foo=5",
+            'content_types': ['dcim.site'],
+            'name': 'cf5',
+            'type': 'url',
         },
         {
-            "type": "dcim.site",
-            "name": "Graph 6",
-            "source": "http://example.com/graphs.py?site={{ obj.name }}&foo=6",
+            'content_types': ['dcim.site'],
+            'name': 'cf6',
+            'type': 'select',
         },
     ]
+    bulk_update_data = {
+        'description': 'New description',
+    }
 
     @classmethod
     def setUpTestData(cls):
-        ct = ContentType.objects.get_for_model(Site)
+        site_ct = ContentType.objects.get_for_model(Site)
 
-        graphs = (
-            Graph(
-                type=ct,
-                name="Graph 1",
-                source="http://example.com/graphs.py?site={{ obj.name }}&foo=1",
+        custom_fields = (
+            CustomField(
+                name='cf1',
+                type='text'
             ),
-            Graph(
-                type=ct,
-                name="Graph 2",
-                source="http://example.com/graphs.py?site={{ obj.name }}&foo=2",
+            CustomField(
+                name='cf2',
+                type='integer'
             ),
-            Graph(
-                type=ct,
-                name="Graph 3",
-                source="http://example.com/graphs.py?site={{ obj.name }}&foo=3",
+            CustomField(
+                name='cf3',
+                type='boolean'
             ),
         )
-        Graph.objects.bulk_create(graphs)
+        CustomField.objects.bulk_create(custom_fields)
+        for cf in custom_fields:
+            cf.content_types.add(site_ct)
 
 
 class ExportTemplateTest(APIViewTestCases.APIViewTestCase):
@@ -102,6 +105,9 @@ class ExportTemplateTest(APIViewTestCases.APIViewTestCase):
             "template_code": "{% for obj in queryset %}{{ obj.name }}\n{% endfor %}",
         },
     ]
+    bulk_update_data = {
+        'description': 'New description',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -144,6 +150,9 @@ class TagTest(APIViewTestCases.APIViewTestCase):
             "slug": "tag-6",
         },
     ]
+    bulk_update_data = {
+        'description': 'New description',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -217,6 +226,9 @@ class ConfigContextTest(APIViewTestCases.APIViewTestCase):
             "data": {"more_baz": None},
         },
     ]
+    bulk_update_data = {
+        'description': 'New description',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -460,5 +472,23 @@ class CreatedUpdatedFilterTest(APITestCase):
             **self.header
         )
 
-        self.assertEqual(response.data["count"], 1)
-        self.assertEqual(response.data["results"][0]["id"], self.rack2.pk)
+        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(response.data['results'][0]['id'], self.rack2.pk)
+
+
+class ContentTypeTest(APITestCase):
+
+    @override_settings(EXEMPT_VIEW_PERMISSIONS=['contenttypes.contenttype'])
+    def test_list_objects(self):
+        contenttype_count = ContentType.objects.count()
+
+        response = self.client.get(reverse('extras-api:contenttype-list'), **self.header)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], contenttype_count)
+
+    @override_settings(EXEMPT_VIEW_PERMISSIONS=['contenttypes.contenttype'])
+    def test_get_object(self):
+        contenttype = ContentType.objects.first()
+
+        url = reverse('extras-api:contenttype-detail', kwargs={'pk': contenttype.pk})
+        self.assertHttpStatus(self.client.get(url, **self.header), status.HTTP_200_OK)

@@ -1,11 +1,9 @@
-from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.urls import reverse
 from taggit.managers import TaggableManager
 
-from dcim.constants import CONNECTION_STATUS_CHOICES
 from dcim.fields import ASNField
-from dcim.models import CableTermination
+from dcim.models import CableTermination, PathEndpoint
 from extras.models import ChangeLoggedModel, CustomFieldModel, ObjectChange, TaggedItem
 from extras.utils import extras_features
 from utilities.querysets import RestrictedQuerySet
@@ -22,32 +20,25 @@ __all__ = (
 )
 
 
-@extras_features(
-    "custom_fields", "custom_links", "graphs", "export_templates", "webhooks"
-)
+@extras_features('custom_fields', 'custom_links', 'export_templates', 'webhooks')
 class Provider(ChangeLoggedModel, CustomFieldModel):
     """
     Each Circuit belongs to a Provider. This is usually a telecommunications company or similar organization. This model
     stores information pertinent to the user's relationship with the Provider.
     """
-
-    name = models.CharField(max_length=50, unique=True)
-    slug = models.SlugField(unique=True)
+    name = models.CharField(
+        max_length=100,
+        unique=True
+    )
+    slug = models.SlugField(
+        max_length=100,
+        unique=True
+    )
     asn = ASNField(
         blank=True,
         null=True,
         verbose_name="ASN",
         help_text="32-bit autonomous system number",
-    )
-    account = models.CharField(max_length=30, blank=True, verbose_name="Account number")
-    portal_url = models.URLField(blank=True, verbose_name="Portal URL")
-    noc_contact = models.TextField(blank=True, verbose_name="NOC contact")
-    admin_contact = models.TextField(blank=True, verbose_name="Admin contact")
-    comments = models.TextField(blank=True)
-    custom_field_values = GenericRelation(
-        to="extras.CustomFieldValue",
-        content_type_field="obj_type",
-        object_id_field="obj_id",
     )
     tags = TaggableManager(through=TaggedItem)
 
@@ -98,9 +89,14 @@ class CircuitType(ChangeLoggedModel):
     Circuits can be organized by their functional role. For example, a user might wish to define CircuitTypes named
     "Long Haul," "Metro," or "Out-of-Band".
     """
-
-    name = models.CharField(max_length=50, unique=True)
-    slug = models.SlugField(unique=True)
+    name = models.CharField(
+        max_length=100,
+        unique=True
+    )
+    slug = models.SlugField(
+        max_length=100,
+        unique=True
+    )
     description = models.CharField(
         max_length=200,
         blank=True,
@@ -134,8 +130,10 @@ class Circuit(ChangeLoggedModel, CustomFieldModel):
     circuits. Each circuit is also assigned a CircuitType and a Site.  Circuit port speed and commit rate are measured
     in Kbps.
     """
-
-    cid = models.CharField(max_length=50, verbose_name="Circuit ID")
+    cid = models.CharField(
+        max_length=100,
+        verbose_name='Circuit ID'
+    )
     provider = models.ForeignKey(
         to="circuits.Provider", on_delete=models.PROTECT, related_name="circuits"
     )
@@ -159,13 +157,6 @@ class Circuit(ChangeLoggedModel, CustomFieldModel):
     )
     commit_rate = models.PositiveIntegerField(
         blank=True, null=True, verbose_name="Commit rate (Kbps)"
-    )
-    description = models.CharField(max_length=200, blank=True)
-    comments = models.TextField(blank=True)
-    custom_field_values = GenericRelation(
-        to="extras.CustomFieldValue",
-        content_type_field="obj_type",
-        object_id_field="obj_id",
     )
 
     objects = CircuitQuerySet.as_manager()
@@ -192,15 +183,6 @@ class Circuit(ChangeLoggedModel, CustomFieldModel):
         "description",
     ]
 
-    STATUS_CLASS_MAP = {
-        CircuitStatusChoices.STATUS_DEPROVISIONING: "warning",
-        CircuitStatusChoices.STATUS_ACTIVE: "success",
-        CircuitStatusChoices.STATUS_PLANNED: "info",
-        CircuitStatusChoices.STATUS_PROVISIONING: "primary",
-        CircuitStatusChoices.STATUS_OFFLINE: "danger",
-        CircuitStatusChoices.STATUS_DECOMMISSIONED: "default",
-    }
-
     class Meta:
         ordering = ["provider", "cid"]
         unique_together = ["provider", "cid"]
@@ -225,7 +207,7 @@ class Circuit(ChangeLoggedModel, CustomFieldModel):
         )
 
     def get_status_class(self):
-        return self.STATUS_CLASS_MAP.get(self.status)
+        return CircuitStatusChoices.CSS_CLASSES.get(self.status)
 
     def _get_termination(self, side):
         for ct in self.terminations.all():
@@ -242,7 +224,7 @@ class Circuit(ChangeLoggedModel, CustomFieldModel):
         return self._get_termination("Z")
 
 
-class CircuitTermination(CableTermination):
+class CircuitTermination(PathEndpoint, CableTermination):
     circuit = models.ForeignKey(
         to="circuits.Circuit", on_delete=models.CASCADE, related_name="terminations"
     )
@@ -252,17 +234,11 @@ class CircuitTermination(CableTermination):
     site = models.ForeignKey(
         to="dcim.Site", on_delete=models.PROTECT, related_name="circuit_terminations"
     )
-    connected_endpoint = models.OneToOneField(
-        to="dcim.Interface",
-        on_delete=models.SET_NULL,
-        related_name="+",
+    port_speed = models.PositiveIntegerField(
+        verbose_name='Port speed (Kbps)',
         blank=True,
-        null=True,
+        null=True
     )
-    connection_status = models.BooleanField(
-        choices=CONNECTION_STATUS_CHOICES, blank=True, null=True
-    )
-    port_speed = models.PositiveIntegerField(verbose_name="Port speed (Kbps)")
     upstream_speed = models.PositiveIntegerField(
         blank=True,
         null=True,

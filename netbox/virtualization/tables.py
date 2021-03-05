@@ -1,33 +1,28 @@
 import django_tables2 as tables
-from django_tables2.utils import Accessor
-
-from dcim.tables import BaseInterfaceTable
+from django.conf import settings
+from dcim.tables.devices import BaseInterfaceTable
 from tenancy.tables import COL_TENANT
 from utilities.tables import (
-    BaseTable,
-    ButtonsColumn,
-    ColoredLabelColumn,
-    TagColumn,
-    ToggleColumn,
+    BaseTable, ButtonsColumn, ChoiceFieldColumn, ColoredLabelColumn, LinkedCountColumn, TagColumn, ToggleColumn,
 )
 from .models import Cluster, ClusterGroup, ClusterType, VirtualMachine, VMInterface
 
-VIRTUALMACHINE_STATUS = """
-<span class="label label-{{ record.get_status_class }}">{{ record.get_status_display }}</span>
-"""
+__all__ = (
+    'ClusterTable',
+    'ClusterGroupTable',
+    'ClusterTypeTable',
+    'VirtualMachineDetailTable',
+    'VirtualMachineTable',
+    'VirtualMachineVMInterfaceTable',
+    'VMInterfaceTable',
+)
 
-VIRTUALMACHINE_PRIMARY_IP = """
-{{ record.primary_ip6.address.ip|default:"" }}
-{% if record.primary_ip6 and record.primary_ip4 %}<br />{% endif %}
-{{ record.primary_ip4.address.ip|default:"" }}
-"""
-
-DEVICE_COUNT = """
-<a href="{% url 'dcim:device_list' %}?cluster_id={{ record.pk }}">{{ value|default:0 }}</a>
-"""
-
-VM_COUNT = """
-<a href="{% url 'virtualization:virtualmachine_list' %}?cluster_id={{ record.pk }}">{{ value|default:0 }}</a>
+VMINTERFACE_BUTTONS = """
+{% if perms.ipam.add_ipaddress %}
+    <a href="{% url 'ipam:ipaddress_add' %}?vminterface={{ record.pk }}&return_url={{ virtualmachine.get_absolute_url }}" class="btn btn-xs btn-success" title="Add IP address">
+        <i class="mdi mdi-plus-thick" aria-hidden="true"></i>
+    </a>
+{% endif %}
 """
 
 
@@ -73,10 +68,24 @@ class ClusterGroupTable(BaseTable):
 class ClusterTable(BaseTable):
     pk = ToggleColumn()
     name = tables.LinkColumn()
-    tenant = tables.Column(linkify=True)
-    site = tables.Column(linkify=True)
-    device_count = tables.TemplateColumn(
-        template_code=DEVICE_COUNT, verbose_name="Devices"
+    tenant = tables.Column(
+        linkify=True
+    )
+    site = tables.Column(
+        linkify=True
+    )
+    device_count = LinkedCountColumn(
+        viewname='dcim:device_list',
+        url_params={'cluster_id': 'pk'},
+        verbose_name='Devices'
+    )
+    vm_count = LinkedCountColumn(
+        viewname='virtualization:virtualmachine_list',
+        url_params={'cluster_id': 'pk'},
+        verbose_name='VMs'
+    )
+    tags = TagColumn(
+        url_name='virtualization:cluster_list'
     )
     vm_count = tables.TemplateColumn(template_code=VM_COUNT, verbose_name="VMs")
     tags = TagColumn(url_name="virtualization:cluster_list")
@@ -114,8 +123,10 @@ class ClusterTable(BaseTable):
 class VirtualMachineTable(BaseTable):
     pk = ToggleColumn()
     name = tables.LinkColumn()
-    status = tables.TemplateColumn(template_code=VIRTUALMACHINE_STATUS)
-    cluster = tables.Column(linkify=True)
+    status = ChoiceFieldColumn()
+    cluster = tables.Column(
+        linkify=True
+    )
     role = ColoredLabelColumn()
     tenant = tables.TemplateColumn(template_code=COL_TENANT)
 
@@ -135,12 +146,28 @@ class VirtualMachineTable(BaseTable):
 
 
 class VirtualMachineDetailTable(VirtualMachineTable):
-    primary_ip4 = tables.Column(linkify=True, verbose_name="IPv4 Address")
-    primary_ip6 = tables.Column(linkify=True, verbose_name="IPv6 Address")
-    primary_ip = tables.TemplateColumn(
-        orderable=False,
-        verbose_name="IP Address",
-        template_code=VIRTUALMACHINE_PRIMARY_IP,
+    primary_ip4 = tables.Column(
+        linkify=True,
+        verbose_name='IPv4 Address'
+    )
+    primary_ip6 = tables.Column(
+        linkify=True,
+        verbose_name='IPv6 Address'
+    )
+    if settings.PREFER_IPV4:
+        primary_ip = tables.Column(
+            linkify=True,
+            order_by=('primary_ip4', 'primary_ip6'),
+            verbose_name='IP Address'
+        )
+    else:
+        primary_ip = tables.Column(
+            linkify=True,
+            order_by=('primary_ip6', 'primary_ip4'),
+            verbose_name='IP Address'
+        )
+    tags = TagColumn(
+        url_name='virtualization:virtualmachine_list'
     )
     tags = TagColumn(url_name="virtualization:virtualmachine_list")
 
@@ -190,16 +217,28 @@ class VMInterfaceTable(BaseInterfaceTable):
     class Meta(BaseTable.Meta):
         model = VMInterface
         fields = (
-            "pk",
-            "virtual_machine",
-            "name",
-            "enabled",
-            "mac_address",
-            "mtu",
-            "description",
-            "tags",
-            "ip_addresses",
-            "untagged_vlan",
-            "tagged_vlans",
+            'pk', 'virtual_machine', 'name', 'enabled', 'mac_address', 'mtu', 'mode', 'description', 'tags',
+            'ip_addresses', 'untagged_vlan', 'tagged_vlans',
         )
-        default_columns = ("pk", "virtual_machine", "name", "enabled", "description")
+        default_columns = ('pk', 'virtual_machine', 'name', 'enabled', 'description')
+
+
+class VirtualMachineVMInterfaceTable(VMInterfaceTable):
+    actions = ButtonsColumn(
+        model=VMInterface,
+        buttons=('edit', 'delete'),
+        prepend_template=VMINTERFACE_BUTTONS
+    )
+
+    class Meta(BaseTable.Meta):
+        model = VMInterface
+        fields = (
+            'pk', 'name', 'enabled', 'mac_address', 'mtu', 'mode', 'description', 'tags', 'ip_addresses',
+            'untagged_vlan', 'tagged_vlans', 'actions',
+        )
+        default_columns = (
+            'pk', 'name', 'enabled', 'mac_address', 'mtu', 'mode', 'description', 'ip_addresses', 'actions',
+        )
+        row_attrs = {
+            'data-name': lambda record: record.name,
+        }

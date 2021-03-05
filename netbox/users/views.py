@@ -227,14 +227,10 @@ class UserKeyView(LoginRequiredMixin, View):
         except UserKey.DoesNotExist:
             userkey = None
 
-        return render(
-            request,
-            self.template_name,
-            {
-                "userkey": userkey,
-                "active_tab": "userkey",
-            },
-        )
+        return render(request, self.template_name, {
+            'object': userkey,
+            'active_tab': 'userkey',
+        })
 
 
 class UserKeyEditView(LoginRequiredMixin, View):
@@ -251,15 +247,11 @@ class UserKeyEditView(LoginRequiredMixin, View):
     def get(self, request):
         form = UserKeyForm(instance=self.userkey)
 
-        return render(
-            request,
-            self.template_name,
-            {
-                "userkey": self.userkey,
-                "form": form,
-                "active_tab": "userkey",
-            },
-        )
+        return render(request, self.template_name, {
+            'object': self.userkey,
+            'form': form,
+            'active_tab': 'userkey',
+        })
 
     def post(self, request):
         form = UserKeyForm(data=request.POST, instance=self.userkey)
@@ -358,16 +350,12 @@ class TokenEditView(LoginRequiredMixin, View):
 
         form = TokenForm(instance=token)
 
-        return render(
-            request,
-            "utilities/obj_edit.html",
-            {
-                "obj": token,
-                "obj_type": token._meta.verbose_name,
-                "form": form,
-                "return_url": reverse("user:token_list"),
-            },
-        )
+        return render(request, 'generic/object_edit.html', {
+            'obj': token,
+            'obj_type': token._meta.verbose_name,
+            'form': form,
+            'return_url': reverse('user:token_list'),
+        })
 
     def post(self, request, pk=None):
 
@@ -395,16 +383,12 @@ class TokenEditView(LoginRequiredMixin, View):
             else:
                 return redirect("user:token_list")
 
-        return render(
-            request,
-            "utilities/obj_edit.html",
-            {
-                "obj": token,
-                "obj_type": token._meta.verbose_name,
-                "form": form,
-                "return_url": reverse("user:token_list"),
-            },
-        )
+        return render(request, 'generic/object_edit.html', {
+            'obj': token,
+            'obj_type': token._meta.verbose_name,
+            'form': form,
+            'return_url': reverse('user:token_list'),
+        })
 
 
 class TokenDeleteView(LoginRequiredMixin, View):
@@ -416,16 +400,12 @@ class TokenDeleteView(LoginRequiredMixin, View):
         }
         form = ConfirmationForm(initial=initial_data)
 
-        return render(
-            request,
-            "utilities/obj_delete.html",
-            {
-                "obj": token,
-                "obj_type": token._meta.verbose_name,
-                "form": form,
-                "return_url": reverse("user:token_list"),
-            },
-        )
+        return render(request, 'generic/object_delete.html', {
+            'obj': token,
+            'obj_type': token._meta.verbose_name,
+            'form': form,
+            'return_url': reverse('user:token_list'),
+        })
 
     def post(self, request, pk):
 
@@ -434,15 +414,11 @@ class TokenDeleteView(LoginRequiredMixin, View):
         if form.is_valid():
             token.delete()
             messages.success(request, "Token deleted")
-            return redirect("user:token_list")
+            return redirect('user:token_list')
 
-        return render(
-            request,
-            "utilities/obj_delete.html",
-            {
-                "obj": token,
-                "obj_type": token._meta.verbose_name,
-                "form": form,
-                "return_url": reverse("user:token_list"),
-            },
-        )
+        return render(request, 'generic/object_delete.html', {
+            'obj': token,
+            'obj_type': token._meta.verbose_name,
+            'form': form,
+            'return_url': reverse('user:token_list'),
+        })

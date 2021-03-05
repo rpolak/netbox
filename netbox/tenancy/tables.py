@@ -1,16 +1,13 @@
 import django_tables2 as tables
 
-from utilities.tables import BaseTable, ButtonsColumn, TagColumn, ToggleColumn
+from utilities.tables import BaseTable, ButtonsColumn, LinkedCountColumn, TagColumn, ToggleColumn
 from .models import Tenant, TenantGroup
 
 MPTT_LINK = """
-{% if record.get_children %}
-    <span style="padding-left: {{ record.get_ancestors|length }}0px "><i class="fa fa-caret-right"></i>
-{% else %}
-    <span style="padding-left: {{ record.get_ancestors|length }}9px">
-{% endif %}
-    <a href="{{ record.get_absolute_url }}">{{ record.name }}</a>
-</span>
+{% for i in record.get_ancestors %}
+    <i class="mdi mdi-circle-small"></i>
+{% endfor %}
+<a href="{{ record.get_absolute_url }}">{{ record.name }}</a>
 """
 
 COL_TENANT = """
@@ -29,9 +26,17 @@ COL_TENANT = """
 
 class TenantGroupTable(BaseTable):
     pk = ToggleColumn()
-    name = tables.TemplateColumn(template_code=MPTT_LINK, orderable=False)
-    tenant_count = tables.Column(verbose_name="Tenants")
-    actions = ButtonsColumn(TenantGroup, pk_field="slug")
+    name = tables.TemplateColumn(
+        template_code=MPTT_LINK,
+        orderable=False,
+        attrs={'td': {'class': 'text-nowrap'}}
+    )
+    tenant_count = LinkedCountColumn(
+        viewname='tenancy:tenant_list',
+        url_params={'group': 'slug'},
+        verbose_name='Tenants'
+    )
+    actions = ButtonsColumn(TenantGroup, pk_field='slug')
 
     class Meta(BaseTable.Meta):
         model = TenantGroup

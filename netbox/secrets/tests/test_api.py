@@ -35,6 +35,9 @@ class SecretRoleTest(APIViewTestCases.APIViewTestCase):
             "slug": "secret-role-6",
         },
     ]
+    bulk_update_data = {
+        'description': 'New description',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -87,15 +90,9 @@ class SecretTest(APIViewTestCases.APIViewTestCase):
         SecretRole.objects.bulk_create(secret_roles)
 
         secrets = (
-            Secret(
-                device=device, role=secret_roles[0], name="Secret 1", plaintext="ABC"
-            ),
-            Secret(
-                device=device, role=secret_roles[0], name="Secret 2", plaintext="DEF"
-            ),
-            Secret(
-                device=device, role=secret_roles[0], name="Secret 3", plaintext="GHI"
-            ),
+            Secret(assigned_object=device, role=secret_roles[0], name='Secret 1', plaintext='ABC'),
+            Secret(assigned_object=device, role=secret_roles[0], name='Secret 2', plaintext='DEF'),
+            Secret(assigned_object=device, role=secret_roles[0], name='Secret 3', plaintext='GHI'),
         )
         for secret in secrets:
             secret.encrypt(self.master_key)
@@ -103,24 +100,31 @@ class SecretTest(APIViewTestCases.APIViewTestCase):
 
         self.create_data = [
             {
-                "device": device.pk,
-                "role": secret_roles[1].pk,
-                "name": "Secret 4",
-                "plaintext": "JKL",
+                'assigned_object_type': 'dcim.device',
+                'assigned_object_id': device.pk,
+                'role': secret_roles[1].pk,
+                'name': 'Secret 4',
+                'plaintext': 'JKL',
             },
             {
-                "device": device.pk,
-                "role": secret_roles[1].pk,
-                "name": "Secret 5",
-                "plaintext": "MNO",
+                'assigned_object_type': 'dcim.device',
+                'assigned_object_id': device.pk,
+                'role': secret_roles[1].pk,
+                'name': 'Secret 5',
+                'plaintext': 'MNO',
             },
             {
-                "device": device.pk,
-                "role": secret_roles[1].pk,
-                "name": "Secret 6",
-                "plaintext": "PQR",
+                'assigned_object_type': 'dcim.device',
+                'assigned_object_id': device.pk,
+                'role': secret_roles[1].pk,
+                'name': 'Secret 6',
+                'plaintext': 'PQR',
             },
         ]
+
+        self.bulk_update_data = {
+            'role': secret_roles[1].pk,
+        }
 
     def prepare_instance(self, instance):
         # Unlock the plaintext prior to evaluation of the instance

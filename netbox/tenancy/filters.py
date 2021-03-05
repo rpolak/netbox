@@ -1,13 +1,8 @@
 import django_filters
 from django.db.models import Q
 
-from extras.filters import CustomFieldFilterSet, CreatedUpdatedFilterSet
-from utilities.filters import (
-    BaseFilterSet,
-    NameSlugSearchFilterSet,
-    TagFilter,
-    TreeNodeMultipleChoiceFilter,
-)
+from extras.filters import CustomFieldModelFilterSet, CreatedUpdatedFilterSet
+from utilities.filters import BaseFilterSet, NameSlugSearchFilterSet, TagFilter, TreeNodeMultipleChoiceFilter
 from .models import Tenant, TenantGroup
 
 
@@ -35,7 +30,7 @@ class TenantGroupFilterSet(BaseFilterSet, NameSlugSearchFilterSet):
         fields = ["id", "name", "slug", "description"]
 
 
-class TenantFilterSet(BaseFilterSet, CustomFieldFilterSet, CreatedUpdatedFilterSet):
+class TenantFilterSet(BaseFilterSet, CustomFieldModelFilterSet, CreatedUpdatedFilterSet):
     q = django_filters.CharFilter(
         method="search",
         label="Search",

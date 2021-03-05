@@ -1,19 +1,12 @@
-from utilities.api import OrderedDefaultRouter
+from netbox.api import OrderedDefaultRouter
 from . import views
 
 
 router = OrderedDefaultRouter()
 router.APIRootView = views.ExtrasRootView
 
-# Custom field choices
-router.register(
-    "_custom_field_choices",
-    views.CustomFieldChoicesViewSet,
-    basename="custom-field-choice",
-)
-
-# Graphs
-router.register("graphs", views.GraphViewSet)
+# Custom fields
+router.register('custom-fields', views.CustomFieldViewSet)
 
 # Export templates
 router.register("export-templates", views.ExportTemplateViewSet)
@@ -39,5 +32,8 @@ router.register("object-changes", views.ObjectChangeViewSet)
 # Job Results
 router.register("job-results", views.JobResultViewSet)
 
-app_name = "extras-api"
+# ContentTypes
+router.register('content-types', views.ContentTypeViewSet)
+
+app_name = 'extras-api'
 urlpatterns = router.urls

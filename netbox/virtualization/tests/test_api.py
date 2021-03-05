@@ -1,10 +1,7 @@
-from django.contrib.contenttypes.models import ContentType
-from django.test import override_settings
 from django.urls import reverse
 from rest_framework import status
 
 from dcim.choices import InterfaceModeChoices
-from extras.models import Graph
 from ipam.models import VLAN
 from utilities.testing import APITestCase, APIViewTestCases
 from virtualization.models import (
@@ -42,6 +39,9 @@ class ClusterTypeTest(APIViewTestCases.APIViewTestCase):
             "slug": "cluster-type-6",
         },
     ]
+    bulk_update_data = {
+        'description': 'New description',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -71,6 +71,9 @@ class ClusterGroupTest(APIViewTestCases.APIViewTestCase):
             "slug": "cluster-type-6",
         },
     ]
+    bulk_update_data = {
+        'description': 'New description',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -85,7 +88,10 @@ class ClusterGroupTest(APIViewTestCases.APIViewTestCase):
 
 class ClusterTest(APIViewTestCases.APIViewTestCase):
     model = Cluster
-    brief_fields = ["id", "name", "url", "virtualmachine_count"]
+    brief_fields = ['id', 'name', 'url', 'virtualmachine_count']
+    bulk_update_data = {
+        'comments': 'New comment',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -130,7 +136,10 @@ class ClusterTest(APIViewTestCases.APIViewTestCase):
 
 class VirtualMachineTest(APIViewTestCases.APIViewTestCase):
     model = VirtualMachine
-    brief_fields = ["id", "name", "url"]
+    brief_fields = ['id', 'name', 'url']
+    bulk_update_data = {
+        'status': 'staged',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -226,7 +235,10 @@ class VirtualMachineTest(APIViewTestCases.APIViewTestCase):
 
 class VMInterfaceTest(APIViewTestCases.APIViewTestCase):
     model = VMInterface
-    brief_fields = ["id", "name", "url", "virtual_machine"]
+    brief_fields = ['id', 'name', 'url', 'virtual_machine']
+    bulk_update_data = {
+        'description': 'New description',
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -276,41 +288,3 @@ class VMInterfaceTest(APIViewTestCases.APIViewTestCase):
                 "untagged_vlan": vlans[2].pk,
             },
         ]
-
-    @override_settings(EXEMPT_VIEW_PERMISSIONS=["*"])
-    def test_get_vminterface_graphs(self):
-        """
-        Test retrieval of Graphs assigned to VM interfaces.
-        """
-        ct = ContentType.objects.get_for_model(VMInterface)
-        graphs = (
-            Graph(
-                type=ct,
-                name="Graph 1",
-                source="http://example.com/graphs.py?interface={{ obj.name }}&foo=1",
-            ),
-            Graph(
-                type=ct,
-                name="Graph 2",
-                source="http://example.com/graphs.py?interface={{ obj.name }}&foo=2",
-            ),
-            Graph(
-                type=ct,
-                name="Graph 3",
-                source="http://example.com/graphs.py?interface={{ obj.name }}&foo=3",
-            ),
-        )
-        Graph.objects.bulk_create(graphs)
-
-        self.add_permissions("virtualization.view_vminterface")
-        url = reverse(
-            "virtualization-api:vminterface-graphs",
-            kwargs={"pk": VMInterface.objects.first().pk},
-        )
-        response = self.client.get(url, **self.header)
-
-        self.assertEqual(len(response.data), 3)
-        self.assertEqual(
-            response.data[0]["embed_url"],
-            "http://example.com/graphs.py?interface=Interface 1&foo=1",
-        )

@@ -6,16 +6,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
-from utilities.utils import get_subquery
-from utilities.views import (
-    BulkDeleteView,
-    BulkEditView,
-    BulkImportView,
-    ObjectView,
-    ObjectDeleteView,
-    ObjectEditView,
-    ObjectListView,
-)
+from netbox.views import generic
+from utilities.utils import count_related
 from . import filters, forms, tables
 from .models import SecretRole, Secret, SessionKey, UserKey
 
@@ -34,29 +26,32 @@ def get_session_key(request):
 # Secret roles
 #
 
-
-class SecretRoleListView(ObjectListView):
-    queryset = SecretRole.objects.annotate(secret_count=get_subquery(Secret, "role"))
+class SecretRoleListView(generic.ObjectListView):
+    queryset = SecretRole.objects.annotate(
+        secret_count=count_related(Secret, 'role')
+    )
     table = tables.SecretRoleTable
 
 
-class SecretRoleEditView(ObjectEditView):
+class SecretRoleEditView(generic.ObjectEditView):
     queryset = SecretRole.objects.all()
     model_form = forms.SecretRoleForm
 
 
-class SecretRoleDeleteView(ObjectDeleteView):
+class SecretRoleDeleteView(generic.ObjectDeleteView):
     queryset = SecretRole.objects.all()
 
 
-class SecretRoleBulkImportView(BulkImportView):
+class SecretRoleBulkImportView(generic.BulkImportView):
     queryset = SecretRole.objects.all()
     model_form = forms.SecretRoleCSVForm
     table = tables.SecretRoleTable
 
 
-class SecretRoleBulkDeleteView(BulkDeleteView):
-    queryset = SecretRole.objects.annotate(secret_count=get_subquery(Secret, "role"))
+class SecretRoleBulkDeleteView(generic.BulkDeleteView):
+    queryset = SecretRole.objects.annotate(
+        secret_count=count_related(Secret, 'role')
+    )
     table = tables.SecretRoleTable
 
 
@@ -64,32 +59,19 @@ class SecretRoleBulkDeleteView(BulkDeleteView):
 # Secrets
 #
 
-
-class SecretListView(ObjectListView):
-    queryset = Secret.objects.prefetch_related("role", "device")
+class SecretListView(generic.ObjectListView):
+    queryset = Secret.objects.all()
     filterset = filters.SecretFilterSet
     filterset_form = forms.SecretFilterForm
     table = tables.SecretTable
     action_buttons = ("import", "export")
 
 
-class SecretView(ObjectView):
+class SecretView(generic.ObjectView):
     queryset = Secret.objects.all()
 
-    def get(self, request, pk):
 
-        secret = get_object_or_404(self.queryset, pk=pk)
-
-        return render(
-            request,
-            "secrets/secret.html",
-            {
-                "secret": secret,
-            },
-        )
-
-
-class SecretEditView(ObjectEditView):
+class SecretEditView(generic.ObjectEditView):
     queryset = Secret.objects.all()
     model_form = forms.SecretForm
     template_name = "secrets/secret_edit.html"
@@ -173,11 +155,11 @@ class SecretEditView(ObjectEditView):
         )
 
 
-class SecretDeleteView(ObjectDeleteView):
+class SecretDeleteView(generic.ObjectDeleteView):
     queryset = Secret.objects.all()
 
 
-class SecretBulkImportView(BulkImportView):
+class SecretBulkImportView(generic.BulkImportView):
     queryset = Secret.objects.all()
     model_form = forms.SecretCSVForm
     table = tables.SecretTable
@@ -233,14 +215,14 @@ class SecretBulkImportView(BulkImportView):
         )
 
 
-class SecretBulkEditView(BulkEditView):
-    queryset = Secret.objects.prefetch_related("role", "device")
+class SecretBulkEditView(generic.BulkEditView):
+    queryset = Secret.objects.prefetch_related('role')
     filterset = filters.SecretFilterSet
     table = tables.SecretTable
     form = forms.SecretBulkEditForm
 
 
-class SecretBulkDeleteView(BulkDeleteView):
-    queryset = Secret.objects.prefetch_related("role", "device")
+class SecretBulkDeleteView(generic.BulkDeleteView):
+    queryset = Secret.objects.prefetch_related('role')
     filterset = filters.SecretFilterSet
     table = tables.SecretTable

@@ -5,13 +5,13 @@ from io import StringIO
 
 import django_filters
 from django import forms
+from django.conf import settings
 from django.forms.fields import JSONField as _JSONField, InvalidJSONInput
-from django.core.exceptions import MultipleObjectsReturned
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.db.models import Count
 from django.forms import BoundField
 from django.urls import reverse
 
-from utilities.api import get_serializer_for_model
 from utilities.choices import unpack_grouped_choices
 from utilities.validators import EnhancedURLValidator
 from . import widgets
@@ -19,18 +19,19 @@ from .constants import *
 from .utils import expand_alphanumeric_pattern, expand_ipaddress_pattern
 
 __all__ = (
-    "CommentField",
-    "CSVChoiceField",
-    "CSVDataField",
-    "CSVModelChoiceField",
-    "DynamicModelChoiceField",
-    "DynamicModelMultipleChoiceField",
-    "ExpandableIPAddressField",
-    "ExpandableNameField",
-    "JSONField",
-    "LaxURLField",
-    "SlugField",
-    "TagFilterField",
+    'CommentField',
+    'CSVChoiceField',
+    'CSVContentTypeField',
+    'CSVDataField',
+    'CSVModelChoiceField',
+    'DynamicModelChoiceField',
+    'DynamicModelMultipleChoiceField',
+    'ExpandableIPAddressField',
+    'ExpandableNameField',
+    'JSONField',
+    'LaxURLField',
+    'SlugField',
+    'TagFilterField',
 )
 
 
@@ -126,23 +127,11 @@ class CSVChoiceField(forms.ChoiceField):
     """
     Invert the provided set of choices to take the human-friendly label as input, and return the database value.
     """
+    STATIC_CHOICES = True
 
-    def __init__(self, choices, *args, **kwargs):
-        super().__init__(choices=choices, *args, **kwargs)
-        self.choices = [
-            (label, label) for value, label in unpack_grouped_choices(choices)
-        ]
-        self.choice_values = {
-            label: value for value, label in unpack_grouped_choices(choices)
-        }
-
-    def clean(self, value):
-        value = super().clean(value)
-        if not value:
-            return ""
-        if value not in self.choice_values:
-            raise forms.ValidationError("Invalid choice: {}".format(value))
-        return self.choice_values[value]
+    def __init__(self, *, choices=(), **kwargs):
+        super().__init__(choices=choices, **kwargs)
+        self.choices = unpack_grouped_choices(choices)
 
 
 class CSVModelChoiceField(forms.ModelChoiceField):
@@ -157,10 +146,30 @@ class CSVModelChoiceField(forms.ModelChoiceField):
     def to_python(self, value):
         try:
             return super().to_python(value)
-        except MultipleObjectsReturned as e:
+        except MultipleObjectsReturned:
             raise forms.ValidationError(
                 f'"{value}" is not a unique value for this field; multiple objects were found'
             )
+
+
+class CSVContentTypeField(CSVModelChoiceField):
+    """
+    Reference a ContentType in the form <app>.<model>
+    """
+    STATIC_CHOICES = True
+
+    def prepare_value(self, value):
+        return f'{value.app_label}.{value.model}'
+
+    def to_python(self, value):
+        try:
+            app_label, model = value.split('.')
+        except ValueError:
+            raise forms.ValidationError(f'Object type must be specified as "<app>.<model>"')
+        try:
+            return self.queryset.get(app_label=app_label, model=model)
+        except ObjectDoesNotExist:
+            raise forms.ValidationError(f'Invalid object type')
 
 
 class ExpandableNameField(forms.CharField):
@@ -220,11 +229,9 @@ class CommentField(forms.CharField):
     widget = forms.Textarea
     default_label = ""
     # TODO: Port Markdown cheat sheet to internal documentation
-    default_helptext = (
-        '<i class="fa fa-info-circle"></i> '
-        '<a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet" target="_blank">'
-        "Markdown</a> syntax is supported"
-    )
+    default_helptext = '<i class="mdi mdi-information-outline"></i> '\
+                       '<a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet" target="_blank">'\
+                       'Markdown</a> syntax is supported'
 
     def __init__(self, *args, **kwargs):
         required = kwargs.pop("required", False)
@@ -383,7 +390,14 @@ class DynamicModelChoiceField(DynamicModelChoiceMixin, forms.ModelChoiceField):
     rendered only with choices set via bound data. Choices are populated on-demand via the APISelect widget.
     """
 
-    pass
+    def clean(self, value):
+        """
+        When null option is enabled and "None" is sent as part of a form to be submitted, it is sent as the
+        string 'null'.  This will check for that condition and gracefully handle the conversion to a NoneType.
+        """
+        if self.null_option is not None and value == settings.FILTERS_NULL_CHOICE_VALUE:
+            return None
+        return super().clean(value)
 
 
 class DynamicModelMultipleChoiceField(
