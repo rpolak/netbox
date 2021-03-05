@@ -9,51 +9,33 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("dcim", "0001_initial"),
-        ("circuits", "0001_initial"),
+        ('dcim', '0001_initial'),
+        ('circuits', '0001_initial'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="circuit",
-            name="interface",
-            field=models.OneToOneField(
-                blank=True,
-                null=True,
-                on_delete=django.db.models.deletion.CASCADE,
-                related_name="circuit",
-                to="dcim.Interface",
-            ),
+            model_name='circuit',
+            name='interface',
+            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='circuit', to='dcim.Interface'),
         ),
         migrations.AddField(
-            model_name="circuit",
-            name="provider",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.PROTECT,
-                related_name="circuits",
-                to="circuits.Provider",
-            ),
+            model_name='circuit',
+            name='provider',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='circuits', to='circuits.Provider'),
         ),
         migrations.AddField(
-            model_name="circuit",
-            name="site",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.PROTECT,
-                related_name="circuits",
-                to="dcim.Site",
-            ),
+            model_name='circuit',
+            name='site',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='circuits', to='dcim.Site'),
         ),
         migrations.AddField(
-            model_name="circuit",
-            name="type",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.PROTECT,
-                related_name="circuits",
-                to="circuits.CircuitType",
-            ),
+            model_name='circuit',
+            name='type',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='circuits', to='circuits.CircuitType'),
         ),
         migrations.AlterUniqueTogether(
-            name="circuit",
-            unique_together=set([("provider", "cid")]),
+            name='circuit',
+            unique_together=set([('provider', 'cid')]),
         ),
     ]

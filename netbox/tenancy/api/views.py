@@ -16,19 +16,21 @@ class TenancyRootView(APIRootView):
     """
     Tenancy API root view
     """
-
     def get_view_name(self):
-        return "Tenancy"
+        return 'Tenancy'
 
 
 #
 # Tenant Groups
 #
 
-
 class TenantGroupViewSet(ModelViewSet):
     queryset = TenantGroup.objects.add_related_count(
-        TenantGroup.objects.all(), Tenant, "group", "tenant_count", cumulative=True
+        TenantGroup.objects.all(),
+        Tenant,
+        'group',
+        'tenant_count',
+        cumulative=True
     )
     serializer_class = serializers.TenantGroupSerializer
     filterset_class = filters.TenantGroupFilterSet
@@ -38,18 +40,19 @@ class TenantGroupViewSet(ModelViewSet):
 # Tenants
 #
 
-
 class TenantViewSet(CustomFieldModelViewSet):
-    queryset = Tenant.objects.prefetch_related("group", "tags").annotate(
-        circuit_count=count_related(Circuit, "tenant"),
-        device_count=count_related(Device, "tenant"),
-        ipaddress_count=count_related(IPAddress, "tenant"),
-        prefix_count=count_related(Prefix, "tenant"),
-        rack_count=count_related(Rack, "tenant"),
-        site_count=count_related(Site, "tenant"),
-        virtualmachine_count=count_related(VirtualMachine, "tenant"),
-        vlan_count=count_related(VLAN, "tenant"),
-        vrf_count=count_related(VRF, "tenant"),
+    queryset = Tenant.objects.prefetch_related(
+        'group', 'tags'
+    ).annotate(
+        circuit_count=count_related(Circuit, 'tenant'),
+        device_count=count_related(Device, 'tenant'),
+        ipaddress_count=count_related(IPAddress, 'tenant'),
+        prefix_count=count_related(Prefix, 'tenant'),
+        rack_count=count_related(Rack, 'tenant'),
+        site_count=count_related(Site, 'tenant'),
+        virtualmachine_count=count_related(VirtualMachine, 'tenant'),
+        vlan_count=count_related(VLAN, 'tenant'),
+        vrf_count=count_related(VRF, 'tenant')
     )
     serializer_class = serializers.TenantSerializer
     filterset_class = filters.TenantFilterSet

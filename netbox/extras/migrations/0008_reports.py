@@ -19,11 +19,7 @@ def verify_postgresql_version(apps, schema_editor):
         pg_version = connection.pg_version
 
         if pg_version < DB_MINIMUM_VERSION:
-            raise Exception(
-                "PostgreSQL 9.4.0 ({}) or higher is required ({} found). Upgrade PostgreSQL and then run migrations again.".format(
-                    DB_MINIMUM_VERSION, pg_version
-                )
-            )
+            raise Exception("PostgreSQL 9.4.0 ({}) or higher is required ({} found). Upgrade PostgreSQL and then run migrations again.".format(DB_MINIMUM_VERSION, pg_version))
 
     # Skip if the database is missing (e.g. for CI testing) or misconfigured.
     except OperationalError:
@@ -34,40 +30,23 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ("extras", "0007_unicode_literals"),
+        ('extras', '0007_unicode_literals'),
     ]
 
     operations = [
         migrations.RunPython(verify_postgresql_version),
         migrations.CreateModel(
-            name="ReportResult",
+            name='ReportResult',
             fields=[
-                (
-                    "id",
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                ("report", models.CharField(max_length=255, unique=True)),
-                ("created", models.DateTimeField(auto_now_add=True)),
-                ("failed", models.BooleanField()),
-                ("data", django.contrib.postgres.fields.jsonb.JSONField()),
-                (
-                    "user",
-                    models.ForeignKey(
-                        blank=True,
-                        null=True,
-                        on_delete=django.db.models.deletion.SET_NULL,
-                        related_name="+",
-                        to=settings.AUTH_USER_MODEL,
-                    ),
-                ),
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('report', models.CharField(max_length=255, unique=True)),
+                ('created', models.DateTimeField(auto_now_add=True)),
+                ('failed', models.BooleanField()),
+                ('data', django.contrib.postgres.fields.jsonb.JSONField()),
+                ('user', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
             ],
             options={
-                "ordering": ["report"],
+                'ordering': ['report'],
             },
         ),
     ]

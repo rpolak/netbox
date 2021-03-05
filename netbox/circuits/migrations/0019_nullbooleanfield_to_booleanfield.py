@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("circuits", "0018_standardize_description"),
+        ('circuits', '0018_standardize_description'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name="circuittermination",
-            name="connection_status",
+            model_name='circuittermination',
+            name='connection_status',
             field=models.BooleanField(blank=True, null=True),
         ),
     ]

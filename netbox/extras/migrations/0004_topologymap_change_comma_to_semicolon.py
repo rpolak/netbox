@@ -6,15 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("extras", "0003_exporttemplate_add_description"),
+        ('extras', '0003_exporttemplate_add_description'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name="topologymap",
-            name="device_patterns",
-            field=models.TextField(
-                help_text=b"Identify devices to include in the diagram using regular expressions, one per line. Each line will result in a new tier of the drawing. Separate multiple regexes within a line using semicolons. Devices will be rendered in the order they are defined."
-            ),
+            model_name='topologymap',
+            name='device_patterns',
+            field=models.TextField(help_text=b'Identify devices to include in the diagram using regular expressions, one per line. Each line will result in a new tier of the drawing. Separate multiple regexes within a line using semicolons. Devices will be rendered in the order they are defined.'),
         ),
     ]

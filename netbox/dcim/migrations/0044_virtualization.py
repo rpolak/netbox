@@ -7,42 +7,24 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("virtualization", "0001_virtualization"),
-        ("dcim", "0043_device_component_name_lengths"),
+        ('virtualization', '0001_virtualization'),
+        ('dcim', '0043_device_component_name_lengths'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="device",
-            name="cluster",
-            field=models.ForeignKey(
-                blank=True,
-                null=True,
-                on_delete=django.db.models.deletion.SET_NULL,
-                related_name="devices",
-                to="virtualization.Cluster",
-            ),
+            model_name='device',
+            name='cluster',
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='devices', to='virtualization.Cluster'),
         ),
         migrations.AddField(
-            model_name="interface",
-            name="virtual_machine",
-            field=models.ForeignKey(
-                blank=True,
-                null=True,
-                on_delete=django.db.models.deletion.CASCADE,
-                related_name="interfaces",
-                to="virtualization.VirtualMachine",
-            ),
+            model_name='interface',
+            name='virtual_machine',
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='interfaces', to='virtualization.VirtualMachine'),
         ),
         migrations.AlterField(
-            model_name="interface",
-            name="device",
-            field=models.ForeignKey(
-                blank=True,
-                null=True,
-                on_delete=django.db.models.deletion.CASCADE,
-                related_name="interfaces",
-                to="dcim.Device",
-            ),
+            model_name='interface',
+            name='device',
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='interfaces', to='dcim.Device'),
         ),
     ]

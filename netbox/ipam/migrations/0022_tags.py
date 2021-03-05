@@ -7,69 +7,39 @@ import taggit.managers
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("taggit", "0002_auto_20150616_2121"),
-        ("ipam", "0021_vrf_ordering"),
+        ('taggit', '0002_auto_20150616_2121'),
+        ('ipam', '0021_vrf_ordering'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="aggregate",
-            name="tags",
-            field=taggit.managers.TaggableManager(
-                help_text="A comma-separated list of tags.",
-                through="taggit.TaggedItem",
-                to="taggit.Tag",
-                verbose_name="Tags",
-            ),
+            model_name='aggregate',
+            name='tags',
+            field=taggit.managers.TaggableManager(help_text='A comma-separated list of tags.', through='taggit.TaggedItem', to='taggit.Tag', verbose_name='Tags'),
         ),
         migrations.AddField(
-            model_name="ipaddress",
-            name="tags",
-            field=taggit.managers.TaggableManager(
-                help_text="A comma-separated list of tags.",
-                through="taggit.TaggedItem",
-                to="taggit.Tag",
-                verbose_name="Tags",
-            ),
+            model_name='ipaddress',
+            name='tags',
+            field=taggit.managers.TaggableManager(help_text='A comma-separated list of tags.', through='taggit.TaggedItem', to='taggit.Tag', verbose_name='Tags'),
         ),
         migrations.AddField(
-            model_name="prefix",
-            name="tags",
-            field=taggit.managers.TaggableManager(
-                help_text="A comma-separated list of tags.",
-                through="taggit.TaggedItem",
-                to="taggit.Tag",
-                verbose_name="Tags",
-            ),
+            model_name='prefix',
+            name='tags',
+            field=taggit.managers.TaggableManager(help_text='A comma-separated list of tags.', through='taggit.TaggedItem', to='taggit.Tag', verbose_name='Tags'),
         ),
         migrations.AddField(
-            model_name="service",
-            name="tags",
-            field=taggit.managers.TaggableManager(
-                help_text="A comma-separated list of tags.",
-                through="taggit.TaggedItem",
-                to="taggit.Tag",
-                verbose_name="Tags",
-            ),
+            model_name='service',
+            name='tags',
+            field=taggit.managers.TaggableManager(help_text='A comma-separated list of tags.', through='taggit.TaggedItem', to='taggit.Tag', verbose_name='Tags'),
         ),
         migrations.AddField(
-            model_name="vlan",
-            name="tags",
-            field=taggit.managers.TaggableManager(
-                help_text="A comma-separated list of tags.",
-                through="taggit.TaggedItem",
-                to="taggit.Tag",
-                verbose_name="Tags",
-            ),
+            model_name='vlan',
+            name='tags',
+            field=taggit.managers.TaggableManager(help_text='A comma-separated list of tags.', through='taggit.TaggedItem', to='taggit.Tag', verbose_name='Tags'),
         ),
         migrations.AddField(
-            model_name="vrf",
-            name="tags",
-            field=taggit.managers.TaggableManager(
-                help_text="A comma-separated list of tags.",
-                through="taggit.TaggedItem",
-                to="taggit.Tag",
-                verbose_name="Tags",
-            ),
+            model_name='vrf',
+            name='tags',
+            field=taggit.managers.TaggableManager(help_text='A comma-separated list of tags.', through='taggit.TaggedItem', to='taggit.Tag', verbose_name='Tags'),
         ),
     ]

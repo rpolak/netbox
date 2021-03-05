@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("tenancy", "0008_nested_tenantgroups_rebuild"),
+        ('tenancy', '0008_nested_tenantgroups_rebuild'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="tenantgroup",
-            name="description",
+            model_name='tenantgroup',
+            name='description',
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name="tenant",
-            name="description",
+            model_name='tenant',
+            name='description',
             field=models.CharField(blank=True, max_length=200),
         ),
     ]

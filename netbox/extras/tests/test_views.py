@@ -18,19 +18,17 @@ class TagTestCase(ViewTestCases.OrganizationalObjectViewTestCase):
     @classmethod
     def setUpTestData(cls):
 
-        Tag.objects.bulk_create(
-            (
-                Tag(name="Tag 1", slug="tag-1"),
-                Tag(name="Tag 2", slug="tag-2"),
-                Tag(name="Tag 3", slug="tag-3"),
-            )
-        )
+        Tag.objects.bulk_create((
+            Tag(name='Tag 1', slug='tag-1'),
+            Tag(name='Tag 2', slug='tag-2'),
+            Tag(name='Tag 3', slug='tag-3'),
+        ))
 
         cls.form_data = {
-            "name": "Tag X",
-            "slug": "tag-x",
-            "color": "c0c0c0",
-            "comments": "Some comments",
+            'name': 'Tag X',
+            'slug': 'tag-x',
+            'color': 'c0c0c0',
+            'comments': 'Some comments',
         }
 
         cls.csv_data = (
@@ -41,7 +39,7 @@ class TagTestCase(ViewTestCases.OrganizationalObjectViewTestCase):
         )
 
         cls.bulk_edit_data = {
-            "color": "00ff00",
+            'color': '00ff00',
         }
 
 
@@ -53,57 +51,60 @@ class ConfigContextTestCase(
     ViewTestCases.DeleteObjectViewTestCase,
     ViewTestCases.ListObjectsViewTestCase,
     ViewTestCases.BulkEditObjectsViewTestCase,
-    ViewTestCases.BulkDeleteObjectsViewTestCase,
+    ViewTestCases.BulkDeleteObjectsViewTestCase
 ):
     model = ConfigContext
 
     @classmethod
     def setUpTestData(cls):
 
-        site = Site.objects.create(name="Site 1", slug="site-1")
+        site = Site.objects.create(name='Site 1', slug='site-1')
 
         # Create three ConfigContexts
         for i in range(1, 4):
             configcontext = ConfigContext(
-                name="Config Context {}".format(i), data={"foo": i}
+                name='Config Context {}'.format(i),
+                data={'foo': i}
             )
             configcontext.save()
             configcontext.sites.add(site)
 
         cls.form_data = {
-            "name": "Config Context X",
-            "weight": 200,
-            "description": "A new config context",
-            "is_active": True,
-            "regions": [],
-            "sites": [site.pk],
-            "roles": [],
-            "platforms": [],
-            "tenant_groups": [],
-            "tenants": [],
-            "tags": [],
-            "data": '{"foo": 123}',
+            'name': 'Config Context X',
+            'weight': 200,
+            'description': 'A new config context',
+            'is_active': True,
+            'regions': [],
+            'sites': [site.pk],
+            'roles': [],
+            'platforms': [],
+            'tenant_groups': [],
+            'tenants': [],
+            'tags': [],
+            'data': '{"foo": 123}',
         }
 
         cls.bulk_edit_data = {
-            "weight": 300,
-            "is_active": False,
-            "description": "New description",
+            'weight': 300,
+            'is_active': False,
+            'description': 'New description',
         }
 
 
 # TODO: Convert to StandardTestCases.Views
 class ObjectChangeTestCase(TestCase):
-    user_permissions = ("extras.view_objectchange",)
+    user_permissions = (
+        'extras.view_objectchange',
+    )
 
     @classmethod
     def setUpTestData(cls):
 
-        site = Site(name="Site 1", slug="site-1")
+        site = Site(name='Site 1', slug='site-1')
         site.save()
 
         # Create three ObjectChanges
-        user = User.objects.create_user(username="testuser2")
+        user = User.objects.create_user(username='testuser2')
         for i in range(1, 4):
             oc = site.to_objectchange(action=ObjectChangeActionChoices.ACTION_UPDATE)
             oc.user = user
@@ -112,12 +113,12 @@ class ObjectChangeTestCase(TestCase):
 
     def test_objectchange_list(self):
 
-        url = reverse("extras:objectchange_list")
+        url = reverse('extras:objectchange_list')
         params = {
             "user": User.objects.first().pk,
         }
 
-        response = self.client.get("{}?{}".format(url, urllib.parse.urlencode(params)))
+        response = self.client.get('{}?{}'.format(url, urllib.parse.urlencode(params)))
         self.assertHttpStatus(response, 200)
 
     def test_objectchange(self):
@@ -128,21 +129,21 @@ class ObjectChangeTestCase(TestCase):
 
 
 class CustomLinkTest(TestCase):
-    user_permissions = ["dcim.view_site"]
+    user_permissions = ['dcim.view_site']
 
     def test_view_object_with_custom_link(self):
         customlink = CustomLink(
             content_type=ContentType.objects.get_for_model(Site),
-            name="Test",
-            text="FOO {{ obj.name }} BAR",
-            url="http://example.com/?site={{ obj.slug }}",
-            new_window=False,
+            name='Test',
+            text='FOO {{ obj.name }} BAR',
+            url='http://example.com/?site={{ obj.slug }}',
+            new_window=False
         )
         customlink.save()
 
-        site = Site(name="Test Site", slug="test-site")
+        site = Site(name='Test Site', slug='test-site')
         site.save()
 
         response = self.client.get(site.get_absolute_url(), follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertIn(f"FOO {site.name} BAR", str(response.content))
+        self.assertIn(f'FOO {site.name} BAR', str(response.content))

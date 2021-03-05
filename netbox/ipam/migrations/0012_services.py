@@ -8,68 +8,30 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("dcim", "0022_color_names_to_rgb"),
-        ("ipam", "0011_rir_add_is_private"),
+        ('dcim', '0022_color_names_to_rgb'),
+        ('ipam', '0011_rir_add_is_private'),
     ]
 
     operations = [
         migrations.CreateModel(
-            name="Service",
+            name='Service',
             fields=[
-                (
-                    "id",
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                ("created", models.DateField(auto_now_add=True)),
-                ("last_updated", models.DateTimeField(auto_now=True)),
-                ("name", models.CharField(max_length=30)),
-                (
-                    "protocol",
-                    models.PositiveSmallIntegerField(
-                        choices=[(6, b"TCP"), (17, b"UDP")]
-                    ),
-                ),
-                (
-                    "port",
-                    models.PositiveIntegerField(
-                        validators=[
-                            django.core.validators.MinValueValidator(1),
-                            django.core.validators.MaxValueValidator(65535),
-                        ],
-                        verbose_name=b"Port number",
-                    ),
-                ),
-                ("description", models.CharField(blank=True, max_length=100)),
-                (
-                    "device",
-                    models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE,
-                        related_name="services",
-                        to="dcim.Device",
-                        verbose_name=b"device",
-                    ),
-                ),
-                (
-                    "ipaddresses",
-                    models.ManyToManyField(
-                        blank=True,
-                        related_name="services",
-                        to="ipam.IPAddress",
-                        verbose_name=b"IP addresses",
-                    ),
-                ),
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('created', models.DateField(auto_now_add=True)),
+                ('last_updated', models.DateTimeField(auto_now=True)),
+                ('name', models.CharField(max_length=30)),
+                ('protocol', models.PositiveSmallIntegerField(choices=[(6, b'TCP'), (17, b'UDP')])),
+                ('port', models.PositiveIntegerField(validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(65535)], verbose_name=b'Port number')),
+                ('description', models.CharField(blank=True, max_length=100)),
+                ('device', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='services', to='dcim.Device', verbose_name=b'device')),
+                ('ipaddresses', models.ManyToManyField(blank=True, related_name='services', to='ipam.IPAddress', verbose_name=b'IP addresses')),
             ],
             options={
-                "ordering": ["device", "protocol", "port"],
+                'ordering': ['device', 'protocol', 'port'],
             },
         ),
         migrations.AlterUniqueTogether(
-            name="service",
-            unique_together=set([("device", "protocol", "port")]),
+            name='service',
+            unique_together=set([('device', 'protocol', 'port')]),
         ),
     ]

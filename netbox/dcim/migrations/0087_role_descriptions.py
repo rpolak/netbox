@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("dcim", "0086_device_name_nonunique"),
+        ('dcim', '0086_device_name_nonunique'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="devicerole",
-            name="description",
+            model_name='devicerole',
+            name='description',
             field=models.CharField(blank=True, max_length=100),
         ),
         migrations.AddField(
-            model_name="rackrole",
-            name="description",
+            model_name='rackrole',
+            name='description',
             field=models.CharField(blank=True, max_length=100),
         ),
     ]

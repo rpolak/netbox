@@ -7,25 +7,23 @@ import timezone_field.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("dcim", "0053_platform_manufacturer"),
+        ('dcim', '0053_platform_manufacturer'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="site",
-            name="description",
+            model_name='site',
+            name='description',
             field=models.CharField(blank=True, max_length=100),
         ),
         migrations.AddField(
-            model_name="site",
-            name="status",
-            field=models.PositiveSmallIntegerField(
-                choices=[[1, "Active"], [2, "Planned"], [4, "Retired"]], default=1
-            ),
+            model_name='site',
+            name='status',
+            field=models.PositiveSmallIntegerField(choices=[[1, 'Active'], [2, 'Planned'], [4, 'Retired']], default=1),
         ),
         migrations.AddField(
-            model_name="site",
-            name="time_zone",
+            model_name='site',
+            name='time_zone',
             field=timezone_field.fields.TimeZoneField(blank=True),
         ),
     ]

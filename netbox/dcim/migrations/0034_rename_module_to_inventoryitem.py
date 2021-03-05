@@ -7,43 +7,27 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("dcim", "0033_rackreservation_rack_editable"),
+        ('dcim', '0033_rackreservation_rack_editable'),
     ]
 
     operations = [
         migrations.RenameModel(
-            old_name="Module",
-            new_name="InventoryItem",
+            old_name='Module',
+            new_name='InventoryItem',
         ),
         migrations.AlterField(
-            model_name="inventoryitem",
-            name="device",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE,
-                related_name="inventory_items",
-                to="dcim.Device",
-            ),
+            model_name='inventoryitem',
+            name='device',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='inventory_items', to='dcim.Device'),
         ),
         migrations.AlterField(
-            model_name="inventoryitem",
-            name="parent",
-            field=models.ForeignKey(
-                blank=True,
-                null=True,
-                on_delete=django.db.models.deletion.CASCADE,
-                related_name="child_items",
-                to="dcim.InventoryItem",
-            ),
+            model_name='inventoryitem',
+            name='parent',
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='child_items', to='dcim.InventoryItem'),
         ),
         migrations.AlterField(
-            model_name="inventoryitem",
-            name="manufacturer",
-            field=models.ForeignKey(
-                blank=True,
-                null=True,
-                on_delete=django.db.models.deletion.PROTECT,
-                related_name="inventory_items",
-                to="dcim.Manufacturer",
-            ),
+            model_name='inventoryitem',
+            name='manufacturer',
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='inventory_items', to='dcim.Manufacturer'),
         ),
     ]

@@ -7,30 +7,24 @@ import taggit.managers
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("extras", "0042_customfield_manager"),
-        ("dcim", "0107_component_labels"),
+        ('extras', '0042_customfield_manager'),
+        ('dcim', '0107_component_labels'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="cable",
-            name="tags",
-            field=taggit.managers.TaggableManager(
-                through="extras.TaggedItem", to="extras.Tag"
-            ),
+            model_name='cable',
+            name='tags',
+            field=taggit.managers.TaggableManager(through='extras.TaggedItem', to='extras.Tag'),
         ),
         migrations.AddField(
-            model_name="powerpanel",
-            name="tags",
-            field=taggit.managers.TaggableManager(
-                through="extras.TaggedItem", to="extras.Tag"
-            ),
+            model_name='powerpanel',
+            name='tags',
+            field=taggit.managers.TaggableManager(through='extras.TaggedItem', to='extras.Tag'),
         ),
         migrations.AddField(
-            model_name="rackreservation",
-            name="tags",
-            field=taggit.managers.TaggableManager(
-                through="extras.TaggedItem", to="extras.Tag"
-            ),
+            model_name='rackreservation',
+            name='tags',
+            field=taggit.managers.TaggableManager(through='extras.TaggedItem', to='extras.Tag'),
         ),
     ]

@@ -4,7 +4,7 @@ from django.db import migrations, models
 
 
 def is_filterable_to_filter_logic(apps, schema_editor):
-    CustomField = apps.get_model("extras", "CustomField")
+    CustomField = apps.get_model('extras', 'CustomField')
     CustomField.objects.filter(is_filterable=False).update(filter_logic=0)
     CustomField.objects.filter(is_filterable=True).update(filter_logic=1)
     # Select fields match on primary key only
@@ -12,7 +12,7 @@ def is_filterable_to_filter_logic(apps, schema_editor):
 
 
 def filter_logic_to_is_filterable(apps, schema_editor):
-    CustomField = apps.get_model("extras", "CustomField")
+    CustomField = apps.get_model('extras', 'CustomField')
     CustomField.objects.filter(filter_logic=0).update(is_filterable=False)
     CustomField.objects.exclude(filter_logic=0).update(is_filterable=True)
 
@@ -20,40 +20,28 @@ def filter_logic_to_is_filterable(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("extras", "0009_topologymap_type"),
+        ('extras', '0009_topologymap_type'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="customfield",
-            name="filter_logic",
-            field=models.PositiveSmallIntegerField(
-                choices=[(0, "Disabled"), (1, "Loose"), (2, "Exact")],
-                default=1,
-                help_text="Loose matches any instance of a given string; exact matches the entire field.",
-            ),
+            model_name='customfield',
+            name='filter_logic',
+            field=models.PositiveSmallIntegerField(choices=[(0, 'Disabled'), (1, 'Loose'), (2, 'Exact')], default=1, help_text='Loose matches any instance of a given string; exact matches the entire field.'),
         ),
         migrations.AlterField(
-            model_name="customfield",
-            name="required",
-            field=models.BooleanField(
-                default=False,
-                help_text="If true, this field is required when creating new objects or editing an existing object.",
-            ),
+            model_name='customfield',
+            name='required',
+            field=models.BooleanField(default=False, help_text='If true, this field is required when creating new objects or editing an existing object.'),
         ),
         migrations.AlterField(
-            model_name="customfield",
-            name="weight",
-            field=models.PositiveSmallIntegerField(
-                default=100,
-                help_text="Fields with higher weights appear lower in a form.",
-            ),
+            model_name='customfield',
+            name='weight',
+            field=models.PositiveSmallIntegerField(default=100, help_text='Fields with higher weights appear lower in a form.'),
         ),
-        migrations.RunPython(
-            is_filterable_to_filter_logic, filter_logic_to_is_filterable
-        ),
+        migrations.RunPython(is_filterable_to_filter_logic, filter_logic_to_is_filterable),
         migrations.RemoveField(
-            model_name="customfield",
-            name="is_filterable",
+            model_name='customfield',
+            name='is_filterable',
         ),
     ]

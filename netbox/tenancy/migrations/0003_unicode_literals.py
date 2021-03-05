@@ -6,15 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("tenancy", "0002_tenant_group_optional"),
+        ('tenancy', '0002_tenant_group_optional'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name="tenant",
-            name="description",
-            field=models.CharField(
-                blank=True, help_text="Long-form name (optional)", max_length=100
-            ),
+            model_name='tenant',
+            name='description',
+            field=models.CharField(blank=True, help_text='Long-form name (optional)', max_length=100),
         ),
     ]

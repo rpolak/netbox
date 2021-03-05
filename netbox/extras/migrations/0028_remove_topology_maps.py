@@ -6,11 +6,11 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("extras", "0027_webhook_additional_headers"),
+        ('extras', '0027_webhook_additional_headers'),
     ]
 
     operations = [
         migrations.DeleteModel(
-            name="TopologyMap",
+            name='TopologyMap',
         ),
     ]

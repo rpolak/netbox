@@ -6,16 +6,16 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("dcim", "0088_powerfeed_available_power"),
+        ('dcim', '0088_powerfeed_available_power'),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name="device",
-            options={"ordering": ("name", "pk")},
+            name='device',
+            options={'ordering': ('name', 'pk')},
         ),
         migrations.AlterModelOptions(
-            name="rack",
-            options={"ordering": ("site", "group", "name", "pk")},
+            name='rack',
+            options={'ordering': ('site', 'group', 'name', 'pk')},
         ),
     ]

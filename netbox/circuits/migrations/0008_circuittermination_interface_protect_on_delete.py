@@ -7,19 +7,13 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("circuits", "0007_circuit_add_description"),
+        ('circuits', '0007_circuit_add_description'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name="circuittermination",
-            name="interface",
-            field=models.OneToOneField(
-                blank=True,
-                null=True,
-                on_delete=django.db.models.deletion.PROTECT,
-                related_name="circuit_termination",
-                to="dcim.Interface",
-            ),
+            model_name='circuittermination',
+            name='interface',
+            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='circuit_termination', to='dcim.Interface'),
         ),
     ]

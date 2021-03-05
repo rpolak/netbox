@@ -6,23 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("circuits", "0017_circuittype_description"),
+        ('circuits', '0017_circuittype_description'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name="circuit",
-            name="description",
+            model_name='circuit',
+            name='description',
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name="circuittermination",
-            name="description",
+            model_name='circuittermination',
+            name='description',
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name="circuittype",
-            name="description",
+            model_name='circuittype',
+            name='description',
             field=models.CharField(blank=True, max_length=200),
         ),
     ]

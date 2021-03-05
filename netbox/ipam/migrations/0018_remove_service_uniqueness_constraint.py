@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("ipam", "0017_ipaddress_roles"),
+        ('ipam', '0017_ipaddress_roles'),
     ]
 
     operations = [
         migrations.AlterUniqueTogether(
-            name="service",
+            name='service',
             unique_together=set([]),
         ),
     ]

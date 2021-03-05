@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("secrets", "0002_userkey_add_session_key"),
+        ('secrets', '0002_userkey_add_session_key'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name="userkey",
-            name="public_key",
-            field=models.TextField(verbose_name="RSA public key"),
+            model_name='userkey',
+            name='public_key',
+            field=models.TextField(verbose_name='RSA public key'),
         ),
     ]

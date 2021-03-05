@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("dcim", "0097_interfacetemplate_type_other"),
+        ('dcim', '0097_interfacetemplate_type_other'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="devicetype",
-            name="front_image",
-            field=models.ImageField(blank=True, upload_to="devicetype-images"),
+            model_name='devicetype',
+            name='front_image',
+            field=models.ImageField(blank=True, upload_to='devicetype-images'),
         ),
         migrations.AddField(
-            model_name="devicetype",
-            name="rear_image",
-            field=models.ImageField(blank=True, upload_to="devicetype-images"),
+            model_name='devicetype',
+            name='rear_image',
+            field=models.ImageField(blank=True, upload_to='devicetype-images'),
         ),
     ]

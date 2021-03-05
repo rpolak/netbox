@@ -28,10 +28,10 @@ from .devices import Device
 from .power import PowerFeed
 
 __all__ = (
-    "Rack",
-    "RackGroup",
-    "RackReservation",
-    "RackRole",
+    'Rack',
+    'RackGroup',
+    'RackReservation',
+    'RackRole',
 )
 
 
@@ -39,54 +39,61 @@ __all__ = (
 # Racks
 #
 
-
-@extras_features("export_templates")
+@extras_features('export_templates')
 class RackGroup(MPTTModel, ChangeLoggedModel):
     """
     Racks can be grouped as subsets within a Site. The scope of a group will depend on how Sites are defined. For
     example, if a Site spans a corporate campus, a RackGroup might be defined to represent each building within that
     campus. If a Site instead represents a single building, a RackGroup might represent a single room or floor.
     """
-
-    name = models.CharField(max_length=100)
-    slug = models.SlugField(max_length=100)
+    name = models.CharField(
+        max_length=100
+    )
+    slug = models.SlugField(
+        max_length=100
+    )
     site = models.ForeignKey(
-        to="dcim.Site", on_delete=models.CASCADE, related_name="rack_groups"
+        to='dcim.Site',
+        on_delete=models.CASCADE,
+        related_name='rack_groups'
     )
     parent = TreeForeignKey(
-        to="self",
+        to='self',
         on_delete=models.CASCADE,
-        related_name="children",
+        related_name='children',
         blank=True,
         null=True,
-        db_index=True,
+        db_index=True
     )
-    description = models.CharField(max_length=200, blank=True)
+    description = models.CharField(
+        max_length=200,
+        blank=True
+    )
 
     objects = TreeManager()
 
-    csv_headers = ["site", "parent", "name", "slug", "description"]
+    csv_headers = ['site', 'parent', 'name', 'slug', 'description']
 
     class Meta:
-        ordering = ["site", "name"]
+        ordering = ['site', 'name']
         unique_together = [
-            ["site", "name"],
-            ["site", "slug"],
+            ['site', 'name'],
+            ['site', 'slug'],
         ]
 
     class MPTTMeta:
-        order_insertion_by = ["name"]
+        order_insertion_by = ['name']
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return "{}?group_id={}".format(reverse("dcim:rack_list"), self.pk)
+        return "{}?group_id={}".format(reverse('dcim:rack_list'), self.pk)
 
     def to_csv(self):
         return (
             self.site,
-            self.parent.name if self.parent else "",
+            self.parent.name if self.parent else '',
             self.name,
             self.slug,
             self.description,
@@ -98,9 +105,7 @@ class RackGroup(MPTTModel, ChangeLoggedModel):
             changed_object=self,
             object_repr=str(self),
             action=action,
-            object_data=serialize_object(
-                self, exclude=["level", "lft", "rght", "tree_id"]
-            ),
+            object_data=serialize_object(self, exclude=['level', 'lft', 'rght', 'tree_id'])
         )
 
     def clean(self):
@@ -108,19 +113,24 @@ class RackGroup(MPTTModel, ChangeLoggedModel):
 
         # Parent RackGroup (if any) must belong to the same Site
         if self.parent and self.parent.site != self.site:
-            raise ValidationError(
-                f"Parent rack group ({self.parent}) must belong to the same site ({self.site})"
-            )
+            raise ValidationError(f"Parent rack group ({self.parent}) must belong to the same site ({self.site})")
 
 
 class RackRole(ChangeLoggedModel):
     """
     Racks can be organized by functional role, similar to Devices.
     """
-
-    name = models.CharField(max_length=100, unique=True)
-    slug = models.SlugField(max_length=100, unique=True)
-    color = ColorField(default=ColorChoices.COLOR_GREY)
+    name = models.CharField(
+        max_length=100,
+        unique=True
+    )
+    slug = models.SlugField(
+        max_length=100,
+        unique=True
+    )
+    color = ColorField(
+        default=ColorChoices.COLOR_GREY
+    )
     description = models.CharField(
         max_length=200,
         blank=True,
@@ -128,16 +138,16 @@ class RackRole(ChangeLoggedModel):
 
     objects = RestrictedQuerySet.as_manager()
 
-    csv_headers = ["name", "slug", "color", "description"]
+    csv_headers = ['name', 'slug', 'color', 'description']
 
     class Meta:
-        ordering = ["name"]
+        ordering = ['name']
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return "{}?role={}".format(reverse("dcim:rack_list"), self.slug)
+        return "{}?role={}".format(reverse('dcim:rack_list'), self.slug)
 
     def to_csv(self):
         return (
@@ -148,200 +158,178 @@ class RackRole(ChangeLoggedModel):
         )
 
 
-@extras_features("custom_fields", "custom_links", "export_templates", "webhooks")
+@extras_features('custom_fields', 'custom_links', 'export_templates', 'webhooks')
 class Rack(ChangeLoggedModel, CustomFieldModel):
     """
     Devices are housed within Racks. Each rack has a defined height measured in rack units, and a front and rear face.
     Each Rack is assigned to a Site and (optionally) a RackGroup.
     """
-
-    name = models.CharField(max_length=100)
-    _name = NaturalOrderingField(target_field="name", max_length=100, blank=True)
+    name = models.CharField(
+        max_length=100
+    )
+    _name = NaturalOrderingField(
+        target_field='name',
+        max_length=100,
+        blank=True
+    )
     facility_id = models.CharField(
         max_length=50,
         blank=True,
         null=True,
-        verbose_name="Facility ID",
-        help_text="Locally-assigned identifier",
+        verbose_name='Facility ID',
+        help_text='Locally-assigned identifier'
     )
     site = models.ForeignKey(
-        to="dcim.Site", on_delete=models.PROTECT, related_name="racks"
+        to='dcim.Site',
+        on_delete=models.PROTECT,
+        related_name='racks'
     )
     group = models.ForeignKey(
-        to="dcim.RackGroup",
+        to='dcim.RackGroup',
         on_delete=models.SET_NULL,
-        related_name="racks",
+        related_name='racks',
         blank=True,
         null=True,
-        help_text="Assigned group",
+        help_text='Assigned group'
     )
     tenant = models.ForeignKey(
-        to="tenancy.Tenant",
+        to='tenancy.Tenant',
         on_delete=models.PROTECT,
-        related_name="racks",
+        related_name='racks',
         blank=True,
-        null=True,
+        null=True
     )
     status = models.CharField(
         max_length=50,
         choices=RackStatusChoices,
-        default=RackStatusChoices.STATUS_ACTIVE,
+        default=RackStatusChoices.STATUS_ACTIVE
     )
     role = models.ForeignKey(
-        to="dcim.RackRole",
+        to='dcim.RackRole',
         on_delete=models.PROTECT,
-        related_name="racks",
+        related_name='racks',
         blank=True,
         null=True,
-        help_text="Functional role",
+        help_text='Functional role'
     )
-    serial = models.CharField(max_length=50, blank=True, verbose_name="Serial number")
+    serial = models.CharField(
+        max_length=50,
+        blank=True,
+        verbose_name='Serial number'
+    )
     asset_tag = models.CharField(
         max_length=50,
         blank=True,
         null=True,
         unique=True,
-        verbose_name="Asset tag",
-        help_text="A unique tag used to identify this rack",
+        verbose_name='Asset tag',
+        help_text='A unique tag used to identify this rack'
     )
     type = models.CharField(
-        choices=RackTypeChoices, max_length=50, blank=True, verbose_name="Type"
+        choices=RackTypeChoices,
+        max_length=50,
+        blank=True,
+        verbose_name='Type'
     )
     width = models.PositiveSmallIntegerField(
         choices=RackWidthChoices,
         default=RackWidthChoices.WIDTH_19IN,
-        verbose_name="Width",
-        help_text="Rail-to-rail width",
+        verbose_name='Width',
+        help_text='Rail-to-rail width'
     )
     u_height = models.PositiveSmallIntegerField(
         default=RACK_U_HEIGHT_DEFAULT,
-        verbose_name="Height (U)",
+        verbose_name='Height (U)',
         validators=[MinValueValidator(1), MaxValueValidator(100)],
-        help_text="Height in rack units",
+        help_text='Height in rack units'
     )
     desc_units = models.BooleanField(
         default=False,
-        verbose_name="Descending units",
-        help_text="Units are numbered top-to-bottom",
+        verbose_name='Descending units',
+        help_text='Units are numbered top-to-bottom'
     )
     outer_width = models.PositiveSmallIntegerField(
-        blank=True, null=True, help_text="Outer dimension of rack (width)"
+        blank=True,
+        null=True,
+        help_text='Outer dimension of rack (width)'
     )
     outer_depth = models.PositiveSmallIntegerField(
-        blank=True, null=True, help_text="Outer dimension of rack (depth)"
+        blank=True,
+        null=True,
+        help_text='Outer dimension of rack (depth)'
     )
     outer_unit = models.CharField(
         max_length=50,
         choices=RackDimensionUnitChoices,
         blank=True,
     )
-    comments = models.TextField(blank=True)
-    images = GenericRelation(to="extras.ImageAttachment")
-    images = GenericRelation(to="extras.ImageAttachment")
+    comments = models.TextField(
+        blank=True
+    )
+    images = GenericRelation(
+        to='extras.ImageAttachment'
+    )
     tags = TaggableManager(through=TaggedItem)
 
     objects = RestrictedQuerySet.as_manager()
 
     csv_headers = [
-        "site",
-        "group",
-        "name",
-        "facility_id",
-        "tenant",
-        "status",
-        "role",
-        "type",
-        "serial",
-        "asset_tag",
-        "width",
-        "u_height",
-        "desc_units",
-        "outer_width",
-        "outer_depth",
-        "outer_unit",
-        "comments",
+        'site', 'group', 'name', 'facility_id', 'tenant', 'status', 'role', 'type', 'serial', 'asset_tag', 'width',
+        'u_height', 'desc_units', 'outer_width', 'outer_depth', 'outer_unit', 'comments',
     ]
     clone_fields = [
-        "site",
-        "group",
-        "tenant",
-        "status",
-        "role",
-        "type",
-        "width",
-        "u_height",
-        "desc_units",
-        "outer_width",
-        "outer_depth",
-        "outer_unit",
+        'site', 'group', 'tenant', 'status', 'role', 'type', 'width', 'u_height', 'desc_units', 'outer_width',
+        'outer_depth', 'outer_unit',
     ]
 
     class Meta:
-        ordering = (
-            "site",
-            "group",
-            "_name",
-            "pk",
-        )  # (site, group, name) may be non-unique
+        ordering = ('site', 'group', '_name', 'pk')  # (site, group, name) may be non-unique
         unique_together = (
             # Name and facility_id must be unique *only* within a RackGroup
-            ("group", "name"),
-            ("group", "facility_id"),
+            ('group', 'name'),
+            ('group', 'facility_id'),
         )
 
     def __str__(self):
         return self.display_name or super().__str__()
 
     def get_absolute_url(self):
-        return reverse("dcim:rack", args=[self.pk])
+        return reverse('dcim:rack', args=[self.pk])
 
     def clean(self):
         super().clean()
 
         # Validate group/site assignment
         if self.site and self.group and self.group.site != self.site:
-            raise ValidationError(
-                f"Assigned rack group must belong to parent site ({self.site})."
-            )
+            raise ValidationError(f"Assigned rack group must belong to parent site ({self.site}).")
 
         # Validate outer dimensions and unit
-        if (
-            self.outer_width is not None or self.outer_depth is not None
-        ) and not self.outer_unit:
-            raise ValidationError(
-                "Must specify a unit when setting an outer width/depth"
-            )
+        if (self.outer_width is not None or self.outer_depth is not None) and not self.outer_unit:
+            raise ValidationError("Must specify a unit when setting an outer width/depth")
         elif self.outer_width is None and self.outer_depth is None:
-            self.outer_unit = ""
+            self.outer_unit = ''
 
         if self.pk:
             # Validate that Rack is tall enough to house the installed Devices
-            top_device = (
-                Device.objects.filter(rack=self)
-                .exclude(position__isnull=True)
-                .order_by("-position")
-                .first()
-            )
+            top_device = Device.objects.filter(
+                rack=self
+            ).exclude(
+                position__isnull=True
+            ).order_by('-position').first()
             if top_device:
                 min_height = top_device.position + top_device.device_type.u_height - 1
                 if self.u_height < min_height:
-                    raise ValidationError(
-                        {
-                            "u_height": "Rack must be at least {}U tall to house currently installed devices.".format(
-                                min_height
-                            )
-                        }
-                    )
+                    raise ValidationError({
+                        'u_height': "Rack must be at least {}U tall to house currently installed devices.".format(
+                            min_height
+                        )
+                    })
             # Validate that Rack was assigned a group of its same site, if applicable
             if self.group:
                 if self.group.site != self.site:
-                    raise ValidationError(
-                        {
-                            "group": "Rack group must be from the same site, {}.".format(
-                                self.site
-                            )
-                        }
-                    )
+                    raise ValidationError({
+                        'group': "Rack group must be from the same site, {}.".format(self.site)
+                    })
 
     def to_csv(self):
         return (
@@ -374,19 +362,13 @@ class Rack(ChangeLoggedModel, CustomFieldModel):
     @property
     def display_name(self):
         if self.facility_id:
-            return f"{self.name} ({self.facility_id})"
+            return f'{self.name} ({self.facility_id})'
         return self.name
 
     def get_status_class(self):
         return RackStatusChoices.CSS_CLASSES.get(self.status)
 
-    def get_rack_units(
-        self,
-        user=None,
-        face=DeviceFaceChoices.FACE_FRONT,
-        exclude=None,
-        expand_devices=True,
-    ):
+    def get_rack_units(self, user=None, face=DeviceFaceChoices.FACE_FRONT, exclude=None, expand_devices=True):
         """
         Return a list of rack units as dictionaries. Example: {'device': None, 'face': 0, 'id': 48, 'name': 'U48'}
         Each key 'device' is either a Device or None. By default, multi-U devices are repeated for each U they occupy.
@@ -403,51 +385,50 @@ class Rack(ChangeLoggedModel, CustomFieldModel):
         elevation = OrderedDict()
         for u in self.units:
             elevation[u] = {
-                "id": u,
-                "name": f"U{u}",
-                "face": face,
-                "device": None,
-                "occupied": False,
+                'id': u,
+                'name': f'U{u}',
+                'face': face,
+                'device': None,
+                'occupied': False
             }
 
         # Add devices to rack units list
         if self.pk:
 
             # Retrieve all devices installed within the rack
-            queryset = (
-                Device.objects.prefetch_related(
-                    "device_type", "device_type__manufacturer", "device_role"
-                )
-                .annotate(devicebay_count=Count("devicebays"))
-                .exclude(pk=exclude)
-                .filter(rack=self, position__gt=0, device_type__u_height__gt=0)
-                .filter(Q(face=face) | Q(device_type__is_full_depth=True))
+            queryset = Device.objects.prefetch_related(
+                'device_type',
+                'device_type__manufacturer',
+                'device_role'
+            ).annotate(
+                devicebay_count=Count('devicebays')
+            ).exclude(
+                pk=exclude
+            ).filter(
+                rack=self,
+                position__gt=0,
+                device_type__u_height__gt=0
+            ).filter(
+                Q(face=face) | Q(device_type__is_full_depth=True)
             )
 
             # Determine which devices the user has permission to view
             permitted_device_ids = []
             if user is not None:
-                permitted_device_ids = self.devices.restrict(user, "view").values_list(
-                    "pk", flat=True
-                )
+                permitted_device_ids = self.devices.restrict(user, 'view').values_list('pk', flat=True)
 
             for device in queryset:
                 if expand_devices:
-                    for u in range(
-                        device.position, device.position + device.device_type.u_height
-                    ):
+                    for u in range(device.position, device.position + device.device_type.u_height):
                         if user is None or device.pk in permitted_device_ids:
-                            elevation[u]["device"] = device
-                        elevation[u]["occupied"] = True
+                            elevation[u]['device'] = device
+                        elevation[u]['occupied'] = True
                 else:
                     if user is None or device.pk in permitted_device_ids:
-                        elevation[device.position]["device"] = device
-                    elevation[device.position]["occupied"] = True
-                    elevation[device.position]["height"] = device.device_type.u_height
-                    for u in range(
-                        device.position + 1,
-                        device.position + device.device_type.u_height,
-                    ):
+                        elevation[device.position]['device'] = device
+                    elevation[device.position]['occupied'] = True
+                    elevation[device.position]['height'] = device.device_type.u_height
+                    for u in range(device.position + 1, device.position + device.device_type.u_height):
                         elevation.pop(u, None)
 
         return [u for u in elevation.values()]
@@ -463,7 +444,7 @@ class Rack(ChangeLoggedModel, CustomFieldModel):
         :param exclude: List of devices IDs to exclude (useful when moving a device within a rack)
         """
         # Gather all devices which consume U space within the rack
-        devices = self.devices.prefetch_related("device_type").filter(position__gte=1)
+        devices = self.devices.prefetch_related('device_type').filter(position__gte=1)
         if exclude is not None:
             devices = devices.exclude(pk__in=exclude)
 
@@ -499,14 +480,14 @@ class Rack(ChangeLoggedModel, CustomFieldModel):
         return reserved_units
 
     def get_elevation_svg(
-        self,
-        face=DeviceFaceChoices.FACE_FRONT,
-        user=None,
-        unit_width=settings.RACK_ELEVATION_DEFAULT_UNIT_WIDTH,
-        unit_height=settings.RACK_ELEVATION_DEFAULT_UNIT_HEIGHT,
-        legend_width=RACK_ELEVATION_LEGEND_WIDTH_DEFAULT,
-        include_images=True,
-        base_url=None,
+            self,
+            face=DeviceFaceChoices.FACE_FRONT,
+            user=None,
+            unit_width=settings.RACK_ELEVATION_DEFAULT_UNIT_WIDTH,
+            unit_height=settings.RACK_ELEVATION_DEFAULT_UNIT_HEIGHT,
+            legend_width=RACK_ELEVATION_LEGEND_WIDTH_DEFAULT,
+            include_images=True,
+            base_url=None
     ):
         """
         Return an SVG of the rack elevation
@@ -521,9 +502,7 @@ class Rack(ChangeLoggedModel, CustomFieldModel):
         :param include_images: Embed front/rear device images where available
         :param base_url: Base URL for links and images. If none, URLs will be relative.
         """
-        elevation = RackElevationSVG(
-            self, user=user, include_images=include_images, base_url=base_url
-        )
+        elevation = RackElevationSVG(self, user=user, include_images=include_images, base_url=base_url)
 
         return elevation.render(face, unit_width, unit_height, legend_width)
 
@@ -559,78 +538,73 @@ class Rack(ChangeLoggedModel, CustomFieldModel):
 
         pf_powerports = PowerPort.objects.filter(
             _cable_peer_type=ContentType.objects.get_for_model(PowerFeed),
-            _cable_peer_id__in=powerfeeds.values_list("id", flat=True),
+            _cable_peer_id__in=powerfeeds.values_list('id', flat=True)
         )
         poweroutlets = PowerOutlet.objects.filter(power_port_id__in=pf_powerports)
-        allocated_draw_total = (
-            PowerPort.objects.filter(
-                _cable_peer_type=ContentType.objects.get_for_model(PowerOutlet),
-                _cable_peer_id__in=poweroutlets.values_list("id", flat=True),
-            ).aggregate(Sum("allocated_draw"))["allocated_draw__sum"]
-            or 0
-        )
+        allocated_draw_total = PowerPort.objects.filter(
+            _cable_peer_type=ContentType.objects.get_for_model(PowerOutlet),
+            _cable_peer_id__in=poweroutlets.values_list('id', flat=True)
+        ).aggregate(Sum('allocated_draw'))['allocated_draw__sum'] or 0
 
         return int(allocated_draw_total / available_power_total * 100)
 
 
-@extras_features("custom_fields", "custom_links", "export_templates", "webhooks")
+@extras_features('custom_fields', 'custom_links', 'export_templates', 'webhooks')
 class RackReservation(ChangeLoggedModel, CustomFieldModel):
     """
     One or more reserved units within a Rack.
     """
-
     rack = models.ForeignKey(
-        to="dcim.Rack", on_delete=models.CASCADE, related_name="reservations"
+        to='dcim.Rack',
+        on_delete=models.CASCADE,
+        related_name='reservations'
     )
-    units = ArrayField(base_field=models.PositiveSmallIntegerField())
+    units = ArrayField(
+        base_field=models.PositiveSmallIntegerField()
+    )
     tenant = models.ForeignKey(
-        to="tenancy.Tenant",
+        to='tenancy.Tenant',
         on_delete=models.PROTECT,
-        related_name="rackreservations",
+        related_name='rackreservations',
         blank=True,
-        null=True,
+        null=True
     )
-    user = models.ForeignKey(to=User, on_delete=models.PROTECT)
-    description = models.CharField(max_length=200)
+    user = models.ForeignKey(
+        to=User,
+        on_delete=models.PROTECT
+    )
+    description = models.CharField(
+        max_length=200
+    )
     tags = TaggableManager(through=TaggedItem)
 
     objects = RestrictedQuerySet.as_manager()
 
-    csv_headers = [
-        "site",
-        "rack_group",
-        "rack",
-        "units",
-        "tenant",
-        "user",
-        "description",
-    ]
+    csv_headers = ['site', 'rack_group', 'rack', 'units', 'tenant', 'user', 'description']
 
     class Meta:
-        ordering = ["created", "pk"]
+        ordering = ['created', 'pk']
 
     def __str__(self):
         return "Reservation for rack {}".format(self.rack)
 
     def get_absolute_url(self):
-        return reverse("dcim:rackreservation", args=[self.pk])
+        return reverse('dcim:rackreservation', args=[self.pk])
 
     def clean(self):
         super().clean()
 
-        if hasattr(self, "rack") and self.units:
+        if hasattr(self, 'rack') and self.units:
 
             # Validate that all specified units exist in the Rack.
             invalid_units = [u for u in self.units if u not in self.rack.units]
             if invalid_units:
-                raise ValidationError(
-                    {
-                        "units": "Invalid unit(s) for {}U rack: {}".format(
-                            self.rack.u_height,
-                            ", ".join([str(u) for u in invalid_units]),
-                        ),
-                    }
-                )
+                raise ValidationError({
+                    'units': "Invalid unit(s) for {}U rack: {}".format(
+                        self.rack.u_height,
+                        ', '.join([str(u) for u in invalid_units]),
+                    ),
+                })
 
             # Check that none of the units has already been reserved for this Rack.
             reserved_units = []
@@ -638,23 +612,21 @@ class RackReservation(ChangeLoggedModel, CustomFieldModel):
                 reserved_units += resv.units
             conflicting_units = [u for u in self.units if u in reserved_units]
             if conflicting_units:
-                raise ValidationError(
-                    {
-                        "units": "The following units have already been reserved: {}".format(
-                            ", ".join([str(u) for u in conflicting_units]),
-                        )
-                    }
-                )
+                raise ValidationError({
+                    'units': 'The following units have already been reserved: {}'.format(
+                        ', '.join([str(u) for u in conflicting_units]),
+                    )
+                })
 
     def to_csv(self):
         return (
             self.rack.site.name,
             self.rack.group if self.rack.group else None,
             self.rack.name,
-            ",".join([str(u) for u in self.units]),
+            ','.join([str(u) for u in self.units]),
             self.tenant.name if self.tenant else None,
             self.user.username,
-            self.description,
+            self.description
         )
 
     @property

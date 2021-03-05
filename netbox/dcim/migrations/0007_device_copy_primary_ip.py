@@ -4,8 +4,8 @@ from django.db import migrations
 
 
 def copy_primary_ip(apps, schema_editor):
-    Device = apps.get_model("dcim", "Device")
-    for d in Device.objects.select_related("primary_ip"):
+    Device = apps.get_model('dcim', 'Device')
+    for d in Device.objects.select_related('primary_ip'):
         if not d.primary_ip:
             continue
         if d.primary_ip.family == 4:
@@ -16,8 +16,8 @@ def copy_primary_ip(apps, schema_editor):
 
 
 def restore_primary_ip(apps, schema_editor):
-    Device = apps.get_model("dcim", "Device")
-    for d in Device.objects.select_related("primary_ip4", "primary_ip6"):
+    Device = apps.get_model('dcim', 'Device')
+    for d in Device.objects.select_related('primary_ip4', 'primary_ip6'):
         if d.primary_ip:
             continue
         # Prefer IPv6 over IPv4
@@ -31,7 +31,7 @@ def restore_primary_ip(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("dcim", "0006_add_device_primary_ip4_ip6"),
+        ('dcim', '0006_add_device_primary_ip4_ip6'),
     ]
 
     operations = [

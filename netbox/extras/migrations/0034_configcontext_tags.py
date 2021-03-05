@@ -6,15 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("extras", "0033_graph_type_template_language"),
+        ('extras', '0033_graph_type_template_language'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="configcontext",
-            name="tags",
-            field=models.ManyToManyField(
-                blank=True, related_name="_configcontext_tags_+", to="extras.Tag"
-            ),
+            model_name='configcontext',
+            name='tags',
+            field=models.ManyToManyField(blank=True, related_name='_configcontext_tags_+', to='extras.Tag'),
         ),
     ]

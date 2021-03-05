@@ -6,23 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("circuits", "0009_unicode_literals"),
+        ('circuits', '0009_unicode_literals'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="circuit",
-            name="status",
-            field=models.PositiveSmallIntegerField(
-                choices=[
-                    [2, "Planned"],
-                    [3, "Provisioning"],
-                    [1, "Active"],
-                    [4, "Offline"],
-                    [0, "Deprovisioning"],
-                    [5, "Decommissioned"],
-                ],
-                default=1,
-            ),
+            model_name='circuit',
+            name='status',
+            field=models.PositiveSmallIntegerField(choices=[[2, 'Planned'], [3, 'Provisioning'], [1, 'Active'], [4, 'Offline'], [0, 'Deprovisioning'], [5, 'Decommissioned']], default=1),
         ),
     ]

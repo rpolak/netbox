@@ -8,65 +8,39 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = []
+    dependencies = [
+    ]
 
     operations = [
         migrations.CreateModel(
-            name="Tenant",
+            name='Tenant',
             fields=[
-                (
-                    "id",
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                ("created", models.DateField(auto_now_add=True)),
-                ("last_updated", models.DateTimeField(auto_now=True)),
-                ("name", models.CharField(max_length=30, unique=True)),
-                ("slug", models.SlugField(unique=True)),
-                (
-                    "description",
-                    models.CharField(
-                        blank=True,
-                        help_text=b"Long-form name (optional)",
-                        max_length=100,
-                    ),
-                ),
-                ("comments", models.TextField(blank=True)),
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('created', models.DateField(auto_now_add=True)),
+                ('last_updated', models.DateTimeField(auto_now=True)),
+                ('name', models.CharField(max_length=30, unique=True)),
+                ('slug', models.SlugField(unique=True)),
+                ('description', models.CharField(blank=True, help_text=b'Long-form name (optional)', max_length=100)),
+                ('comments', models.TextField(blank=True)),
             ],
             options={
-                "ordering": ["group", "name"],
+                'ordering': ['group', 'name'],
             },
         ),
         migrations.CreateModel(
-            name="TenantGroup",
+            name='TenantGroup',
             fields=[
-                (
-                    "id",
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                ("name", models.CharField(max_length=50, unique=True)),
-                ("slug", models.SlugField(unique=True)),
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=50, unique=True)),
+                ('slug', models.SlugField(unique=True)),
             ],
             options={
-                "ordering": ["name"],
+                'ordering': ['name'],
             },
         ),
         migrations.AddField(
-            model_name="tenant",
-            name="group",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.PROTECT,
-                related_name="tenants",
-                to="tenancy.TenantGroup",
-            ),
+            model_name='tenant',
+            name='group',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='tenants', to='tenancy.TenantGroup'),
         ),
     ]

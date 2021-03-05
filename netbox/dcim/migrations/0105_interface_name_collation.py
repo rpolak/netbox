@@ -7,14 +7,12 @@ import utilities.query_functions
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("dcim", "0104_correct_infiniband_types"),
+        ('dcim', '0104_correct_infiniband_types'),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name="interface",
-            options={
-                "ordering": ("device", utilities.query_functions.CollateAsChar("_name"))
-            },
+            name='interface',
+            options={'ordering': ('device', utilities.query_functions.CollateAsChar('_name'))},
         ),
     ]

@@ -7,51 +7,39 @@ import taggit.managers
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("ipam", "0024_vrf_allow_null_rd"),
-        ("extras", "0019_tag_taggeditem"),
+        ('ipam', '0024_vrf_allow_null_rd'),
+        ('extras', '0019_tag_taggeditem'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name="aggregate",
-            name="tags",
-            field=taggit.managers.TaggableManager(
-                through="extras.TaggedItem", to="extras.Tag"
-            ),
+            model_name='aggregate',
+            name='tags',
+            field=taggit.managers.TaggableManager(through='extras.TaggedItem', to='extras.Tag'),
         ),
         migrations.AlterField(
-            model_name="ipaddress",
-            name="tags",
-            field=taggit.managers.TaggableManager(
-                through="extras.TaggedItem", to="extras.Tag"
-            ),
+            model_name='ipaddress',
+            name='tags',
+            field=taggit.managers.TaggableManager(through='extras.TaggedItem', to='extras.Tag'),
         ),
         migrations.AlterField(
-            model_name="prefix",
-            name="tags",
-            field=taggit.managers.TaggableManager(
-                through="extras.TaggedItem", to="extras.Tag"
-            ),
+            model_name='prefix',
+            name='tags',
+            field=taggit.managers.TaggableManager(through='extras.TaggedItem', to='extras.Tag'),
         ),
         migrations.AlterField(
-            model_name="service",
-            name="tags",
-            field=taggit.managers.TaggableManager(
-                through="extras.TaggedItem", to="extras.Tag"
-            ),
+            model_name='service',
+            name='tags',
+            field=taggit.managers.TaggableManager(through='extras.TaggedItem', to='extras.Tag'),
         ),
         migrations.AlterField(
-            model_name="vlan",
-            name="tags",
-            field=taggit.managers.TaggableManager(
-                through="extras.TaggedItem", to="extras.Tag"
-            ),
+            model_name='vlan',
+            name='tags',
+            field=taggit.managers.TaggableManager(through='extras.TaggedItem', to='extras.Tag'),
         ),
         migrations.AlterField(
-            model_name="vrf",
-            name="tags",
-            field=taggit.managers.TaggableManager(
-                through="extras.TaggedItem", to="extras.Tag"
-            ),
+            model_name='vrf',
+            name='tags',
+            field=taggit.managers.TaggableManager(through='extras.TaggedItem', to='extras.Tag'),
         ),
     ]

@@ -12,9 +12,10 @@ from utilities.querysets import RestrictedQuerySet
 # Tags
 #
 
-
 class Tag(TagBase, ChangeLoggedModel):
-    color = ColorField(default=ColorChoices.COLOR_GREY)
+    color = ColorField(
+        default=ColorChoices.COLOR_GREY
+    )
     description = models.CharField(
         max_length=200,
         blank=True,
@@ -22,10 +23,10 @@ class Tag(TagBase, ChangeLoggedModel):
 
     objects = RestrictedQuerySet.as_manager()
 
-    csv_headers = ["name", "slug", "color", "description"]
+    csv_headers = ['name', 'slug', 'color', 'description']
 
     class Meta:
-        ordering = ["name"]
+        ordering = ['name']
 
     def slugify(self, tag, i=None):
         # Allow Unicode in Tag slugs (avoids empty slugs for Tags with all-Unicode names)
@@ -35,13 +36,22 @@ class Tag(TagBase, ChangeLoggedModel):
         return slug
 
     def to_csv(self):
-        return (self.name, self.slug, self.color, self.description)
+        return (
+            self.name,
+            self.slug,
+            self.color,
+            self.description
+        )
 
 
 class TaggedItem(GenericTaggedItemBase):
     tag = models.ForeignKey(
-        to=Tag, related_name="%(app_label)s_%(class)s_items", on_delete=models.CASCADE
+        to=Tag,
+        related_name="%(app_label)s_%(class)s_items",
+        on_delete=models.CASCADE
     )
 
     class Meta:
-        index_together = ("content_type", "object_id")
+        index_together = (
+            ("content_type", "object_id")
+        )

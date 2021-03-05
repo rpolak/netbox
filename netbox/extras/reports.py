@@ -27,7 +27,7 @@ def get_report(module_name, report_name):
     """
     Return a specific report from within a module.
     """
-    file_path = "{}/{}.py".format(settings.REPORTS_ROOT, module_name)
+    file_path = '{}/{}.py'.format(settings.REPORTS_ROOT, module_name)
 
     spec = importlib.util.spec_from_file_location(module_name, file_path)
     module = importlib.util.module_from_spec(spec)
@@ -65,13 +65,13 @@ def get_reports():
     return module_list
 
 
-@job("default")
+@job('default')
 def run_report(job_result, *args, **kwargs):
     """
     Helper function to call the run method on a report. This is needed to get around the inability to pickle an instance
     method for queueing into the background processor.
     """
-    module_name, report_name = job_result.name.split(".", 1)
+    module_name, report_name = job_result.name.split('.', 1)
     report = get_report(module_name, report_name)
 
     try:
@@ -86,8 +86,10 @@ def run_report(job_result, *args, **kwargs):
     JobResult.objects.filter(
         obj_type=job_result.obj_type,
         name=job_result.name,
-        status__in=JobResultStatusChoices.TERMINAL_STATE_CHOICES,
-    ).exclude(pk=job_result.pk).delete()
+        status__in=JobResultStatusChoices.TERMINAL_STATE_CHOICES
+    ).exclude(
+        pk=job_result.pk
+    ).delete()
 
 
 class Report(object):
@@ -114,7 +116,6 @@ class Report(object):
         }
     }
     """
-
     description = None
 
     def __init__(self):
@@ -128,17 +129,15 @@ class Report(object):
         # Compile test methods and initialize results skeleton
         test_methods = []
         for method in dir(self):
-            if method.startswith("test_") and callable(getattr(self, method)):
+            if method.startswith('test_') and callable(getattr(self, method)):
                 test_methods.append(method)
-                self._results[method] = OrderedDict(
-                    [
-                        ("success", 0),
-                        ("info", 0),
-                        ("warning", 0),
-                        ("failure", 0),
-                        ("log", []),
-                    ]
-                )
+                self._results[method] = OrderedDict([
+                    ('success', 0),
+                    ('info', 0),
+                    ('warning', 0),
+                    ('failure', 0),
+                    ('log', []),
+                ])
         if not test_methods:
             raise Exception("A report must contain at least one test method.")
         self.test_methods = test_methods
@@ -160,7 +159,7 @@ class Report(object):
 
     @property
     def full_name(self):
-        return f"{self.module}.{self.class_name}"
+        return f'{self.module}.{self.class_name}'
 
     def _log(self, obj, message, level=LogLevelChoices.LOG_DEFAULT):
         """
@@ -168,15 +167,13 @@ class Report(object):
         """
         if level not in LogLevelChoices.as_dict():
             raise Exception("Unknown logging level: {}".format(level))
-        self._results[self.active_test]["log"].append(
-            (
-                timezone.now().isoformat(),
-                level,
-                str(obj) if obj else None,
-                obj.get_absolute_url() if hasattr(obj, "get_absolute_url") else None,
-                message,
-            )
-        )
+        self._results[self.active_test]['log'].append((
+            timezone.now().isoformat(),
+            level,
+            str(obj) if obj else None,
+            obj.get_absolute_url() if hasattr(obj, 'get_absolute_url') else None,
+            message,
+        ))
 
     def log(self, message):
         """
@@ -191,7 +188,7 @@ class Report(object):
         """
         if message:
             self._log(obj, message, level=LogLevelChoices.LOG_SUCCESS)
-        self._results[self.active_test]["success"] += 1
+        self._results[self.active_test]['success'] += 1
         self.logger.info(f"Success | {obj}: {message}")
 
     def log_info(self, obj, message):
@@ -199,7 +196,7 @@ class Report(object):
         Log an informational message.
         """
         self._log(obj, message, level=LogLevelChoices.LOG_INFO)
-        self._results[self.active_test]["info"] += 1
+        self._results[self.active_test]['info'] += 1
         self.logger.info(f"Info | {obj}: {message}")
 
     def log_warning(self, obj, message):
@@ -207,7 +204,7 @@ class Report(object):
         Log a warning.
         """
         self._log(obj, message, level=LogLevelChoices.LOG_WARNING)
-        self._results[self.active_test]["warning"] += 1
+        self._results[self.active_test]['warning'] += 1
         self.logger.info(f"Warning | {obj}: {message}")
 
     def log_failure(self, obj, message):
@@ -215,7 +212,7 @@ class Report(object):
         Log a failure. Calling this method will automatically mark the report as failed.
         """
         self._log(obj, message, level=LogLevelChoices.LOG_FAILURE)
-        self._results[self.active_test]["failure"] += 1
+        self._results[self.active_test]['failure'] += 1
         self.logger.info(f"Failure | {obj}: {message}")
         self.failed = True
 
@@ -243,10 +240,7 @@ class Report(object):
 
         except Exception as e:
             stacktrace = traceback.format_exc()
-            self.log_failure(
-                None,
-                f"An exception occurred: {type(e).__name__}: {e} <pre>{stacktrace}</pre>",
-            )
+            self.log_failure(None, f"An exception occurred: {type(e).__name__}: {e} <pre>{stacktrace}</pre>")
             logger.error(f"Exception raised during report execution: {e}")
             job_result.set_status(JobResultStatusChoices.STATUS_ERRORED)
 

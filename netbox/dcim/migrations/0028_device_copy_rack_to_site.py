@@ -4,7 +4,7 @@ from django.db import migrations
 
 
 def copy_site_from_rack(apps, schema_editor):
-    Device = apps.get_model("dcim", "Device")
+    Device = apps.get_model('dcim', 'Device')
     for device in Device.objects.all():
         device.site = device.rack.site
         device.save()
@@ -13,7 +13,7 @@ def copy_site_from_rack(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("dcim", "0027_device_add_site"),
+        ('dcim', '0027_device_add_site'),
     ]
 
     operations = [

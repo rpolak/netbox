@@ -7,13 +7,13 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("circuits", "0002_auto_20160622_1821"),
+        ('circuits', '0002_auto_20160622_1821'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name="provider",
-            name="asn",
-            field=dcim.fields.ASNField(blank=True, null=True, verbose_name=b"ASN"),
+            model_name='provider',
+            name='asn',
+            field=dcim.fields.ASNField(blank=True, null=True, verbose_name=b'ASN'),
         ),
     ]

@@ -1,20 +1,10 @@
 from rest_framework.routers import APIRootView
 
 from dcim.models import Device
-from extras.api.views import (
-    ConfigContextQuerySetMixin,
-    CustomFieldModelViewSet,
-    ModelViewSet,
-)
+from extras.api.views import ConfigContextQuerySetMixin, CustomFieldModelViewSet, ModelViewSet
 from utilities.utils import count_related
 from virtualization import filters
-from virtualization.models import (
-    Cluster,
-    ClusterGroup,
-    ClusterType,
-    VirtualMachine,
-    VMInterface,
-)
+from virtualization.models import Cluster, ClusterGroup, ClusterType, VirtualMachine, VMInterface
 from . import serializers
 
 
@@ -22,19 +12,17 @@ class VirtualizationRootView(APIRootView):
     """
     Virtualization API root view
     """
-
     def get_view_name(self):
-        return "Virtualization"
+        return 'Virtualization'
 
 
 #
 # Clusters
 #
 
-
 class ClusterTypeViewSet(ModelViewSet):
     queryset = ClusterType.objects.annotate(
-        cluster_count=count_related(Cluster, "type")
+        cluster_count=count_related(Cluster, 'type')
     )
     serializer_class = serializers.ClusterTypeSerializer
     filterset_class = filters.ClusterTypeFilterSet
@@ -42,7 +30,7 @@ class ClusterTypeViewSet(ModelViewSet):
 
 class ClusterGroupViewSet(ModelViewSet):
     queryset = ClusterGroup.objects.annotate(
-        cluster_count=count_related(Cluster, "group")
+        cluster_count=count_related(Cluster, 'group')
     )
     serializer_class = serializers.ClusterGroupSerializer
     filterset_class = filters.ClusterGroupFilterSet
@@ -50,10 +38,10 @@ class ClusterGroupViewSet(ModelViewSet):
 
 class ClusterViewSet(CustomFieldModelViewSet):
     queryset = Cluster.objects.prefetch_related(
-        "type", "group", "tenant", "site", "tags"
+        'type', 'group', 'tenant', 'site', 'tags'
     ).annotate(
-        device_count=count_related(Device, "cluster"),
-        virtualmachine_count=count_related(VirtualMachine, "cluster"),
+        device_count=count_related(Device, 'cluster'),
+        virtualmachine_count=count_related(VirtualMachine, 'cluster')
     )
     serializer_class = serializers.ClusterSerializer
     filterset_class = filters.ClusterFilterSet
@@ -63,16 +51,9 @@ class ClusterViewSet(CustomFieldModelViewSet):
 # Virtual machines
 #
 
-
 class VirtualMachineViewSet(ConfigContextQuerySetMixin, CustomFieldModelViewSet):
     queryset = VirtualMachine.objects.prefetch_related(
-        "cluster__site",
-        "role",
-        "tenant",
-        "platform",
-        "primary_ip4",
-        "primary_ip6",
-        "tags",
+        'cluster__site', 'role', 'tenant', 'platform', 'primary_ip4', 'primary_ip6', 'tags'
     )
     filterset_class = filters.VirtualMachineFilterSet
 
@@ -87,11 +68,11 @@ class VirtualMachineViewSet(ConfigContextQuerySetMixin, CustomFieldModelViewSet)
         Else, return the VirtualMachineWithConfigContextSerializer
         """
 
-        request = self.get_serializer_context()["request"]
-        if request.query_params.get("brief", False):
+        request = self.get_serializer_context()['request']
+        if request.query_params.get('brief', False):
             return serializers.NestedVirtualMachineSerializer
 
-        elif "config_context" in request.query_params.get("exclude", []):
+        elif 'config_context' in request.query_params.get('exclude', []):
             return serializers.VirtualMachineSerializer
 
         return serializers.VirtualMachineWithConfigContextSerializer
@@ -99,8 +80,8 @@ class VirtualMachineViewSet(ConfigContextQuerySetMixin, CustomFieldModelViewSet)
 
 class VMInterfaceViewSet(ModelViewSet):
     queryset = VMInterface.objects.prefetch_related(
-        "virtual_machine", "tags", "tagged_vlans"
+        'virtual_machine', 'tags', 'tagged_vlans'
     )
     serializer_class = serializers.VMInterfaceSerializer
     filterset_class = filters.VMInterfaceFilterSet
-    brief_prefetch_fields = ["virtual_machine"]
+    brief_prefetch_fields = ['virtual_machine']

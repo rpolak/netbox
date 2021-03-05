@@ -15,20 +15,17 @@ from .nested_serializers import *
 # Secrets
 #
 
-
 class SecretRoleSerializer(ValidatedModelSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name="secrets-api:secretrole-detail"
-    )
+    url = serializers.HyperlinkedIdentityField(view_name='secrets-api:secretrole-detail')
     secret_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = SecretRole
-        fields = ["id", "url", "name", "slug", "description", "secret_count"]
+        fields = ['id', 'url', 'name', 'slug', 'description', 'secret_count']
 
 
 class SecretSerializer(TaggedObjectSerializer, CustomFieldModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name="secrets-api:secret-detail")
+    url = serializers.HyperlinkedIdentityField(view_name='secrets-api:secret-detail')
     assigned_object_type = ContentTypeField(
         queryset=ContentType.objects.filter(SECRET_ASSIGNMENT_MODELS)
     )
@@ -39,36 +36,25 @@ class SecretSerializer(TaggedObjectSerializer, CustomFieldModelSerializer):
     class Meta:
         model = Secret
         fields = [
-            "id",
-            "url",
-            "assigned_object_type",
-            "assigned_object_id",
-            "assigned_object",
-            "role",
-            "name",
-            "plaintext",
-            "hash",
-            "tags",
-            "custom_fields",
-            "created",
-            "last_updated",
+            'id', 'url', 'assigned_object_type', 'assigned_object_id', 'assigned_object', 'role', 'name', 'plaintext',
+            'hash', 'tags', 'custom_fields', 'created', 'last_updated',
         ]
         validators = []
 
     @swagger_serializer_method(serializer_or_field=serializers.DictField)
     def get_assigned_object(self, obj):
-        serializer = get_serializer_for_model(obj.assigned_object, prefix="Nested")
-        context = {"request": self.context["request"]}
+        serializer = get_serializer_for_model(obj.assigned_object, prefix='Nested')
+        context = {'request': self.context['request']}
         return serializer(obj.assigned_object, context=context).data
 
     def validate(self, data):
 
         # Encrypt plaintext data using the master key provided from the view context
-        if data.get("plaintext"):
-            s = Secret(plaintext=data["plaintext"])
-            s.encrypt(self.context["master_key"])
-            data["ciphertext"] = s.ciphertext
-            data["hash"] = s.hash
+        if data.get('plaintext'):
+            s = Secret(plaintext=data['plaintext'])
+            s.encrypt(self.context['master_key'])
+            data['ciphertext'] = s.ciphertext
+            data['hash'] = s.hash
 
         super().validate(data)
 

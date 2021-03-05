@@ -7,13 +7,13 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("virtualization", "0007_change_logging"),
+        ('virtualization', '0007_change_logging'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="virtualmachine",
-            name="local_context_data",
+            model_name='virtualmachine',
+            name='local_context_data',
             field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True),
         ),
     ]

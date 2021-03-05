@@ -4,18 +4,7 @@ from netaddr import IPNetwork
 
 from dcim.models import Device, DeviceRole, DeviceType, Manufacturer, Site
 from ipam.choices import *
-from ipam.models import (
-    Aggregate,
-    IPAddress,
-    Prefix,
-    RIR,
-    Role,
-    RouteTarget,
-    Service,
-    VLAN,
-    VLANGroup,
-    VRF,
-)
+from ipam.models import Aggregate, IPAddress, Prefix, RIR, Role, RouteTarget, Service, VLAN, VLANGroup, VRF
 from tenancy.models import Tenant
 from utilities.testing import ViewTestCases
 
@@ -27,28 +16,26 @@ class VRFTestCase(ViewTestCases.PrimaryObjectViewTestCase):
     def setUpTestData(cls):
 
         tenants = (
-            Tenant(name="Tenant A", slug="tenant-a"),
-            Tenant(name="Tenant B", slug="tenant-b"),
+            Tenant(name='Tenant A', slug='tenant-a'),
+            Tenant(name='Tenant B', slug='tenant-b'),
         )
         Tenant.objects.bulk_create(tenants)
 
-        VRF.objects.bulk_create(
-            [
-                VRF(name="VRF 1", rd="65000:1"),
-                VRF(name="VRF 2", rd="65000:2"),
-                VRF(name="VRF 3", rd="65000:3"),
-            ]
-        )
+        VRF.objects.bulk_create([
+            VRF(name='VRF 1', rd='65000:1'),
+            VRF(name='VRF 2', rd='65000:2'),
+            VRF(name='VRF 3', rd='65000:3'),
+        ])
 
-        tags = cls.create_tags("Alpha", "Bravo", "Charlie")
+        tags = cls.create_tags('Alpha', 'Bravo', 'Charlie')
 
         cls.form_data = {
-            "name": "VRF X",
-            "rd": "65000:999",
-            "tenant": tenants[0].pk,
-            "enforce_unique": True,
-            "description": "A new VRF",
-            "tags": [t.pk for t in tags],
+            'name': 'VRF X',
+            'rd': '65000:999',
+            'tenant': tenants[0].pk,
+            'enforce_unique': True,
+            'description': 'A new VRF',
+            'tags': [t.pk for t in tags],
         }
 
         cls.csv_data = (
@@ -59,9 +46,9 @@ class VRFTestCase(ViewTestCases.PrimaryObjectViewTestCase):
         )
 
         cls.bulk_edit_data = {
-            "tenant": tenants[1].pk,
-            "enforce_unique": False,
-            "description": "New description",
+            'tenant': tenants[1].pk,
+            'enforce_unique': False,
+            'description': 'New description',
         }
 
 
@@ -72,24 +59,24 @@ class RouteTargetTestCase(ViewTestCases.PrimaryObjectViewTestCase):
     def setUpTestData(cls):
 
         tenants = (
-            Tenant(name="Tenant A", slug="tenant-a"),
-            Tenant(name="Tenant B", slug="tenant-b"),
+            Tenant(name='Tenant A', slug='tenant-a'),
+            Tenant(name='Tenant B', slug='tenant-b'),
         )
         Tenant.objects.bulk_create(tenants)
 
-        tags = cls.create_tags("Alpha", "Bravo", "Charlie")
+        tags = cls.create_tags('Alpha', 'Bravo', 'Charlie')
 
         route_targets = (
-            RouteTarget(name="65000:1001", tenant=tenants[0]),
-            RouteTarget(name="65000:1002", tenant=tenants[1]),
-            RouteTarget(name="65000:1003"),
+            RouteTarget(name='65000:1001', tenant=tenants[0]),
+            RouteTarget(name='65000:1002', tenant=tenants[1]),
+            RouteTarget(name='65000:1003'),
         )
         RouteTarget.objects.bulk_create(route_targets)
 
         cls.form_data = {
-            "name": "65000:100",
-            "description": "A new route target",
-            "tags": [t.pk for t in tags],
+            'name': '65000:100',
+            'description': 'A new route target',
+            'tags': [t.pk for t in tags],
         }
 
         cls.csv_data = (
@@ -100,8 +87,8 @@ class RouteTargetTestCase(ViewTestCases.PrimaryObjectViewTestCase):
         )
 
         cls.bulk_edit_data = {
-            "tenant": tenants[1].pk,
-            "description": "New description",
+            'tenant': tenants[1].pk,
+            'description': 'New description',
         }
 
 
@@ -111,19 +98,17 @@ class RIRTestCase(ViewTestCases.OrganizationalObjectViewTestCase):
     @classmethod
     def setUpTestData(cls):
 
-        RIR.objects.bulk_create(
-            [
-                RIR(name="RIR 1", slug="rir-1"),
-                RIR(name="RIR 2", slug="rir-2"),
-                RIR(name="RIR 3", slug="rir-3"),
-            ]
-        )
+        RIR.objects.bulk_create([
+            RIR(name='RIR 1', slug='rir-1'),
+            RIR(name='RIR 2', slug='rir-2'),
+            RIR(name='RIR 3', slug='rir-3'),
+        ])
 
         cls.form_data = {
-            "name": "RIR X",
-            "slug": "rir-x",
-            "is_private": True,
-            "description": "A new RIR",
+            'name': 'RIR X',
+            'slug': 'rir-x',
+            'is_private': True,
+            'description': 'A new RIR',
         }
 
         cls.csv_data = (
@@ -141,27 +126,25 @@ class AggregateTestCase(ViewTestCases.PrimaryObjectViewTestCase):
     def setUpTestData(cls):
 
         rirs = (
-            RIR(name="RIR 1", slug="rir-1"),
-            RIR(name="RIR 2", slug="rir-2"),
+            RIR(name='RIR 1', slug='rir-1'),
+            RIR(name='RIR 2', slug='rir-2'),
         )
         RIR.objects.bulk_create(rirs)
 
-        Aggregate.objects.bulk_create(
-            [
-                Aggregate(prefix=IPNetwork("10.1.0.0/16"), rir=rirs[0]),
-                Aggregate(prefix=IPNetwork("10.2.0.0/16"), rir=rirs[0]),
-                Aggregate(prefix=IPNetwork("10.3.0.0/16"), rir=rirs[0]),
-            ]
-        )
+        Aggregate.objects.bulk_create([
+            Aggregate(prefix=IPNetwork('10.1.0.0/16'), rir=rirs[0]),
+            Aggregate(prefix=IPNetwork('10.2.0.0/16'), rir=rirs[0]),
+            Aggregate(prefix=IPNetwork('10.3.0.0/16'), rir=rirs[0]),
+        ])
 
-        tags = cls.create_tags("Alpha", "Bravo", "Charlie")
+        tags = cls.create_tags('Alpha', 'Bravo', 'Charlie')
 
         cls.form_data = {
-            "prefix": IPNetwork("10.99.0.0/16"),
-            "rir": rirs[1].pk,
-            "date_added": datetime.date(2020, 1, 1),
-            "description": "A new aggregate",
-            "tags": [t.pk for t in tags],
+            'prefix': IPNetwork('10.99.0.0/16'),
+            'rir': rirs[1].pk,
+            'date_added': datetime.date(2020, 1, 1),
+            'description': 'A new aggregate',
+            'tags': [t.pk for t in tags],
         }
 
         cls.csv_data = (
@@ -172,9 +155,9 @@ class AggregateTestCase(ViewTestCases.PrimaryObjectViewTestCase):
         )
 
         cls.bulk_edit_data = {
-            "rir": rirs[1].pk,
-            "date_added": datetime.date(2020, 1, 1),
-            "description": "New description",
+            'rir': rirs[1].pk,
+            'date_added': datetime.date(2020, 1, 1),
+            'description': 'New description',
         }
 
 
@@ -184,19 +167,17 @@ class RoleTestCase(ViewTestCases.OrganizationalObjectViewTestCase):
     @classmethod
     def setUpTestData(cls):
 
-        Role.objects.bulk_create(
-            [
-                Role(name="Role 1", slug="role-1"),
-                Role(name="Role 2", slug="role-2"),
-                Role(name="Role 3", slug="role-3"),
-            ]
-        )
+        Role.objects.bulk_create([
+            Role(name='Role 1', slug='role-1'),
+            Role(name='Role 2', slug='role-2'),
+            Role(name='Role 3', slug='role-3'),
+        ])
 
         cls.form_data = {
-            "name": "Role X",
-            "slug": "role-x",
-            "weight": 200,
-            "description": "A new role",
+            'name': 'Role X',
+            'slug': 'role-x',
+            'weight': 200,
+            'description': 'A new role',
         }
 
         cls.csv_data = (
@@ -214,58 +195,41 @@ class PrefixTestCase(ViewTestCases.PrimaryObjectViewTestCase):
     def setUpTestData(cls):
 
         sites = (
-            Site(name="Site 1", slug="site-1"),
-            Site(name="Site 2", slug="site-2"),
+            Site(name='Site 1', slug='site-1'),
+            Site(name='Site 2', slug='site-2'),
         )
         Site.objects.bulk_create(sites)
 
         vrfs = (
-            VRF(name="VRF 1", rd="65000:1"),
-            VRF(name="VRF 2", rd="65000:2"),
+            VRF(name='VRF 1', rd='65000:1'),
+            VRF(name='VRF 2', rd='65000:2'),
         )
         VRF.objects.bulk_create(vrfs)
 
         roles = (
-            Role(name="Role 1", slug="role-1"),
-            Role(name="Role 2", slug="role-2"),
+            Role(name='Role 1', slug='role-1'),
+            Role(name='Role 2', slug='role-2'),
         )
 
-        Prefix.objects.bulk_create(
-            [
-                Prefix(
-                    prefix=IPNetwork("10.1.0.0/16"),
-                    vrf=vrfs[0],
-                    site=sites[0],
-                    role=roles[0],
-                ),
-                Prefix(
-                    prefix=IPNetwork("10.2.0.0/16"),
-                    vrf=vrfs[0],
-                    site=sites[0],
-                    role=roles[0],
-                ),
-                Prefix(
-                    prefix=IPNetwork("10.3.0.0/16"),
-                    vrf=vrfs[0],
-                    site=sites[0],
-                    role=roles[0],
-                ),
-            ]
-        )
+        Prefix.objects.bulk_create([
+            Prefix(prefix=IPNetwork('10.1.0.0/16'), vrf=vrfs[0], site=sites[0], role=roles[0]),
+            Prefix(prefix=IPNetwork('10.2.0.0/16'), vrf=vrfs[0], site=sites[0], role=roles[0]),
+            Prefix(prefix=IPNetwork('10.3.0.0/16'), vrf=vrfs[0], site=sites[0], role=roles[0]),
+        ])
 
-        tags = cls.create_tags("Alpha", "Bravo", "Charlie")
+        tags = cls.create_tags('Alpha', 'Bravo', 'Charlie')
 
         cls.form_data = {
-            "prefix": IPNetwork("192.0.2.0/24"),
-            "site": sites[1].pk,
-            "vrf": vrfs[1].pk,
-            "tenant": None,
-            "vlan": None,
-            "status": PrefixStatusChoices.STATUS_RESERVED,
-            "role": roles[1].pk,
-            "is_pool": True,
-            "description": "A new prefix",
-            "tags": [t.pk for t in tags],
+            'prefix': IPNetwork('192.0.2.0/24'),
+            'site': sites[1].pk,
+            'vrf': vrfs[1].pk,
+            'tenant': None,
+            'vlan': None,
+            'status': PrefixStatusChoices.STATUS_RESERVED,
+            'role': roles[1].pk,
+            'is_pool': True,
+            'description': 'A new prefix',
+            'tags': [t.pk for t in tags],
         }
 
         cls.csv_data = (
@@ -276,13 +240,13 @@ class PrefixTestCase(ViewTestCases.PrimaryObjectViewTestCase):
         )
 
         cls.bulk_edit_data = {
-            "site": sites[1].pk,
-            "vrf": vrfs[1].pk,
-            "tenant": None,
-            "status": PrefixStatusChoices.STATUS_RESERVED,
-            "role": roles[1].pk,
-            "is_pool": False,
-            "description": "New description",
+            'site': sites[1].pk,
+            'vrf': vrfs[1].pk,
+            'tenant': None,
+            'status': PrefixStatusChoices.STATUS_RESERVED,
+            'role': roles[1].pk,
+            'is_pool': False,
+            'description': 'New description',
         }
 
 
@@ -293,31 +257,29 @@ class IPAddressTestCase(ViewTestCases.PrimaryObjectViewTestCase):
     def setUpTestData(cls):
 
         vrfs = (
-            VRF(name="VRF 1", rd="65000:1"),
-            VRF(name="VRF 2", rd="65000:2"),
+            VRF(name='VRF 1', rd='65000:1'),
+            VRF(name='VRF 2', rd='65000:2'),
         )
         VRF.objects.bulk_create(vrfs)
 
-        IPAddress.objects.bulk_create(
-            [
-                IPAddress(address=IPNetwork("192.0.2.1/24"), vrf=vrfs[0]),
-                IPAddress(address=IPNetwork("192.0.2.2/24"), vrf=vrfs[0]),
-                IPAddress(address=IPNetwork("192.0.2.3/24"), vrf=vrfs[0]),
-            ]
-        )
+        IPAddress.objects.bulk_create([
+            IPAddress(address=IPNetwork('192.0.2.1/24'), vrf=vrfs[0]),
+            IPAddress(address=IPNetwork('192.0.2.2/24'), vrf=vrfs[0]),
+            IPAddress(address=IPNetwork('192.0.2.3/24'), vrf=vrfs[0]),
+        ])
 
-        tags = cls.create_tags("Alpha", "Bravo", "Charlie")
+        tags = cls.create_tags('Alpha', 'Bravo', 'Charlie')
 
         cls.form_data = {
-            "vrf": vrfs[1].pk,
-            "address": IPNetwork("192.0.2.99/24"),
-            "tenant": None,
-            "status": IPAddressStatusChoices.STATUS_RESERVED,
-            "role": IPAddressRoleChoices.ROLE_ANYCAST,
-            "nat_inside": None,
-            "dns_name": "example",
-            "description": "A new IP address",
-            "tags": [t.pk for t in tags],
+            'vrf': vrfs[1].pk,
+            'address': IPNetwork('192.0.2.99/24'),
+            'tenant': None,
+            'status': IPAddressStatusChoices.STATUS_RESERVED,
+            'role': IPAddressRoleChoices.ROLE_ANYCAST,
+            'nat_inside': None,
+            'dns_name': 'example',
+            'description': 'A new IP address',
+            'tags': [t.pk for t in tags],
         }
 
         cls.csv_data = (
@@ -328,12 +290,12 @@ class IPAddressTestCase(ViewTestCases.PrimaryObjectViewTestCase):
         )
 
         cls.bulk_edit_data = {
-            "vrf": vrfs[1].pk,
-            "tenant": None,
-            "status": IPAddressStatusChoices.STATUS_RESERVED,
-            "role": IPAddressRoleChoices.ROLE_ANYCAST,
-            "dns_name": "example",
-            "description": "New description",
+            'vrf': vrfs[1].pk,
+            'tenant': None,
+            'status': IPAddressStatusChoices.STATUS_RESERVED,
+            'role': IPAddressRoleChoices.ROLE_ANYCAST,
+            'dns_name': 'example',
+            'description': 'New description',
         }
 
 
@@ -343,21 +305,19 @@ class VLANGroupTestCase(ViewTestCases.OrganizationalObjectViewTestCase):
     @classmethod
     def setUpTestData(cls):
 
-        site = Site.objects.create(name="Site 1", slug="site-1")
+        site = Site.objects.create(name='Site 1', slug='site-1')
 
-        VLANGroup.objects.bulk_create(
-            [
-                VLANGroup(name="VLAN Group 1", slug="vlan-group-1", site=site),
-                VLANGroup(name="VLAN Group 2", slug="vlan-group-2", site=site),
-                VLANGroup(name="VLAN Group 3", slug="vlan-group-3", site=site),
-            ]
-        )
+        VLANGroup.objects.bulk_create([
+            VLANGroup(name='VLAN Group 1', slug='vlan-group-1', site=site),
+            VLANGroup(name='VLAN Group 2', slug='vlan-group-2', site=site),
+            VLANGroup(name='VLAN Group 3', slug='vlan-group-3', site=site),
+        ])
 
         cls.form_data = {
-            "name": "VLAN Group X",
-            "slug": "vlan-group-x",
-            "site": site.pk,
-            "description": "A new VLAN group",
+            'name': 'VLAN Group X',
+            'slug': 'vlan-group-x',
+            'site': site.pk,
+            'description': 'A new VLAN group',
         }
 
         cls.csv_data = (
@@ -375,61 +335,41 @@ class VLANTestCase(ViewTestCases.PrimaryObjectViewTestCase):
     def setUpTestData(cls):
 
         sites = (
-            Site(name="Site 1", slug="site-1"),
-            Site(name="Site 2", slug="site-2"),
+            Site(name='Site 1', slug='site-1'),
+            Site(name='Site 2', slug='site-2'),
         )
         Site.objects.bulk_create(sites)
 
         vlangroups = (
-            VLANGroup(name="VLAN Group 1", slug="vlan-group-1", site=sites[0]),
-            VLANGroup(name="VLAN Group 2", slug="vlan-group-2", site=sites[1]),
+            VLANGroup(name='VLAN Group 1', slug='vlan-group-1', site=sites[0]),
+            VLANGroup(name='VLAN Group 2', slug='vlan-group-2', site=sites[1]),
         )
         VLANGroup.objects.bulk_create(vlangroups)
 
         roles = (
-            Role(name="Role 1", slug="role-1"),
-            Role(name="Role 2", slug="role-2"),
+            Role(name='Role 1', slug='role-1'),
+            Role(name='Role 2', slug='role-2'),
         )
         Role.objects.bulk_create(roles)
 
-        VLAN.objects.bulk_create(
-            [
-                VLAN(
-                    group=vlangroups[0],
-                    vid=101,
-                    name="VLAN101",
-                    site=sites[0],
-                    role=roles[0],
-                ),
-                VLAN(
-                    group=vlangroups[0],
-                    vid=102,
-                    name="VLAN102",
-                    site=sites[0],
-                    role=roles[0],
-                ),
-                VLAN(
-                    group=vlangroups[0],
-                    vid=103,
-                    name="VLAN103",
-                    site=sites[0],
-                    role=roles[0],
-                ),
-            ]
-        )
+        VLAN.objects.bulk_create([
+            VLAN(group=vlangroups[0], vid=101, name='VLAN101', site=sites[0], role=roles[0]),
+            VLAN(group=vlangroups[0], vid=102, name='VLAN102', site=sites[0], role=roles[0]),
+            VLAN(group=vlangroups[0], vid=103, name='VLAN103', site=sites[0], role=roles[0]),
+        ])
 
-        tags = cls.create_tags("Alpha", "Bravo", "Charlie")
+        tags = cls.create_tags('Alpha', 'Bravo', 'Charlie')
 
         cls.form_data = {
-            "site": sites[1].pk,
-            "group": vlangroups[1].pk,
-            "vid": 999,
-            "name": "VLAN999",
-            "tenant": None,
-            "status": VLANStatusChoices.STATUS_RESERVED,
-            "role": roles[1].pk,
-            "description": "A new VLAN",
-            "tags": [t.pk for t in tags],
+            'site': sites[1].pk,
+            'group': vlangroups[1].pk,
+            'vid': 999,
+            'name': 'VLAN999',
+            'tenant': None,
+            'status': VLANStatusChoices.STATUS_RESERVED,
+            'role': roles[1].pk,
+            'description': 'A new VLAN',
+            'tags': [t.pk for t in tags],
         }
 
         cls.csv_data = (
@@ -440,12 +380,12 @@ class VLANTestCase(ViewTestCases.PrimaryObjectViewTestCase):
         )
 
         cls.bulk_edit_data = {
-            "site": sites[1].pk,
-            "group": vlangroups[1].pk,
-            "tenant": None,
-            "status": VLANStatusChoices.STATUS_RESERVED,
-            "role": roles[1].pk,
-            "description": "New description",
+            'site': sites[1].pk,
+            'group': vlangroups[1].pk,
+            'tenant': None,
+            'status': VLANStatusChoices.STATUS_RESERVED,
+            'role': roles[1].pk,
+            'description': 'New description',
         }
 
 
@@ -459,61 +399,36 @@ class ServiceTestCase(
     ViewTestCases.ListObjectsViewTestCase,
     ViewTestCases.BulkImportObjectsViewTestCase,
     ViewTestCases.BulkEditObjectsViewTestCase,
-    ViewTestCases.BulkDeleteObjectsViewTestCase,
+    ViewTestCases.BulkDeleteObjectsViewTestCase
 ):
     model = Service
 
     @classmethod
     def setUpTestData(cls):
 
-        site = Site.objects.create(name="Site 1", slug="site-1")
-        manufacturer = Manufacturer.objects.create(
-            name="Manufacturer 1", slug="manufacturer-1"
-        )
-        devicetype = DeviceType.objects.create(
-            manufacturer=manufacturer, model="Device Type 1"
-        )
-        devicerole = DeviceRole.objects.create(
-            name="Device Role 1", slug="device-role-1"
-        )
-        device = Device.objects.create(
-            name="Device 1", site=site, device_type=devicetype, device_role=devicerole
-        )
+        site = Site.objects.create(name='Site 1', slug='site-1')
+        manufacturer = Manufacturer.objects.create(name='Manufacturer 1', slug='manufacturer-1')
+        devicetype = DeviceType.objects.create(manufacturer=manufacturer, model='Device Type 1')
+        devicerole = DeviceRole.objects.create(name='Device Role 1', slug='device-role-1')
+        device = Device.objects.create(name='Device 1', site=site, device_type=devicetype, device_role=devicerole)
 
-        Service.objects.bulk_create(
-            [
-                Service(
-                    device=device,
-                    name="Service 1",
-                    protocol=ServiceProtocolChoices.PROTOCOL_TCP,
-                    ports=[101],
-                ),
-                Service(
-                    device=device,
-                    name="Service 2",
-                    protocol=ServiceProtocolChoices.PROTOCOL_TCP,
-                    ports=[102],
-                ),
-                Service(
-                    device=device,
-                    name="Service 3",
-                    protocol=ServiceProtocolChoices.PROTOCOL_TCP,
-                    ports=[103],
-                ),
-            ]
-        )
+        Service.objects.bulk_create([
+            Service(device=device, name='Service 1', protocol=ServiceProtocolChoices.PROTOCOL_TCP, ports=[101]),
+            Service(device=device, name='Service 2', protocol=ServiceProtocolChoices.PROTOCOL_TCP, ports=[102]),
+            Service(device=device, name='Service 3', protocol=ServiceProtocolChoices.PROTOCOL_TCP, ports=[103]),
+        ])
 
-        tags = cls.create_tags("Alpha", "Bravo", "Charlie")
+        tags = cls.create_tags('Alpha', 'Bravo', 'Charlie')
 
         cls.form_data = {
-            "device": device.pk,
-            "virtual_machine": None,
-            "name": "Service X",
-            "protocol": ServiceProtocolChoices.PROTOCOL_TCP,
-            "ports": "104,105",
-            "ipaddresses": [],
-            "description": "A new service",
-            "tags": [t.pk for t in tags],
+            'device': device.pk,
+            'virtual_machine': None,
+            'name': 'Service X',
+            'protocol': ServiceProtocolChoices.PROTOCOL_TCP,
+            'ports': '104,105',
+            'ipaddresses': [],
+            'description': 'A new service',
+            'tags': [t.pk for t in tags],
         }
 
         cls.csv_data = (
@@ -524,7 +439,7 @@ class ServiceTestCase(
         )
 
         cls.bulk_edit_data = {
-            "protocol": ServiceProtocolChoices.PROTOCOL_UDP,
-            "ports": "106,107",
-            "description": "New description",
+            'protocol': ServiceProtocolChoices.PROTOCOL_UDP,
+            'ports': '106,107',
+            'description': 'New description',
         }

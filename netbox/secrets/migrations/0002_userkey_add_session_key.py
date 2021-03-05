@@ -8,48 +8,30 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("secrets", "0001_initial"),
+        ('secrets', '0001_initial'),
     ]
 
     operations = [
         migrations.CreateModel(
-            name="SessionKey",
+            name='SessionKey',
             fields=[
-                (
-                    "id",
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                ("cipher", models.BinaryField(max_length=512)),
-                ("hash", models.CharField(editable=False, max_length=128)),
-                ("created", models.DateTimeField(auto_now_add=True)),
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('cipher', models.BinaryField(max_length=512)),
+                ('hash', models.CharField(editable=False, max_length=128)),
+                ('created', models.DateTimeField(auto_now_add=True)),
             ],
             options={
-                "ordering": ["userkey__user__username"],
+                'ordering': ['userkey__user__username'],
             },
         ),
         migrations.AlterField(
-            model_name="userkey",
-            name="user",
-            field=models.OneToOneField(
-                editable=False,
-                on_delete=django.db.models.deletion.CASCADE,
-                related_name="user_key",
-                to=settings.AUTH_USER_MODEL,
-            ),
+            model_name='userkey',
+            name='user',
+            field=models.OneToOneField(editable=False, on_delete=django.db.models.deletion.CASCADE, related_name='user_key', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
-            model_name="sessionkey",
-            name="userkey",
-            field=models.OneToOneField(
-                editable=False,
-                on_delete=django.db.models.deletion.CASCADE,
-                related_name="session_key",
-                to="secrets.UserKey",
-            ),
+            model_name='sessionkey',
+            name='userkey',
+            field=models.OneToOneField(editable=False, on_delete=django.db.models.deletion.CASCADE, related_name='session_key', to='secrets.UserKey'),
         ),
     ]

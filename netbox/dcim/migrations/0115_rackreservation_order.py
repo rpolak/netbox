@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("dcim", "0114_update_jsonfield"),
+        ('dcim', '0114_update_jsonfield'),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name="rackreservation",
-            options={"ordering": ["created", "pk"]},
+            name='rackreservation',
+            options={'ordering': ['created', 'pk']},
         ),
     ]

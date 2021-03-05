@@ -7,52 +7,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("dcim", "0115_rackreservation_order"),
+        ('dcim', '0115_rackreservation_order'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name="frontport",
-            name="rear_port_position",
-            field=models.PositiveSmallIntegerField(
-                default=1,
-                validators=[
-                    django.core.validators.MinValueValidator(1),
-                    django.core.validators.MaxValueValidator(1024),
-                ],
-            ),
+            model_name='frontport',
+            name='rear_port_position',
+            field=models.PositiveSmallIntegerField(default=1, validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(1024)]),
         ),
         migrations.AlterField(
-            model_name="frontporttemplate",
-            name="rear_port_position",
-            field=models.PositiveSmallIntegerField(
-                default=1,
-                validators=[
-                    django.core.validators.MinValueValidator(1),
-                    django.core.validators.MaxValueValidator(1024),
-                ],
-            ),
+            model_name='frontporttemplate',
+            name='rear_port_position',
+            field=models.PositiveSmallIntegerField(default=1, validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(1024)]),
         ),
         migrations.AlterField(
-            model_name="rearport",
-            name="positions",
-            field=models.PositiveSmallIntegerField(
-                default=1,
-                validators=[
-                    django.core.validators.MinValueValidator(1),
-                    django.core.validators.MaxValueValidator(1024),
-                ],
-            ),
+            model_name='rearport',
+            name='positions',
+            field=models.PositiveSmallIntegerField(default=1, validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(1024)]),
         ),
         migrations.AlterField(
-            model_name="rearporttemplate",
-            name="positions",
-            field=models.PositiveSmallIntegerField(
-                default=1,
-                validators=[
-                    django.core.validators.MinValueValidator(1),
-                    django.core.validators.MaxValueValidator(1024),
-                ],
-            ),
+            model_name='rearporttemplate',
+            name='positions',
+            field=models.PositiveSmallIntegerField(default=1, validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(1024)]),
         ),
     ]

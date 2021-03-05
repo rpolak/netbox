@@ -6,28 +6,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("secrets", "0004_tags"),
+        ('secrets', '0004_tags'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="secretrole",
-            name="created",
+            model_name='secretrole',
+            name='created',
             field=models.DateField(auto_now_add=True, null=True),
         ),
         migrations.AddField(
-            model_name="secretrole",
-            name="last_updated",
+            model_name='secretrole',
+            name='last_updated',
             field=models.DateTimeField(auto_now=True, null=True),
         ),
         migrations.AlterField(
-            model_name="secret",
-            name="created",
+            model_name='secret',
+            name='created',
             field=models.DateField(auto_now_add=True, null=True),
         ),
         migrations.AlterField(
-            model_name="secret",
-            name="last_updated",
+            model_name='secret',
+            name='last_updated',
             field=models.DateTimeField(auto_now=True, null=True),
         ),
     ]

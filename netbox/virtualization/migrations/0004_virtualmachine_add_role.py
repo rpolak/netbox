@@ -7,20 +7,14 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("dcim", "0044_virtualization"),
-        ("virtualization", "0003_cluster_add_site"),
+        ('dcim', '0044_virtualization'),
+        ('virtualization', '0003_cluster_add_site'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="virtualmachine",
-            name="role",
-            field=models.ForeignKey(
-                blank=True,
-                null=True,
-                on_delete=django.db.models.deletion.PROTECT,
-                related_name="virtual_machines",
-                to="dcim.DeviceRole",
-            ),
+            model_name='virtualmachine',
+            name='role',
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='virtual_machines', to='dcim.DeviceRole'),
         ),
     ]

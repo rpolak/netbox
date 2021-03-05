@@ -7,42 +7,24 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("tenancy", "0001_initial"),
-        ("dcim", "0011_devicetype_part_number"),
+        ('tenancy', '0001_initial'),
+        ('dcim', '0011_devicetype_part_number'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="device",
-            name="tenant",
-            field=models.ForeignKey(
-                blank=True,
-                null=True,
-                on_delete=django.db.models.deletion.PROTECT,
-                related_name="devices",
-                to="tenancy.Tenant",
-            ),
+            model_name='device',
+            name='tenant',
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='devices', to='tenancy.Tenant'),
         ),
         migrations.AddField(
-            model_name="rack",
-            name="tenant",
-            field=models.ForeignKey(
-                blank=True,
-                null=True,
-                on_delete=django.db.models.deletion.PROTECT,
-                related_name="racks",
-                to="tenancy.Tenant",
-            ),
+            model_name='rack',
+            name='tenant',
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='racks', to='tenancy.Tenant'),
         ),
         migrations.AddField(
-            model_name="site",
-            name="tenant",
-            field=models.ForeignKey(
-                blank=True,
-                null=True,
-                on_delete=django.db.models.deletion.PROTECT,
-                related_name="sites",
-                to="tenancy.Tenant",
-            ),
+            model_name='site',
+            name='tenant',
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='sites', to='tenancy.Tenant'),
         ),
     ]

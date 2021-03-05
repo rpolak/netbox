@@ -7,15 +7,13 @@ import utilities.validators
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("dcim", "0098_devicetype_images"),
+        ('dcim', '0098_devicetype_images'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name="powerfeed",
-            name="voltage",
-            field=models.SmallIntegerField(
-                default=120, validators=[utilities.validators.ExclusionValidator([0])]
-            ),
+            model_name='powerfeed',
+            name='voltage',
+            field=models.SmallIntegerField(default=120, validators=[utilities.validators.ExclusionValidator([0])]),
         ),
     ]

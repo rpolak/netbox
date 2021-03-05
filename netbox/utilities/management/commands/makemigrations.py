@@ -10,6 +10,7 @@ models.Field.deconstruct = custom_deconstruct
 
 
 class Command(_Command):
+
     def handle(self, *args, **kwargs):
         """
         This built-in management command enables the creation of new database schema migration files, which should

@@ -6,23 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("extras", "0004_topologymap_change_comma_to_semicolon"),
+        ('extras', '0004_topologymap_change_comma_to_semicolon'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name="useraction",
-            name="action",
-            field=models.PositiveSmallIntegerField(
-                choices=[
-                    (1, b"created"),
-                    (7, b"bulk created"),
-                    (2, b"imported"),
-                    (3, b"modified"),
-                    (4, b"bulk edited"),
-                    (5, b"deleted"),
-                    (6, b"bulk deleted"),
-                ]
-            ),
+            model_name='useraction',
+            name='action',
+            field=models.PositiveSmallIntegerField(choices=[(1, b'created'), (7, b'bulk created'), (2, b'imported'), (3, b'modified'), (4, b'bulk edited'), (5, b'deleted'), (6, b'bulk deleted')]),
         ),
     ]

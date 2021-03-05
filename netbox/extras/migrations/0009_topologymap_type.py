@@ -6,15 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("extras", "0008_reports"),
+        ('extras', '0008_reports'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="topologymap",
-            name="type",
-            field=models.PositiveSmallIntegerField(
-                choices=[(1, "Network"), (2, "Console"), (3, "Power")], default=1
-            ),
+            model_name='topologymap',
+            name='type',
+            field=models.PositiveSmallIntegerField(choices=[(1, 'Network'), (2, 'Console'), (3, 'Power')], default=1),
         ),
     ]

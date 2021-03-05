@@ -6,27 +6,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("virtualization", "0013_deterministic_ordering"),
-        ("extras", "0036_contenttype_filters_to_q_objects"),
+        ('virtualization', '0013_deterministic_ordering'),
+        ('extras', '0036_contenttype_filters_to_q_objects'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="configcontext",
-            name="cluster_groups",
-            field=models.ManyToManyField(
-                blank=True,
-                related_name="_configcontext_cluster_groups_+",
-                to="virtualization.ClusterGroup",
-            ),
+            model_name='configcontext',
+            name='cluster_groups',
+            field=models.ManyToManyField(blank=True, related_name='_configcontext_cluster_groups_+', to='virtualization.ClusterGroup'),
         ),
         migrations.AddField(
-            model_name="configcontext",
-            name="clusters",
-            field=models.ManyToManyField(
-                blank=True,
-                related_name="_configcontext_clusters_+",
-                to="virtualization.Cluster",
-            ),
+            model_name='configcontext',
+            name='clusters',
+            field=models.ManyToManyField(blank=True, related_name='_configcontext_clusters_+', to='virtualization.Cluster'),
         ),
     ]

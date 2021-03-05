@@ -7,19 +7,13 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("dcim", "0009_site_32bit_asn_support"),
+        ('dcim', '0009_site_32bit_asn_support'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name="devicebay",
-            name="installed_device",
-            field=models.OneToOneField(
-                blank=True,
-                null=True,
-                on_delete=django.db.models.deletion.SET_NULL,
-                related_name="parent_bay",
-                to="dcim.Device",
-            ),
+            model_name='devicebay',
+            name='installed_device',
+            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='parent_bay', to='dcim.Device'),
         ),
     ]

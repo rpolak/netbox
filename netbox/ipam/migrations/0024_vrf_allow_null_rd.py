@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("ipam", "0023_change_logging"),
+        ('ipam', '0023_change_logging'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name="vrf",
-            name="rd",
+            model_name='vrf',
+            name='rd',
             field=models.CharField(blank=True, max_length=21, null=True, unique=True),
         ),
     ]

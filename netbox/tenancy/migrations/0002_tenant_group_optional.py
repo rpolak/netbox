@@ -7,19 +7,13 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("tenancy", "0001_initial"),
+        ('tenancy', '0001_initial'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name="tenant",
-            name="group",
-            field=models.ForeignKey(
-                blank=True,
-                null=True,
-                on_delete=django.db.models.deletion.SET_NULL,
-                related_name="tenants",
-                to="tenancy.TenantGroup",
-            ),
+            model_name='tenant',
+            name='group',
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='tenants', to='tenancy.TenantGroup'),
         ),
     ]

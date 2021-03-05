@@ -13,15 +13,21 @@ from extras.choices import *
 # Change logging
 #
 
-
 class ChangeLoggedModel(models.Model):
     """
     An abstract model which adds fields to store the creation and last-updated times for an object. Both fields can be
     null to facilitate adding these fields to existing instances via a database migration.
     """
-
-    created = models.DateField(auto_now_add=True, blank=True, null=True)
-    last_updated = models.DateTimeField(auto_now=True, blank=True, null=True)
+    created = models.DateField(
+        auto_now_add=True,
+        blank=True,
+        null=True
+    )
+    last_updated = models.DateTimeField(
+        auto_now=True,
+        blank=True,
+        null=True
+    )
 
     class Meta:
         abstract = True
@@ -35,7 +41,7 @@ class ChangeLoggedModel(models.Model):
             changed_object=self,
             object_repr=str(self),
             action=action,
-            object_data=serialize_object(self),
+            object_data=serialize_object(self)
         )
 
 
@@ -45,64 +51,78 @@ class ObjectChange(models.Model):
     indicate an object related to the one being changed. For example, a change to an interface may also indicate the
     parent device. This will ensure changes made to component models appear in the parent model's changelog.
     """
-
-    time = models.DateTimeField(auto_now_add=True, editable=False, db_index=True)
+    time = models.DateTimeField(
+        auto_now_add=True,
+        editable=False,
+        db_index=True
+    )
     user = models.ForeignKey(
         to=User,
         on_delete=models.SET_NULL,
-        related_name="changes",
+        related_name='changes',
         blank=True,
-        null=True,
+        null=True
     )
-    user_name = models.CharField(max_length=150, editable=False)
-    request_id = models.UUIDField(editable=False)
-    action = models.CharField(max_length=50, choices=ObjectChangeActionChoices)
+    user_name = models.CharField(
+        max_length=150,
+        editable=False
+    )
+    request_id = models.UUIDField(
+        editable=False
+    )
+    action = models.CharField(
+        max_length=50,
+        choices=ObjectChangeActionChoices
+    )
     changed_object_type = models.ForeignKey(
-        to=ContentType, on_delete=models.PROTECT, related_name="+"
+        to=ContentType,
+        on_delete=models.PROTECT,
+        related_name='+'
     )
     changed_object_id = models.PositiveIntegerField()
     changed_object = GenericForeignKey(
-        ct_field="changed_object_type", fk_field="changed_object_id"
+        ct_field='changed_object_type',
+        fk_field='changed_object_id'
     )
     related_object_type = models.ForeignKey(
         to=ContentType,
         on_delete=models.PROTECT,
-        related_name="+",
+        related_name='+',
         blank=True,
-        null=True,
+        null=True
     )
-    related_object_id = models.PositiveIntegerField(blank=True, null=True)
+    related_object_id = models.PositiveIntegerField(
+        blank=True,
+        null=True
+    )
     related_object = GenericForeignKey(
-        ct_field="related_object_type", fk_field="related_object_id"
+        ct_field='related_object_type',
+        fk_field='related_object_id'
     )
-    object_repr = models.CharField(max_length=200, editable=False)
-    object_data = models.JSONField(editable=False)
+    object_repr = models.CharField(
+        max_length=200,
+        editable=False
+    )
+    object_data = models.JSONField(
+        editable=False
+    )
 
     objects = RestrictedQuerySet.as_manager()
 
     csv_headers = [
-        "time",
-        "user",
-        "user_name",
-        "request_id",
-        "action",
-        "changed_object_type",
-        "changed_object_id",
-        "related_object_type",
-        "related_object_id",
-        "object_repr",
-        "object_data",
+        'time', 'user', 'user_name', 'request_id', 'action', 'changed_object_type', 'changed_object_id',
+        'related_object_type', 'related_object_id', 'object_repr', 'object_data',
     ]
 
     class Meta:
-        ordering = ["-time"]
+        ordering = ['-time']
 
     def __str__(self):
-        return "{} {} {} by {}".format(
+        return '{} {} {} by {}'.format(
             self.changed_object_type,
             self.object_repr,
             self.get_action_display().lower(),
-            self.user_name,
+            self.user_name
         )
 
     def save(self, *args, **kwargs):
@@ -116,7 +136,7 @@ class ObjectChange(models.Model):
         return super().save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse("extras:objectchange", args=[self.pk])
+        return reverse('extras:objectchange', args=[self.pk])
 
     def to_csv(self):
         return (

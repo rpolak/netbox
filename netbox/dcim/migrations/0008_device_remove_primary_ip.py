@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("dcim", "0007_device_copy_primary_ip"),
+        ('dcim', '0007_device_copy_primary_ip'),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name="device",
-            name="primary_ip",
+            model_name='device',
+            name='primary_ip',
         ),
     ]

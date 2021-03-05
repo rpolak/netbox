@@ -24,10 +24,10 @@ from .utils import encrypt_master_key, decrypt_master_key, generate_random_key
 
 
 __all__ = (
-    "Secret",
-    "SecretRole",
-    "SessionKey",
-    "UserKey",
+    'Secret',
+    'SecretRole',
+    'SessionKey',
+    'UserKey',
 )
 
 
@@ -37,21 +37,32 @@ class UserKey(models.Model):
     copy of the master encryption key. The encrypted instance of the master key can be decrypted only with the user's
     matching (private) decryption key.
     """
-
-    created = models.DateField(auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True)
-    user = models.OneToOneField(
-        to=User, on_delete=models.CASCADE, related_name="user_key", editable=False
+    created = models.DateField(
+        auto_now_add=True
     )
-    public_key = models.TextField(verbose_name="RSA public key")
+    last_updated = models.DateTimeField(
+        auto_now=True
+    )
+    user = models.OneToOneField(
+        to=User,
+        on_delete=models.CASCADE,
+        related_name='user_key',
+        editable=False
+    )
+    public_key = models.TextField(
+        verbose_name='RSA public key'
+    )
     master_key_cipher = models.BinaryField(
-        max_length=512, blank=True, null=True, editable=False
+        max_length=512,
+        blank=True,
+        null=True,
+        editable=False
     )
 
     objects = UserKeyQuerySet.as_manager()
 
     class Meta:
-        ordering = ["user__username"]
+        ordering = ['user__username']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -72,48 +83,37 @@ class UserKey(models.Model):
             try:
                 pubkey = RSA.import_key(self.public_key)
             except ValueError:
-                raise ValidationError({"public_key": "Invalid RSA key format."})
+                raise ValidationError({
+                    'public_key': "Invalid RSA key format."
+                })
             except Exception:
-                raise ValidationError(
-                    "Something went wrong while trying to save your key. Please ensure that you're "
-                    "uploading a valid RSA public key in PEM format (no SSH/PGP)."
-                )
+                raise ValidationError("Something went wrong while trying to save your key. Please ensure that you're "
+                                      "uploading a valid RSA public key in PEM format (no SSH/PGP).")
 
             # Validate the public key length
             pubkey_length = pubkey.size_in_bits()
             if pubkey_length < settings.SECRETS_MIN_PUBKEY_SIZE:
-                raise ValidationError(
-                    {
-                        "public_key": "Insufficient key length. Keys must be at least {} bits long.".format(
-                            settings.SECRETS_MIN_PUBKEY_SIZE
-                        )
-                    }
-                )
+                raise ValidationError({
+                    'public_key': "Insufficient key length. Keys must be at least {} bits long.".format(
+                        settings.SECRETS_MIN_PUBKEY_SIZE
+                    )
+                })
             # We can't use keys bigger than our master_key_cipher field can hold
             if pubkey_length > 4096:
-                raise ValidationError(
-                    {
-                        "public_key": "Public key size ({}) is too large. Maximum key size is 4096 bits.".format(
-                            pubkey_length
-                        )
-                    }
-                )
+                raise ValidationError({
+                    'public_key': "Public key size ({}) is too large. Maximum key size is 4096 bits.".format(
+                        pubkey_length
+                    )
+                })
 
     def save(self, *args, **kwargs):
 
         # Check whether public_key has been modified. If so, nullify the initial master_key_cipher.
-        if (
-            self.__initial_master_key_cipher
-            and self.public_key != self.__initial_public_key
-        ):
+        if self.__initial_master_key_cipher and self.public_key != self.__initial_public_key:
             self.master_key_cipher = None
 
         # If no other active UserKeys exist, generate a new master key and use it to activate this UserKey.
-        if (
-            self.is_filled()
-            and not self.is_active()
-            and not UserKey.objects.active().count()
-        ):
+        if self.is_filled() and not self.is_active() and not UserKey.objects.active().count():
             master_key = generate_random_key()
             self.master_key_cipher = encrypt_master_key(master_key, self.public_key)
 
@@ -123,13 +123,9 @@ class UserKey(models.Model):
 
         # If Secrets exist and this is the last active UserKey, prevent its deletion. Deleting the last UserKey will
         # result in the master key being destroyed and rendering all Secrets inaccessible.
-        if Secret.objects.count() and [uk.pk for uk in UserKey.objects.active()] == [
-            self.pk
-        ]:
-            raise Exception(
-                "Cannot delete the last active UserKey when Secrets exist! This would render all secrets "
-                "inaccessible."
-            )
+        if Secret.objects.count() and [uk.pk for uk in UserKey.objects.active()] == [self.pk]:
+            raise Exception("Cannot delete the last active UserKey when Secrets exist! This would render all secrets "
+                            "inaccessible.")
 
         super().delete(*args, **kwargs)
 
@@ -138,7 +134,6 @@ class UserKey(models.Model):
         Returns True if the UserKey has been filled with a public RSA key.
         """
         return bool(self.public_key)
-
     is_filled.boolean = True
 
     def is_active(self):
@@ -146,7 +141,6 @@ class UserKey(models.Model):
         Returns True if the UserKey has been populated with an encrypted copy of the master key.
         """
         return self.master_key_cipher is not None
-
     is_active.boolean = True
 
     def get_master_key(self, private_key):
@@ -165,9 +159,7 @@ class UserKey(models.Model):
         Activate the UserKey by saving an encrypted copy of the master key to the database.
         """
         if not self.public_key:
-            raise Exception(
-                "Cannot activate UserKey: Its public key must be filled first."
-            )
+            raise Exception("Cannot activate UserKey: Its public key must be filled first.")
         self.master_key_cipher = encrypt_master_key(master_key, self.public_key)
         self.save()
 
@@ -176,21 +168,28 @@ class SessionKey(models.Model):
     """
     A SessionKey stores a User's temporary key to be used for the encryption and decryption of secrets.
     """
-
     userkey = models.OneToOneField(
-        to="secrets.UserKey",
+        to='secrets.UserKey',
         on_delete=models.CASCADE,
-        related_name="session_key",
-        editable=False,
+        related_name='session_key',
+        editable=False
     )
-    cipher = models.BinaryField(max_length=512, editable=False)
-    hash = models.CharField(max_length=128, editable=False)
-    created = models.DateTimeField(auto_now_add=True)
+    cipher = models.BinaryField(
+        max_length=512,
+        editable=False
+    )
+    hash = models.CharField(
+        max_length=128,
+        editable=False
+    )
+    created = models.DateTimeField(
+        auto_now_add=True
+    )
 
     key = None
 
     class Meta:
-        ordering = ["userkey__user__username"]
+        ordering = ['userkey__user__username']
 
     def __str__(self):
         return self.userkey.user.username
@@ -240,9 +239,14 @@ class SecretRole(ChangeLoggedModel):
     A SecretRole represents an arbitrary functional classification of Secrets. For example, a user might define roles
     such as "Login Credentials" or "SNMP Communities."
     """
-
-    name = models.CharField(max_length=100, unique=True)
-    slug = models.SlugField(max_length=100, unique=True)
+    name = models.CharField(
+        max_length=100,
+        unique=True
+    )
+    slug = models.SlugField(
+        max_length=100,
+        unique=True
+    )
     description = models.CharField(
         max_length=200,
         blank=True,
@@ -250,16 +254,16 @@ class SecretRole(ChangeLoggedModel):
 
     objects = RestrictedQuerySet.as_manager()
 
-    csv_headers = ["name", "slug", "description"]
+    csv_headers = ['name', 'slug', 'description']
 
     class Meta:
-        ordering = ["name"]
+        ordering = ['name']
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return "{}?role={}".format(reverse("secrets:secret_list"), self.slug)
+        return "{}?role={}".format(reverse('secrets:secret_list'), self.slug)
 
     def to_csv(self):
         return (
@@ -269,7 +273,7 @@ class SecretRole(ChangeLoggedModel):
         )
 
 
-@extras_features("custom_fields", "custom_links", "export_templates", "webhooks")
+@extras_features('custom_fields', 'custom_links', 'export_templates', 'webhooks')
 class Secret(ChangeLoggedModel, CustomFieldModel):
     """
     A Secret stores an AES256-encrypted copy of sensitive data, such as passwords or secret keys. An irreversible
@@ -280,54 +284,60 @@ class Secret(ChangeLoggedModel, CustomFieldModel):
     A Secret can be up to 65,535 bytes (64KB - 1B) in length. Each secret string will be padded with random data to
     a minimum of 64 bytes during encryption in order to protect short strings from ciphertext analysis.
     """
-
-    assigned_object_type = models.ForeignKey(to=ContentType, on_delete=models.PROTECT)
+    assigned_object_type = models.ForeignKey(
+        to=ContentType,
+        on_delete=models.PROTECT
+    )
     assigned_object_id = models.PositiveIntegerField()
     assigned_object = GenericForeignKey(
-        ct_field="assigned_object_type", fk_field="assigned_object_id"
+        ct_field='assigned_object_type',
+        fk_field='assigned_object_id'
     )
     role = models.ForeignKey(
-        to="secrets.SecretRole", on_delete=models.PROTECT, related_name="secrets"
+        to='secrets.SecretRole',
+        on_delete=models.PROTECT,
+        related_name='secrets'
     )
-    name = models.CharField(max_length=100, blank=True)
+    name = models.CharField(
+        max_length=100,
+        blank=True
+    )
     ciphertext = models.BinaryField(
         max_length=65568,  # 128-bit IV + 16-bit pad length + 65535B secret + 15B padding
-        editable=False,
+        editable=False
+    )
+    hash = models.CharField(
+        max_length=128,
+        editable=False
     )
     tags = TaggableManager(through=TaggedItem)
 
     objects = RestrictedQuerySet.as_manager()
 
     plaintext = None
-    csv_headers = [
-        "assigned_object_type",
-        "assigned_object_id",
-        "role",
-        "name",
-        "plaintext",
-    ]
+    csv_headers = ['assigned_object_type', 'assigned_object_id', 'role', 'name', 'plaintext']
 
     class Meta:
-        ordering = ("role", "name", "pk")
-        unique_together = ("assigned_object_type", "assigned_object_id", "role", "name")
+        ordering = ('role', 'name', 'pk')
+        unique_together = ('assigned_object_type', 'assigned_object_id', 'role', 'name')
 
     def __init__(self, *args, **kwargs):
-        self.plaintext = kwargs.pop("plaintext", None)
+        self.plaintext = kwargs.pop('plaintext', None)
         super().__init__(*args, **kwargs)
 
     def __str__(self):
-        return self.name or "Secret"
+        return self.name or 'Secret'
 
     def get_absolute_url(self):
-        return reverse("secrets:secret", args=[self.pk])
+        return reverse('secrets:secret', args=[self.pk])
 
     def to_csv(self):
         return (
-            f"{self.assigned_object_type.app_label}.{self.assigned_object_type.model}",
+            f'{self.assigned_object_type.app_label}.{self.assigned_object_type.model}',
             self.assigned_object_id,
             self.role,
             self.name,
-            self.plaintext or "",
+            self.plaintext or '',
         )
 
     def _pad(self, s):
@@ -337,7 +347,7 @@ class Secret(ChangeLoggedModel, CustomFieldModel):
         |LL|MySecret|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
         +--+--------+-------------------------------------------+
         """
-        s = s.encode("utf8")
+        s = s.encode('utf8')
         if len(s) > 65535:
             raise ValueError("Maximum plaintext size is 65535 bytes.")
 
@@ -362,7 +372,7 @@ class Secret(ChangeLoggedModel, CustomFieldModel):
             plaintext_length = (ord(s[0]) << 8) + ord(s[1])
         else:
             plaintext_length = (s[0] << 8) + s[1]
-        return s[2 : plaintext_length + 2].decode("utf8")
+        return s[2:plaintext_length + 2].decode('utf8')
 
     def encrypt(self, secret_key):
         """

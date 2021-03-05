@@ -7,13 +7,13 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("dcim", "0062_interface_mtu"),
+        ('dcim', '0062_interface_mtu'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="device",
-            name="local_context_data",
+            model_name='device',
+            name='local_context_data',
             field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True),
         ),
     ]

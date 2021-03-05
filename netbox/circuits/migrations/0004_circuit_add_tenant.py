@@ -7,20 +7,14 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("tenancy", "0001_initial"),
-        ("circuits", "0003_provider_32bit_asn_support"),
+        ('tenancy', '0001_initial'),
+        ('circuits', '0003_provider_32bit_asn_support'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="circuit",
-            name="tenant",
-            field=models.ForeignKey(
-                blank=True,
-                null=True,
-                on_delete=django.db.models.deletion.PROTECT,
-                related_name="circuits",
-                to="tenancy.Tenant",
-            ),
+            model_name='circuit',
+            name='tenant',
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='circuits', to='tenancy.Tenant'),
         ),
     ]

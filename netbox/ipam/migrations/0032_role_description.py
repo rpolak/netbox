@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("ipam", "0031_3569_service_fields"),
+        ('ipam', '0031_3569_service_fields'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="role",
-            name="description",
+            model_name='role',
+            name='description',
             field=models.CharField(blank=True, max_length=100),
         ),
     ]

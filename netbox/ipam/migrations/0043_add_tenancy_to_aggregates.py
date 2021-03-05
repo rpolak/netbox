@@ -7,20 +7,14 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("tenancy", "0011_standardize_name_length"),
-        ("ipam", "0042_standardize_name_length"),
+        ('tenancy', '0011_standardize_name_length'),
+        ('ipam', '0042_standardize_name_length'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="aggregate",
-            name="tenant",
-            field=models.ForeignKey(
-                blank=True,
-                null=True,
-                on_delete=django.db.models.deletion.PROTECT,
-                related_name="aggregates",
-                to="tenancy.tenant",
-            ),
+            model_name='aggregate',
+            name='tenant',
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='aggregates', to='tenancy.tenant'),
         ),
     ]

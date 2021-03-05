@@ -6,93 +6,93 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("dcim", "0102_nested_rackgroups_rebuild"),
+        ('dcim', '0102_nested_rackgroups_rebuild'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="manufacturer",
-            name="description",
+            model_name='manufacturer',
+            name='description',
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AddField(
-            model_name="platform",
-            name="description",
+            model_name='platform',
+            name='description',
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AddField(
-            model_name="rackgroup",
-            name="description",
+            model_name='rackgroup',
+            name='description',
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AddField(
-            model_name="region",
-            name="description",
+            model_name='region',
+            name='description',
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name="consoleport",
-            name="description",
+            model_name='consoleport',
+            name='description',
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name="consoleserverport",
-            name="description",
+            model_name='consoleserverport',
+            name='description',
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name="devicebay",
-            name="description",
+            model_name='devicebay',
+            name='description',
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name="devicerole",
-            name="description",
+            model_name='devicerole',
+            name='description',
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name="frontport",
-            name="description",
+            model_name='frontport',
+            name='description',
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name="interface",
-            name="description",
+            model_name='interface',
+            name='description',
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name="inventoryitem",
-            name="description",
+            model_name='inventoryitem',
+            name='description',
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name="poweroutlet",
-            name="description",
+            model_name='poweroutlet',
+            name='description',
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name="powerport",
-            name="description",
+            model_name='powerport',
+            name='description',
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name="rackreservation",
-            name="description",
+            model_name='rackreservation',
+            name='description',
             field=models.CharField(max_length=200),
         ),
         migrations.AlterField(
-            model_name="rackrole",
-            name="description",
+            model_name='rackrole',
+            name='description',
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name="rearport",
-            name="description",
+            model_name='rearport',
+            name='description',
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name="site",
-            name="description",
+            model_name='site',
+            name='description',
             field=models.CharField(blank=True, max_length=200),
         ),
     ]

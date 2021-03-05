@@ -3,36 +3,36 @@
 #  only. It is not intended for production use.                   #
 ###################################################################
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ['*']
 
 DATABASE = {
-    "NAME": "netbox",
-    "USER": "netbox",
-    "PASSWORD": "netbox",
-    "HOST": "localhost",
-    "PORT": "",
-    "CONN_MAX_AGE": 300,
+    'NAME': 'netbox',
+    'USER': 'netbox',
+    'PASSWORD': 'netbox',
+    'HOST': 'localhost',
+    'PORT': '',
+    'CONN_MAX_AGE': 300,
 }
 
 PLUGINS = [
-    "extras.tests.dummy_plugin",
+    'extras.tests.dummy_plugin',
 ]
 
 REDIS = {
-    "tasks": {
-        "HOST": "localhost",
-        "PORT": 6379,
-        "PASSWORD": "",
-        "DATABASE": 0,
-        "SSL": False,
+    'tasks': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'PASSWORD': '',
+        'DATABASE': 0,
+        'SSL': False,
     },
-    "caching": {
-        "HOST": "localhost",
-        "PORT": 6379,
-        "PASSWORD": "",
-        "DATABASE": 1,
-        "SSL": False,
-    },
+    'caching': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'PASSWORD': '',
+        'DATABASE': 1,
+        'SSL': False,
+    }
 }
 
-SECRET_KEY = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+SECRET_KEY = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'

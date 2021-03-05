@@ -6,38 +6,38 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("dcim", "0112_standardize_components"),
+        ('dcim', '0112_standardize_components'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name="consoleport",
-            name="connection_status",
+            model_name='consoleport',
+            name='connection_status',
             field=models.BooleanField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name="consoleserverport",
-            name="connection_status",
+            model_name='consoleserverport',
+            name='connection_status',
             field=models.BooleanField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name="interface",
-            name="connection_status",
+            model_name='interface',
+            name='connection_status',
             field=models.BooleanField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name="powerfeed",
-            name="connection_status",
+            model_name='powerfeed',
+            name='connection_status',
             field=models.BooleanField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name="poweroutlet",
-            name="connection_status",
+            model_name='poweroutlet',
+            name='connection_status',
             field=models.BooleanField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name="powerport",
-            name="connection_status",
+            model_name='powerport',
+            name='connection_status',
             field=models.BooleanField(blank=True, null=True),
         ),
     ]

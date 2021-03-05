@@ -6,16 +6,16 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("dcim", "0057_tags"),
+        ('dcim', '0057_tags'),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name="rack",
-            options={"ordering": ["site", "group", "name"]},
+            name='rack',
+            options={'ordering': ['site', 'group', 'name']},
         ),
         migrations.AlterUniqueTogether(
-            name="rack",
-            unique_together=set([("group", "name"), ("group", "facility_id")]),
+            name='rack',
+            unique_together=set([('group', 'name'), ('group', 'facility_id')]),
         ),
     ]

@@ -40,17 +40,15 @@ class DCIMRootView(APIRootView):
     """
     DCIM API root view
     """
-
     def get_view_name(self):
-        return "DCIM"
+        return 'DCIM'
 
 
 # Mixins
 
 class PathEndpointMixin(object):
 
-class CableTraceMixin(object):
-    @action(detail=True, url_path="trace")
+    @action(detail=True, url_path='trace')
     def trace(self, request, pk):
         """
         Trace a complete cable path and return each segment as a three-tuple of (termination, cable, termination).
@@ -66,17 +64,15 @@ class CableTraceMixin(object):
                 break
 
             # Serialize each object
-            serializer_a = get_serializer_for_model(near_end, prefix="Nested")
-            x = serializer_a(near_end, context={"request": request}).data
+            serializer_a = get_serializer_for_model(near_end, prefix='Nested')
+            x = serializer_a(near_end, context={'request': request}).data
             if cable is not None:
-                y = serializers.TracedCableSerializer(
-                    cable, context={"request": request}
-                ).data
+                y = serializers.TracedCableSerializer(cable, context={'request': request}).data
             else:
                 y = None
             if far_end is not None:
-                serializer_b = get_serializer_for_model(far_end, prefix="Nested")
-                z = serializer_b(far_end, context={"request": request}).data
+                serializer_b = get_serializer_for_model(far_end, prefix='Nested')
+                z = serializer_b(far_end, context={'request': request}).data
             else:
                 z = None
 
@@ -103,10 +99,13 @@ class PassThroughPortMixin(object):
 # Regions
 #
 
-
 class RegionViewSet(ModelViewSet):
     queryset = Region.objects.add_related_count(
-        Region.objects.all(), Site, "region", "site_count", cumulative=True
+        Region.objects.all(),
+        Site,
+        'region',
+        'site_count',
+        cumulative=True
     )
     serializer_class = serializers.RegionSerializer
     filterset_class = filters.RegionFilterSet
@@ -115,7 +114,6 @@ class RegionViewSet(ModelViewSet):
 #
 # Sites
 #
-
 
 class SiteViewSet(CustomFieldModelViewSet):
     queryset = Site.objects.prefetch_related(
@@ -136,11 +134,14 @@ class SiteViewSet(CustomFieldModelViewSet):
 # Rack groups
 #
 
-
 class RackGroupViewSet(ModelViewSet):
     queryset = RackGroup.objects.add_related_count(
-        RackGroup.objects.all(), Rack, "group", "rack_count", cumulative=True
-    ).prefetch_related("site")
+        RackGroup.objects.all(),
+        Rack,
+        'group',
+        'rack_count',
+        cumulative=True
+    ).prefetch_related('site')
     serializer_class = serializers.RackGroupSerializer
     filterset_class = filters.RackGroupFilterSet
 
@@ -148,7 +149,6 @@ class RackGroupViewSet(ModelViewSet):
 #
 # Rack roles
 #
-
 
 class RackRoleViewSet(ModelViewSet):
     queryset = RackRole.objects.annotate(
@@ -162,10 +162,9 @@ class RackRoleViewSet(ModelViewSet):
 # Racks
 #
 
-
 class RackViewSet(CustomFieldModelViewSet):
     queryset = Rack.objects.prefetch_related(
-        "site", "group__site", "role", "tenant", "tags"
+        'site', 'group__site', 'role', 'tenant', 'tags'
     ).annotate(
         device_count=count_related(Device, 'rack'),
         powerfeed_count=count_related(PowerFeed, 'rack')
@@ -175,7 +174,7 @@ class RackViewSet(CustomFieldModelViewSet):
 
     @swagger_auto_schema(
         responses={200: serializers.RackUnitSerializer(many=True)},
-        query_serializer=serializers.RackElevationDetailFilterSerializer,
+        query_serializer=serializers.RackElevationDetailFilterSerializer
     )
     @action(detail=True)
     def elevation(self, request, pk=None):
@@ -188,40 +187,36 @@ class RackViewSet(CustomFieldModelViewSet):
             return Response(serializer.errors, 400)
         data = serializer.validated_data
 
-        if data["render"] == "svg":
+        if data['render'] == 'svg':
             # Render and return the elevation as an SVG drawing with the correct content type
             drawing = rack.get_elevation_svg(
-                face=data["face"],
+                face=data['face'],
                 user=request.user,
-                unit_width=data["unit_width"],
-                unit_height=data["unit_height"],
-                legend_width=data["legend_width"],
-                include_images=data["include_images"],
-                base_url=request.build_absolute_uri("/"),
+                unit_width=data['unit_width'],
+                unit_height=data['unit_height'],
+                legend_width=data['legend_width'],
+                include_images=data['include_images'],
+                base_url=request.build_absolute_uri('/')
             )
-            return HttpResponse(drawing.tostring(), content_type="image/svg+xml")
+            return HttpResponse(drawing.tostring(), content_type='image/svg+xml')
 
         else:
             # Return a JSON representation of the rack units in the elevation
             elevation = rack.get_rack_units(
-                face=data["face"],
+                face=data['face'],
                 user=request.user,
-                exclude=data["exclude"],
-                expand_devices=data["expand_devices"],
+                exclude=data['exclude'],
+                expand_devices=data['expand_devices']
             )
 
             # Enable filtering rack units by ID
-            q = data["q"]
+            q = data['q']
             if q:
-                elevation = [
-                    u for u in elevation if q in str(u["id"]) or q in str(u["name"])
-                ]
+                elevation = [u for u in elevation if q in str(u['id']) or q in str(u['name'])]
 
             page = self.paginate_queryset(elevation)
             if page is not None:
-                rack_units = serializers.RackUnitSerializer(
-                    page, many=True, context={"request": request}
-                )
+                rack_units = serializers.RackUnitSerializer(page, many=True, context={'request': request})
                 return self.get_paginated_response(rack_units.data)
 
 
@@ -229,9 +224,8 @@ class RackViewSet(CustomFieldModelViewSet):
 # Rack reservations
 #
 
-
 class RackReservationViewSet(ModelViewSet):
-    queryset = RackReservation.objects.prefetch_related("rack", "user", "tenant")
+    queryset = RackReservation.objects.prefetch_related('rack', 'user', 'tenant')
     serializer_class = serializers.RackReservationSerializer
     filterset_class = filters.RackReservationFilterSet
 
@@ -243,7 +237,6 @@ class RackReservationViewSet(ModelViewSet):
 #
 # Manufacturers
 #
-
 
 class ManufacturerViewSet(ModelViewSet):
     queryset = Manufacturer.objects.annotate(
@@ -259,7 +252,6 @@ class ManufacturerViewSet(ModelViewSet):
 # Device types
 #
 
-
 class DeviceTypeViewSet(CustomFieldModelViewSet):
     queryset = DeviceType.objects.prefetch_related('manufacturer', 'tags').annotate(
         device_count=count_related(Device, 'device_type')
@@ -273,53 +265,50 @@ class DeviceTypeViewSet(CustomFieldModelViewSet):
 # Device type components
 #
 
-
 class ConsolePortTemplateViewSet(ModelViewSet):
-    queryset = ConsolePortTemplate.objects.prefetch_related("device_type__manufacturer")
+    queryset = ConsolePortTemplate.objects.prefetch_related('device_type__manufacturer')
     serializer_class = serializers.ConsolePortTemplateSerializer
     filterset_class = filters.ConsolePortTemplateFilterSet
 
 
 class ConsoleServerPortTemplateViewSet(ModelViewSet):
-    queryset = ConsoleServerPortTemplate.objects.prefetch_related(
-        "device_type__manufacturer"
-    )
+    queryset = ConsoleServerPortTemplate.objects.prefetch_related('device_type__manufacturer')
     serializer_class = serializers.ConsoleServerPortTemplateSerializer
     filterset_class = filters.ConsoleServerPortTemplateFilterSet
 
 
 class PowerPortTemplateViewSet(ModelViewSet):
-    queryset = PowerPortTemplate.objects.prefetch_related("device_type__manufacturer")
+    queryset = PowerPortTemplate.objects.prefetch_related('device_type__manufacturer')
     serializer_class = serializers.PowerPortTemplateSerializer
     filterset_class = filters.PowerPortTemplateFilterSet
 
 
 class PowerOutletTemplateViewSet(ModelViewSet):
-    queryset = PowerOutletTemplate.objects.prefetch_related("device_type__manufacturer")
+    queryset = PowerOutletTemplate.objects.prefetch_related('device_type__manufacturer')
     serializer_class = serializers.PowerOutletTemplateSerializer
     filterset_class = filters.PowerOutletTemplateFilterSet
 
 
 class InterfaceTemplateViewSet(ModelViewSet):
-    queryset = InterfaceTemplate.objects.prefetch_related("device_type__manufacturer")
+    queryset = InterfaceTemplate.objects.prefetch_related('device_type__manufacturer')
     serializer_class = serializers.InterfaceTemplateSerializer
     filterset_class = filters.InterfaceTemplateFilterSet
 
 
 class FrontPortTemplateViewSet(ModelViewSet):
-    queryset = FrontPortTemplate.objects.prefetch_related("device_type__manufacturer")
+    queryset = FrontPortTemplate.objects.prefetch_related('device_type__manufacturer')
     serializer_class = serializers.FrontPortTemplateSerializer
     filterset_class = filters.FrontPortTemplateFilterSet
 
 
 class RearPortTemplateViewSet(ModelViewSet):
-    queryset = RearPortTemplate.objects.prefetch_related("device_type__manufacturer")
+    queryset = RearPortTemplate.objects.prefetch_related('device_type__manufacturer')
     serializer_class = serializers.RearPortTemplateSerializer
     filterset_class = filters.RearPortTemplateFilterSet
 
 
 class DeviceBayTemplateViewSet(ModelViewSet):
-    queryset = DeviceBayTemplate.objects.prefetch_related("device_type__manufacturer")
+    queryset = DeviceBayTemplate.objects.prefetch_related('device_type__manufacturer')
     serializer_class = serializers.DeviceBayTemplateSerializer
     filterset_class = filters.DeviceBayTemplateFilterSet
 
@@ -327,7 +316,6 @@ class DeviceBayTemplateViewSet(ModelViewSet):
 #
 # Device roles
 #
-
 
 class DeviceRoleViewSet(ModelViewSet):
     queryset = DeviceRole.objects.annotate(
@@ -341,7 +329,6 @@ class DeviceRoleViewSet(ModelViewSet):
 #
 # Platforms
 #
-
 
 class PlatformViewSet(ModelViewSet):
     queryset = Platform.objects.annotate(
@@ -358,17 +345,8 @@ class PlatformViewSet(ModelViewSet):
 
 class DeviceViewSet(ConfigContextQuerySetMixin, CustomFieldModelViewSet):
     queryset = Device.objects.prefetch_related(
-        "device_type__manufacturer",
-        "device_role",
-        "tenant",
-        "platform",
-        "site",
-        "rack",
-        "parent_bay",
-        "virtual_chassis__master",
-        "primary_ip4__nat_outside",
-        "primary_ip6__nat_outside",
-        "tags",
+        'device_type__manufacturer', 'device_role', 'tenant', 'platform', 'site', 'rack', 'parent_bay',
+        'virtual_chassis__master', 'primary_ip4__nat_outside', 'primary_ip6__nat_outside', 'tags',
     )
     filterset_class = filters.DeviceFilterSet
 
@@ -383,11 +361,11 @@ class DeviceViewSet(ConfigContextQuerySetMixin, CustomFieldModelViewSet):
         Else, return the DeviceWithConfigContextSerializer
         """
 
-        request = self.get_serializer_context()["request"]
-        if request.query_params.get("brief", False):
+        request = self.get_serializer_context()['request']
+        if request.query_params.get('brief', False):
             return serializers.NestedDeviceSerializer
 
-        elif "config_context" in request.query_params.get("exclude", []):
+        elif 'config_context' in request.query_params.get('exclude', []):
             return serializers.DeviceSerializer
 
         return serializers.DeviceWithConfigContextSerializer
@@ -395,27 +373,26 @@ class DeviceViewSet(ConfigContextQuerySetMixin, CustomFieldModelViewSet):
     @swagger_auto_schema(
         manual_parameters=[
             Parameter(
-                name="method", in_="query", required=True, type=openapi.TYPE_STRING
+                name='method',
+                in_='query',
+                required=True,
+                type=openapi.TYPE_STRING
             )
         ],
-        responses={"200": serializers.DeviceNAPALMSerializer},
+        responses={'200': serializers.DeviceNAPALMSerializer}
     )
-    @action(detail=True, url_path="napalm")
+    @action(detail=True, url_path='napalm')
     def napalm(self, request, pk):
         """
         Execute a NAPALM method on a Device
         """
         device = get_object_or_404(self.queryset, pk=pk)
         if not device.primary_ip:
-            raise ServiceUnavailable(
-                "This device does not have a primary IP address configured."
-            )
+            raise ServiceUnavailable("This device does not have a primary IP address configured.")
         if device.platform is None:
             raise ServiceUnavailable("No platform is configured for this device.")
         if not device.platform.napalm_driver:
-            raise ServiceUnavailable(
-                f"No NAPALM driver is configured for this device's platform: {device.platform}."
-            )
+            raise ServiceUnavailable(f"No NAPALM driver is configured for this device's platform: {device.platform}.")
 
         # Check for primary IP address from NetBox object
         if device.primary_ip:
@@ -433,35 +410,30 @@ class DeviceViewSet(ConfigContextQuerySetMixin, CustomFieldModelViewSet):
                 # Name lookup failure
                 raise ServiceUnavailable(
                     f"Name lookup failure, unable to resolve IP address for {device.name}. Please set Primary IP or "
-                    f"setup name resolution."
-                )
+                    f"setup name resolution.")
 
         # Check that NAPALM is installed
         try:
             import napalm
             from napalm.base.exceptions import ModuleImportError
         except ModuleNotFoundError as e:
-            if getattr(e, "name") == "napalm":
-                raise ServiceUnavailable(
-                    "NAPALM is not installed. Please see the documentation for instructions."
-                )
+            if getattr(e, 'name') == 'napalm':
+                raise ServiceUnavailable("NAPALM is not installed. Please see the documentation for instructions.")
             raise e
 
         # Validate the configured driver
         try:
             driver = napalm.get_network_driver(device.platform.napalm_driver)
         except ModuleImportError:
-            raise ServiceUnavailable(
-                "NAPALM driver for platform {} not found: {}.".format(
-                    device.platform, device.platform.napalm_driver
-                )
-            )
+            raise ServiceUnavailable("NAPALM driver for platform {} not found: {}.".format(
+                device.platform, device.platform.napalm_driver
+            ))
 
         # Verify user permission
-        if not request.user.has_perm("dcim.napalm_read_device"):
+        if not request.user.has_perm('dcim.napalm_read_device'):
             return HttpResponseForbidden()
 
-        napalm_methods = request.GET.getlist("method")
+        napalm_methods = request.GET.getlist('method')
         response = OrderedDict([(m, None) for m in napalm_methods])
         username = settings.NAPALM_USERNAME
         password = settings.NAPALM_PASSWORD
@@ -471,13 +443,13 @@ class DeviceViewSet(ConfigContextQuerySetMixin, CustomFieldModelViewSet):
 
         # Update NAPALM parameters according to the request headers
         for header in request.headers:
-            if header[:9].lower() != "x-napalm-":
+            if header[:9].lower() != 'x-napalm-':
                 continue
 
             key = header[9:]
-            if key.lower() == "username":
+            if key.lower() == 'username':
                 username = request.headers[header]
-            elif key.lower() == "password":
+            elif key.lower() == 'password':
                 password = request.headers[header]
             elif key:
                 optional_args[key.lower()] = request.headers[header]
@@ -488,33 +460,27 @@ class DeviceViewSet(ConfigContextQuerySetMixin, CustomFieldModelViewSet):
             username=username,
             password=password,
             timeout=settings.NAPALM_TIMEOUT,
-            optional_args=optional_args,
+            optional_args=optional_args
         )
         try:
             d.open()
         except Exception as e:
-            raise ServiceUnavailable(
-                "Error connecting to the device at {}: {}".format(host, e)
-            )
+            raise ServiceUnavailable("Error connecting to the device at {}: {}".format(host, e))
 
         # Validate and execute each specified NAPALM method
         for method in napalm_methods:
             if not hasattr(driver, method):
-                response[method] = {"error": "Unknown NAPALM method"}
+                response[method] = {'error': 'Unknown NAPALM method'}
                 continue
-            if not method.startswith("get_"):
-                response[method] = {"error": "Only get_* NAPALM methods are supported"}
+            if not method.startswith('get_'):
+                response[method] = {'error': 'Only get_* NAPALM methods are supported'}
                 continue
             try:
                 response[method] = getattr(d, method)()
             except NotImplementedError:
-                response[method] = {
-                    "error": "Method {} not implemented for NAPALM driver {}".format(
-                        method, driver
-                    )
-                }
+                response[method] = {'error': 'Method {} not implemented for NAPALM driver {}'.format(method, driver)}
             except Exception as e:
-                response[method] = {"error": "Method {} failed: {}".format(method, e)}
+                response[method] = {'error': 'Method {} failed: {}'.format(method, e)}
         d.close()
 
         return Response(response)
@@ -578,18 +544,14 @@ class RearPortViewSet(PassThroughPortMixin, ModelViewSet):
 
 
 class DeviceBayViewSet(ModelViewSet):
-    queryset = DeviceBay.objects.prefetch_related("installed_device").prefetch_related(
-        "tags"
-    )
+    queryset = DeviceBay.objects.prefetch_related('installed_device').prefetch_related('tags')
     serializer_class = serializers.DeviceBaySerializer
     filterset_class = filters.DeviceBayFilterSet
     brief_prefetch_fields = ['device']
 
 
 class InventoryItemViewSet(ModelViewSet):
-    queryset = InventoryItem.objects.prefetch_related(
-        "device", "manufacturer"
-    ).prefetch_related("tags")
+    queryset = InventoryItem.objects.prefetch_related('device', 'manufacturer').prefetch_related('tags')
     serializer_class = serializers.InventoryItemSerializer
     filterset_class = filters.InventoryItemFilterSet
     brief_prefetch_fields = ['device']
@@ -598,7 +560,6 @@ class InventoryItemViewSet(ModelViewSet):
 #
 # Connections
 #
-
 
 class ConsoleConnectionViewSet(ListModelMixin, GenericViewSet):
     queryset = ConsolePort.objects.prefetch_related('device', '_path').filter(
@@ -630,10 +591,11 @@ class InterfaceConnectionViewSet(ListModelMixin, GenericViewSet):
 # Cables
 #
 
-
 class CableViewSet(ModelViewSet):
     metadata_class = ContentTypeMetadata
-    queryset = Cable.objects.prefetch_related("termination_a", "termination_b")
+    queryset = Cable.objects.prefetch_related(
+        'termination_a', 'termination_b'
+    )
     serializer_class = serializers.CableSerializer
     filterset_class = filters.CableFilterSet
 
@@ -641,7 +603,6 @@ class CableViewSet(ModelViewSet):
 #
 # Virtual chassis
 #
-
 
 class VirtualChassisViewSet(ModelViewSet):
     queryset = VirtualChassis.objects.prefetch_related('tags').annotate(
@@ -655,7 +616,6 @@ class VirtualChassisViewSet(ModelViewSet):
 #
 # Power panels
 #
-
 
 class PowerPanelViewSet(ModelViewSet):
     queryset = PowerPanel.objects.prefetch_related(
@@ -683,7 +643,6 @@ class PowerFeedViewSet(PathEndpointMixin, CustomFieldModelViewSet):
 # Miscellaneous
 #
 
-
 class ConnectedDeviceViewSet(ViewSet):
     """
     This endpoint allows a user to determine what device (if any) is connected to a given peer device and peer
@@ -693,21 +652,20 @@ class ConnectedDeviceViewSet(ViewSet):
     * `peer_device`: The name of the peer device
     * `peer_interface`: The name of the peer interface
     """
-
     permission_classes = [IsAuthenticatedOrLoginNotRequired]
     _device_param = Parameter(
-        name="peer_device",
-        in_="query",
-        description="The name of the peer device",
+        name='peer_device',
+        in_='query',
+        description='The name of the peer device',
         required=True,
-        type=openapi.TYPE_STRING,
+        type=openapi.TYPE_STRING
     )
     _interface_param = Parameter(
-        name="peer_interface",
-        in_="query",
-        description="The name of the peer interface",
+        name='peer_interface',
+        in_='query',
+        description='The name of the peer interface',
         required=True,
-        type=openapi.TYPE_STRING,
+        type=openapi.TYPE_STRING
     )
 
     def get_view_name(self):
@@ -715,7 +673,7 @@ class ConnectedDeviceViewSet(ViewSet):
 
     @swagger_auto_schema(
         manual_parameters=[_device_param, _interface_param],
-        responses={"200": serializers.DeviceSerializer},
+        responses={'200': serializers.DeviceSerializer}
     )
     def list(self, request):
 
@@ -723,23 +681,17 @@ class ConnectedDeviceViewSet(ViewSet):
         peer_interface_name = request.query_params.get(self._interface_param.name)
 
         if not peer_device_name or not peer_interface_name:
-            raise MissingFilterException(
-                detail='Request must include "peer_device" and "peer_interface" filters.'
-            )
+            raise MissingFilterException(detail='Request must include "peer_device" and "peer_interface" filters.')
 
         # Determine local interface from peer interface's connection
         peer_interface = get_object_or_404(
             Interface.objects.all(),
             device__name=peer_device_name,
-            name=peer_interface_name,
+            name=peer_interface_name
         )
         local_interface = peer_interface.connected_endpoint
 
         if local_interface is None:
             return Response()
 
-        return Response(
-            serializers.DeviceSerializer(
-                local_interface.device, context={"request": request}
-            ).data
-        )
+        return Response(serializers.DeviceSerializer(local_interface.device, context={'request': request}).data)

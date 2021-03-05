@@ -9,7 +9,6 @@ class TreeQuerySet(TreeQuerySet_, RestrictedQuerySet):
     """
     Mate django-mptt's TreeQuerySet with our RestrictedQuerySet for permissions enforcement.
     """
-
     pass
 
 
@@ -17,5 +16,4 @@ class TreeManager(Manager.from_queryset(TreeQuerySet), TreeManager_):
     """
     Extend django-mptt's TreeManager to incorporate RestrictedQuerySet().
     """
-
     pass

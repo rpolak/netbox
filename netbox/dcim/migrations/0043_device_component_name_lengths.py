@@ -6,63 +6,63 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("dcim", "0042_interface_ff_10ge_cx4"),
+        ('dcim', '0042_interface_ff_10ge_cx4'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name="consoleport",
-            name="name",
+            model_name='consoleport',
+            name='name',
             field=models.CharField(max_length=50),
         ),
         migrations.AlterField(
-            model_name="consoleporttemplate",
-            name="name",
+            model_name='consoleporttemplate',
+            name='name',
             field=models.CharField(max_length=50),
         ),
         migrations.AlterField(
-            model_name="consoleserverport",
-            name="name",
+            model_name='consoleserverport',
+            name='name',
             field=models.CharField(max_length=50),
         ),
         migrations.AlterField(
-            model_name="consoleserverporttemplate",
-            name="name",
+            model_name='consoleserverporttemplate',
+            name='name',
             field=models.CharField(max_length=50),
         ),
         migrations.AlterField(
-            model_name="devicebaytemplate",
-            name="name",
+            model_name='devicebaytemplate',
+            name='name',
             field=models.CharField(max_length=50),
         ),
         migrations.AlterField(
-            model_name="interface",
-            name="name",
+            model_name='interface',
+            name='name',
             field=models.CharField(max_length=64),
         ),
         migrations.AlterField(
-            model_name="interfacetemplate",
-            name="name",
+            model_name='interfacetemplate',
+            name='name',
             field=models.CharField(max_length=64),
         ),
         migrations.AlterField(
-            model_name="poweroutlet",
-            name="name",
+            model_name='poweroutlet',
+            name='name',
             field=models.CharField(max_length=50),
         ),
         migrations.AlterField(
-            model_name="poweroutlettemplate",
-            name="name",
+            model_name='poweroutlettemplate',
+            name='name',
             field=models.CharField(max_length=50),
         ),
         migrations.AlterField(
-            model_name="powerport",
-            name="name",
+            model_name='powerport',
+            name='name',
             field=models.CharField(max_length=50),
         ),
         migrations.AlterField(
-            model_name="powerporttemplate",
-            name="name",
+            model_name='powerporttemplate',
+            name='name',
             field=models.CharField(max_length=50),
         ),
     ]

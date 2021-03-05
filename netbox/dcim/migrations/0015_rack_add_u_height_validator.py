@@ -7,20 +7,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("dcim", "0014_rack_add_type_width"),
+        ('dcim', '0014_rack_add_type_width'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name="rack",
-            name="u_height",
-            field=models.PositiveSmallIntegerField(
-                default=42,
-                validators=[
-                    django.core.validators.MinValueValidator(1),
-                    django.core.validators.MaxValueValidator(100),
-                ],
-                verbose_name=b"Height (U)",
-            ),
+            model_name='rack',
+            name='u_height',
+            field=models.PositiveSmallIntegerField(default=42, validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(100)], verbose_name=b'Height (U)'),
         ),
     ]

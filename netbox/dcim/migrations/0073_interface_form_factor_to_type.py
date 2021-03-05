@@ -6,18 +6,18 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("dcim", "0072_powerfeeds"),
+        ('dcim', '0072_powerfeeds'),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name="interface",
-            old_name="form_factor",
-            new_name="type",
+            model_name='interface',
+            old_name='form_factor',
+            new_name='type',
         ),
         migrations.RenameField(
-            model_name="interfacetemplate",
-            old_name="form_factor",
-            new_name="type",
+            model_name='interfacetemplate',
+            old_name='form_factor',
+            new_name='type',
         ),
     ]

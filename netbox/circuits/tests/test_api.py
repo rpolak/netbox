@@ -7,128 +7,129 @@ from utilities.testing import APITestCase, APIViewTestCases
 
 
 class AppTest(APITestCase):
+
     def test_root(self):
-        url = reverse("circuits-api:api-root")
-        response = self.client.get("{}?format=api".format(url), **self.header)
+        url = reverse('circuits-api:api-root')
+        response = self.client.get('{}?format=api'.format(url), **self.header)
 
         self.assertEqual(response.status_code, 200)
 
 
 class ProviderTest(APIViewTestCases.APIViewTestCase):
     model = Provider
-    brief_fields = ["circuit_count", "id", "name", "slug", "url"]
+    brief_fields = ['circuit_count', 'id', 'name', 'slug', 'url']
     create_data = [
         {
-            "name": "Provider 4",
-            "slug": "provider-4",
+            'name': 'Provider 4',
+            'slug': 'provider-4',
         },
         {
-            "name": "Provider 5",
-            "slug": "provider-5",
+            'name': 'Provider 5',
+            'slug': 'provider-5',
         },
         {
-            "name": "Provider 6",
-            "slug": "provider-6",
+            'name': 'Provider 6',
+            'slug': 'provider-6',
         },
     ]
     bulk_update_data = {
-        "asn": 1234,
+        'asn': 1234,
     }
 
     @classmethod
     def setUpTestData(cls):
 
         providers = (
-            Provider(name="Provider 1", slug="provider-1"),
-            Provider(name="Provider 2", slug="provider-2"),
-            Provider(name="Provider 3", slug="provider-3"),
+            Provider(name='Provider 1', slug='provider-1'),
+            Provider(name='Provider 2', slug='provider-2'),
+            Provider(name='Provider 3', slug='provider-3'),
         )
         Provider.objects.bulk_create(providers)
 
 
 class CircuitTypeTest(APIViewTestCases.APIViewTestCase):
     model = CircuitType
-    brief_fields = ["circuit_count", "id", "name", "slug", "url"]
+    brief_fields = ['circuit_count', 'id', 'name', 'slug', 'url']
     create_data = (
         {
-            "name": "Circuit Type 4",
-            "slug": "circuit-type-4",
+            'name': 'Circuit Type 4',
+            'slug': 'circuit-type-4',
         },
         {
-            "name": "Circuit Type 5",
-            "slug": "circuit-type-5",
+            'name': 'Circuit Type 5',
+            'slug': 'circuit-type-5',
         },
         {
-            "name": "Circuit Type 6",
-            "slug": "circuit-type-6",
+            'name': 'Circuit Type 6',
+            'slug': 'circuit-type-6',
         },
     )
     bulk_update_data = {
-        "description": "New description",
+        'description': 'New description',
     }
 
     @classmethod
     def setUpTestData(cls):
 
         circuit_types = (
-            CircuitType(name="Circuit Type 1", slug="circuit-type-1"),
-            CircuitType(name="Circuit Type 2", slug="circuit-type-2"),
-            CircuitType(name="Circuit Type 3", slug="circuit-type-3"),
+            CircuitType(name='Circuit Type 1', slug='circuit-type-1'),
+            CircuitType(name='Circuit Type 2', slug='circuit-type-2'),
+            CircuitType(name='Circuit Type 3', slug='circuit-type-3'),
         )
         CircuitType.objects.bulk_create(circuit_types)
 
 
 class CircuitTest(APIViewTestCases.APIViewTestCase):
     model = Circuit
-    brief_fields = ["cid", "id", "url"]
+    brief_fields = ['cid', 'id', 'url']
     bulk_update_data = {
-        "status": "planned",
+        'status': 'planned',
     }
 
     @classmethod
     def setUpTestData(cls):
 
         providers = (
-            Provider(name="Provider 1", slug="provider-1"),
-            Provider(name="Provider 2", slug="provider-2"),
+            Provider(name='Provider 1', slug='provider-1'),
+            Provider(name='Provider 2', slug='provider-2'),
         )
         Provider.objects.bulk_create(providers)
 
         circuit_types = (
-            CircuitType(name="Circuit Type 1", slug="circuit-type-1"),
-            CircuitType(name="Circuit Type 2", slug="circuit-type-2"),
+            CircuitType(name='Circuit Type 1', slug='circuit-type-1'),
+            CircuitType(name='Circuit Type 2', slug='circuit-type-2'),
         )
         CircuitType.objects.bulk_create(circuit_types)
 
         circuits = (
-            Circuit(cid="Circuit 1", provider=providers[0], type=circuit_types[0]),
-            Circuit(cid="Circuit 2", provider=providers[0], type=circuit_types[0]),
-            Circuit(cid="Circuit 3", provider=providers[0], type=circuit_types[0]),
+            Circuit(cid='Circuit 1', provider=providers[0], type=circuit_types[0]),
+            Circuit(cid='Circuit 2', provider=providers[0], type=circuit_types[0]),
+            Circuit(cid='Circuit 3', provider=providers[0], type=circuit_types[0]),
         )
         Circuit.objects.bulk_create(circuits)
 
         cls.create_data = [
             {
-                "cid": "Circuit 4",
-                "provider": providers[1].pk,
-                "type": circuit_types[1].pk,
+                'cid': 'Circuit 4',
+                'provider': providers[1].pk,
+                'type': circuit_types[1].pk,
             },
             {
-                "cid": "Circuit 5",
-                "provider": providers[1].pk,
-                "type": circuit_types[1].pk,
+                'cid': 'Circuit 5',
+                'provider': providers[1].pk,
+                'type': circuit_types[1].pk,
             },
             {
-                "cid": "Circuit 6",
-                "provider": providers[1].pk,
-                "type": circuit_types[1].pk,
+                'cid': 'Circuit 6',
+                'provider': providers[1].pk,
+                'type': circuit_types[1].pk,
             },
         ]
 
 
 class CircuitTerminationTest(APIViewTestCases.APIViewTestCase):
     model = CircuitTermination
-    brief_fields = ["cable", "circuit", "id", "term_side", "url"]
+    brief_fields = ['cable', 'circuit', 'id', 'term_side', 'url']
 
     @classmethod
     def setUpTestData(cls):
@@ -136,20 +137,18 @@ class CircuitTerminationTest(APIViewTestCases.APIViewTestCase):
         SIDE_Z = CircuitTerminationSideChoices.SIDE_Z
 
         sites = (
-            Site(name="Site 1", slug="site-1"),
-            Site(name="Site 2", slug="site-2"),
+            Site(name='Site 1', slug='site-1'),
+            Site(name='Site 2', slug='site-2'),
         )
         Site.objects.bulk_create(sites)
 
-        provider = Provider.objects.create(name="Provider 1", slug="provider-1")
-        circuit_type = CircuitType.objects.create(
-            name="Circuit Type 1", slug="circuit-type-1"
-        )
+        provider = Provider.objects.create(name='Provider 1', slug='provider-1')
+        circuit_type = CircuitType.objects.create(name='Circuit Type 1', slug='circuit-type-1')
 
         circuits = (
-            Circuit(cid="Circuit 1", provider=provider, type=circuit_type),
-            Circuit(cid="Circuit 2", provider=provider, type=circuit_type),
-            Circuit(cid="Circuit 3", provider=provider, type=circuit_type),
+            Circuit(cid='Circuit 1', provider=provider, type=circuit_type),
+            Circuit(cid='Circuit 2', provider=provider, type=circuit_type),
+            Circuit(cid='Circuit 3', provider=provider, type=circuit_type),
         )
         Circuit.objects.bulk_create(circuits)
 
@@ -163,17 +162,19 @@ class CircuitTerminationTest(APIViewTestCases.APIViewTestCase):
 
         cls.create_data = [
             {
-                "circuit": circuits[2].pk,
-                "term_side": SIDE_A,
-                "site": sites[1].pk,
-                "port_speed": 200000,
+                'circuit': circuits[2].pk,
+                'term_side': SIDE_A,
+                'site': sites[1].pk,
+                'port_speed': 200000,
             },
             {
-                "circuit": circuits[2].pk,
-                "term_side": SIDE_Z,
-                "site": sites[1].pk,
-                "port_speed": 200000,
+                'circuit': circuits[2].pk,
+                'term_side': SIDE_Z,
+                'site': sites[1].pk,
+                'port_speed': 200000,
             },
         ]
 
-        cls.bulk_update_data = {"port_speed": 123456}
+        cls.bulk_update_data = {
+            'port_speed': 123456
+        }

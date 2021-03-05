@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("dcim", "0022_color_names_to_rgb"),
+        ('dcim', '0022_color_names_to_rgb'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="devicetype",
-            name="comments",
+            model_name='devicetype',
+            name='comments',
             field=models.TextField(blank=True),
         ),
     ]

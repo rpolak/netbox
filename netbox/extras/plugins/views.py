@@ -15,23 +15,17 @@ class InstalledPluginsAdminView(View):
     """
     Admin view for listing all installed plugins
     """
-
     def get(self, request):
         plugins = [apps.get_app_config(plugin) for plugin in settings.PLUGINS]
-        return render(
-            request,
-            "extras/admin/plugins_list.html",
-            {
-                "plugins": plugins,
-            },
-        )
+        return render(request, 'extras/admin/plugins_list.html', {
+            'plugins': plugins,
+        })
 
 
 class InstalledPluginsAPIView(APIView):
     """
     API view for listing all installed plugins
     """
-
     permission_classes = [permissions.IsAdminUser]
     _ignore_model_permissions = True
     exclude_from_schema = True
@@ -43,21 +37,16 @@ class InstalledPluginsAPIView(APIView):
     @staticmethod
     def _get_plugin_data(plugin_app_config):
         return {
-            "name": plugin_app_config.verbose_name,
-            "package": plugin_app_config.name,
-            "author": plugin_app_config.author,
-            "author_email": plugin_app_config.author_email,
-            "description": plugin_app_config.description,
-            "verison": plugin_app_config.version,
+            'name': plugin_app_config.verbose_name,
+            'package': plugin_app_config.name,
+            'author': plugin_app_config.author,
+            'author_email': plugin_app_config.author_email,
+            'description': plugin_app_config.description,
+            'verison': plugin_app_config.version
         }
 
     def get(self, request, format=None):
-        return Response(
-            [
-                self._get_plugin_data(apps.get_app_config(plugin))
-                for plugin in settings.PLUGINS
-            ]
-        )
+        return Response([self._get_plugin_data(apps.get_app_config(plugin)) for plugin in settings.PLUGINS])
 
 
 class PluginsAPIRootView(APIView):
@@ -71,16 +60,13 @@ class PluginsAPIRootView(APIView):
     @staticmethod
     def _get_plugin_entry(plugin, app_config, request, format):
         # Check if the plugin specifies any API URLs
-        api_app_name = f"{app_config.name}-api"
+        api_app_name = f'{app_config.name}-api'
         try:
-            entry = (
-                getattr(app_config, "base_url", app_config.label),
-                reverse(
-                    f"plugins-api:{api_app_name}:api-root",
-                    request=request,
-                    format=format,
-                ),
-            )
+            entry = (getattr(app_config, 'base_url', app_config.label), reverse(
+                f"plugins-api:{api_app_name}:api-root",
+                request=request,
+                format=format
+            ))
         except NoReverseMatch:
             # The plugin does not include an api-root url
             entry = None
@@ -96,16 +82,7 @@ class PluginsAPIRootView(APIView):
             if entry is not None:
                 entries.append(entry)
 
-        return Response(
-            OrderedDict(
-                (
-                    (
-                        "installed-plugins",
-                        reverse(
-                            "plugins-api:plugins-list", request=request, format=format
-                        ),
-                    ),
-                    *entries,
-                )
-            )
-        )
+        return Response(OrderedDict((
+            ('installed-plugins', reverse('plugins-api:plugins-list', request=request, format=format)),
+            *entries
+        )))
