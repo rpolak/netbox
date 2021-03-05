@@ -9,7 +9,6 @@ from netbox.api import ContentTypeField
 
 
 class BulkOperationMetadata(SimpleMetadata):
-
     def determine_actions(self, request, view):
         """
         Replace the stock determine_actions() method to assess object permissions only
@@ -17,14 +16,18 @@ class BulkOperationMetadata(SimpleMetadata):
         with bulk update in place (see #5470).
         """
         actions = {}
-        for method in {'PUT', 'POST'} & set(view.allowed_methods):
+        for method in {"PUT", "POST"} & set(view.allowed_methods):
             view.request = clone_request(request, method)
             try:
                 # Test global permissions
-                if hasattr(view, 'check_permissions'):
+                if hasattr(view, "check_permissions"):
                     view.check_permissions(view.request)
                 # Test object permissions (if viewing a specific object)
-                if method == 'PUT' and view.lookup_url_kwarg and hasattr(view, 'get_object'):
+                if (
+                    method == "PUT"
+                    and view.lookup_url_kwarg
+                    and hasattr(view, "get_object")
+                ):
                     view.get_object()
             except (exceptions.APIException, PermissionDenied, Http404):
                 pass
@@ -40,16 +43,19 @@ class BulkOperationMetadata(SimpleMetadata):
 
 
 class ContentTypeMetadata(BulkOperationMetadata):
-
     def get_field_info(self, field):
         field_info = super().get_field_info(field)
-        if hasattr(field, 'queryset') and not field_info.get('read_only') and isinstance(field, ContentTypeField):
-            field_info['choices'] = [
+        if (
+            hasattr(field, "queryset")
+            and not field_info.get("read_only")
+            and isinstance(field, ContentTypeField)
+        ):
+            field_info["choices"] = [
                 {
-                    'value': choice_value,
-                    'display_name': force_str(choice_name, strings_only=True)
+                    "value": choice_value,
+                    "display_name": force_str(choice_name, strings_only=True),
                 }
                 for choice_value, choice_name in field.choices.items()
             ]
-            field_info['choices'].sort(key=lambda item: item['display_name'])
+            field_info["choices"].sort(key=lambda item: item["display_name"])
         return field_info

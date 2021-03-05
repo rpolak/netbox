@@ -132,4 +132,4 @@ class GetReturnURLMixin:
                 pass
 
         # If all else fails, return home. Ideally this should never happen.
-        return reverse('home')
+        return reverse("home")

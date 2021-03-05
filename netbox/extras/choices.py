@@ -82,9 +82,9 @@ class ObjectChangeActionChoices(ChoiceSet):
     )
 
     CSS_CLASSES = {
-        ACTION_CREATE: 'success',
-        ACTION_UPDATE: 'primary',
-        ACTION_DELETE: 'danger',
+        ACTION_CREATE: "success",
+        ACTION_UPDATE: "primary",
+        ACTION_DELETE: "danger",
     }
 
 
@@ -110,11 +110,11 @@ class LogLevelChoices(ChoiceSet):
     )
 
     CSS_CLASSES = {
-        LOG_DEFAULT: 'default',
-        LOG_SUCCESS: 'success',
-        LOG_INFO: 'info',
-        LOG_WARNING: 'warning',
-        LOG_FAILURE: 'danger',
+        LOG_DEFAULT: "default",
+        LOG_SUCCESS: "success",
+        LOG_INFO: "info",
+        LOG_WARNING: "warning",
+        LOG_FAILURE: "danger",
     }
 
 

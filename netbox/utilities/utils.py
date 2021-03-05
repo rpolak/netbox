@@ -92,8 +92,8 @@ def serialize_object(obj, extra=None, exclude=None):
     data = json.loads(json_str)[0]["fields"]
 
     # Include custom_field_data as "custom_fields"
-    if hasattr(obj, 'custom_field_data'):
-        data['custom_fields'] = data.pop('custom_field_data')
+    if hasattr(obj, "custom_field_data"):
+        data["custom_fields"] = data.pop("custom_field_data")
 
     # Include any tags. Check for tags cached on the instance; fall back to using the manager.
     if is_taggable(obj):
@@ -293,8 +293,10 @@ def array_to_string(array):
     For example:
         [0, 1, 2, 10, 14, 15, 16] => "0-2, 10, 14-16"
     """
-    group = (list(x) for _, x in groupby(sorted(array), lambda x, c=count(): next(c) - x))
-    return ', '.join('-'.join(map(str, (g[0], g[-1])[:len(g)])) for g in group)
+    group = (
+        list(x) for _, x in groupby(sorted(array), lambda x, c=count(): next(c) - x)
+    )
+    return ", ".join("-".join(map(str, (g[0], g[-1])[: len(g)])) for g in group)
 
 
 #

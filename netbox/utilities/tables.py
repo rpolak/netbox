@@ -14,6 +14,7 @@ class BaseTable(tables.Table):
 
     :param user: Personalize table display for the given user (optional). Has no effect if AnonymousUser is passed.
     """
+
     class Meta:
         attrs = {
             "class": "table table-hover table-headings",
@@ -39,8 +40,8 @@ class BaseTable(tables.Table):
         if user is not None and not isinstance(user, AnonymousUser):
             columns = user.config.get(f"tables.{self.__class__.__name__}.columns")
             if columns:
-                pk = self.base_columns.pop('pk', None)
-                actions = self.base_columns.pop('actions', None)
+                pk = self.base_columns.pop("pk", None)
+                actions = self.base_columns.pop("actions", None)
 
                 for name, column in self.base_columns.items():
                     if name in columns:
@@ -51,18 +52,18 @@ class BaseTable(tables.Table):
 
                 # Always include PK and actions column, if defined on the table
                 if pk:
-                    self.base_columns['pk'] = pk
-                    self.sequence.insert(0, 'pk')
+                    self.base_columns["pk"] = pk
+                    self.sequence.insert(0, "pk")
                 if actions:
-                    self.base_columns['actions'] = actions
-                    self.sequence.append('actions')
+                    self.base_columns["actions"] = actions
+                    self.sequence.append("actions")
 
         # Dynamically update the table's QuerySet to ensure related fields are pre-fetched
         if isinstance(self.data, TableQuerysetData):
             prefetch_fields = []
             for column in self.columns:
                 if column.visible:
-                    model = getattr(self.Meta, 'model')
+                    model = getattr(self.Meta, "model")
                     accessor = column.accessor
                     prefetch_path = []
                     for field_name in accessor.split(accessor.SEPARATOR):
@@ -79,8 +80,10 @@ class BaseTable(tables.Table):
                             prefetch_path.append(field_name)
                             break
                     if prefetch_path:
-                        prefetch_fields.append('__'.join(prefetch_path))
-            self.data.data = self.data.data.prefetch_related(None).prefetch_related(*prefetch_fields)
+                        prefetch_fields.append("__".join(prefetch_path))
+            self.data.data = self.data.data.prefetch_related(None).prefetch_related(
+                *prefetch_fields
+            )
 
     @property
     def configurable_columns(self):
@@ -131,11 +134,15 @@ class BooleanColumn(tables.Column):
 
     def render(self, value):
         if value:
-            rendered = '<span class="text-success"><i class="mdi mdi-check-bold"></i></span>'
+            rendered = (
+                '<span class="text-success"><i class="mdi mdi-check-bold"></i></span>'
+            )
         elif value is None:
             rendered = '<span class="text-muted">&mdash;</span>'
         else:
-            rendered = '<span class="text-danger"><i class="mdi mdi-close-thick"></i></span>'
+            rendered = (
+                '<span class="text-danger"><i class="mdi mdi-close-thick"></i></span>'
+            )
         return mark_safe(rendered)
 
 
@@ -177,7 +184,7 @@ class ButtonsColumn(tables.TemplateColumn):
         buttons=None,
         prepend_template=None,
         return_url_extra="",
-        **kwargs
+        **kwargs,
     ):
         if prepend_template:
             prepend_template = prepend_template.replace("{", "{{")
@@ -209,14 +216,13 @@ class ChoiceFieldColumn(tables.Column):
     Render a ChoiceField value inside a <span> indicating a particular CSS class. This is useful for displaying colored
     choices. The CSS class is derived by calling .get_FOO_class() on the row record.
     """
+
     def render(self, record, bound_column, value):
         if value:
             name = bound_column.name
-            css_class = getattr(record, f'get_{name}_class')()
-            label = getattr(record, f'get_{name}_display')()
-            return mark_safe(
-                f'<span class="label label-{css_class}">{label}</span>'
-            )
+            css_class = getattr(record, f"get_{name}_class")()
+            label = getattr(record, f"get_{name}_display")()
+            return mark_safe(f'<span class="label label-{css_class}">{label}</span>')
         return self.default
 
 
@@ -253,7 +259,10 @@ class LinkedCountColumn(tables.Column):
     :param view_kwargs: Additional kwargs to pass for URL resolution (optional)
     :param url_params: A dict of query parameters to append to the URL (e.g. ?foo=bar) (optional)
     """
-    def __init__(self, viewname, *args, view_kwargs=None, url_params=None, default=0, **kwargs):
+
+    def __init__(
+        self, viewname, *args, view_kwargs=None, url_params=None, default=0, **kwargs
+    ):
         self.viewname = viewname
         self.view_kwargs = view_kwargs or {}
         self.url_params = url_params
@@ -263,7 +272,9 @@ class LinkedCountColumn(tables.Column):
         if value:
             url = reverse(self.viewname, kwargs=self.view_kwargs)
             if self.url_params:
-                url += '?' + '&'.join([f'{k}={getattr(record, v)}' for k, v in self.url_params.items()])
+                url += "?" + "&".join(
+                    [f"{k}={getattr(record, v)}" for k, v in self.url_params.items()]
+                )
             return mark_safe(f'<a href="{url}">{value}</a>')
         return value
 

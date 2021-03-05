@@ -20,14 +20,9 @@ class TenantGroup(MPTTModel, ChangeLoggedModel):
     """
     An arbitrary collection of Tenants.
     """
-    name = models.CharField(
-        max_length=100,
-        unique=True
-    )
-    slug = models.SlugField(
-        max_length=100,
-        unique=True
-    )
+
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
     parent = TreeForeignKey(
         to="self",
         on_delete=models.CASCADE,
@@ -80,14 +75,9 @@ class Tenant(ChangeLoggedModel, CustomFieldModel):
     A Tenant represents an organization served by the NetBox owner. This is typically a customer or an internal
     department.
     """
-    name = models.CharField(
-        max_length=100,
-        unique=True
-    )
-    slug = models.SlugField(
-        max_length=100,
-        unique=True
-    )
+
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
     group = models.ForeignKey(
         to="tenancy.TenantGroup",
         on_delete=models.SET_NULL,

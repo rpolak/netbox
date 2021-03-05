@@ -32,7 +32,7 @@ class ProviderTest(APIViewTestCases.APIViewTestCase):
         },
     ]
     bulk_update_data = {
-        'asn': 1234,
+        "asn": 1234,
     }
 
     @classmethod
@@ -64,7 +64,7 @@ class CircuitTypeTest(APIViewTestCases.APIViewTestCase):
         },
     )
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
 
     @classmethod
@@ -80,9 +80,9 @@ class CircuitTypeTest(APIViewTestCases.APIViewTestCase):
 
 class CircuitTest(APIViewTestCases.APIViewTestCase):
     model = Circuit
-    brief_fields = ['cid', 'id', 'url']
+    brief_fields = ["cid", "id", "url"]
     bulk_update_data = {
-        'status': 'planned',
+        "status": "planned",
     }
 
     @classmethod
@@ -176,6 +176,4 @@ class CircuitTerminationTest(APIViewTestCases.APIViewTestCase):
             },
         ]
 
-        cls.bulk_update_data = {
-            'port_speed': 123456
-        }
+        cls.bulk_update_data = {"port_speed": 123456}

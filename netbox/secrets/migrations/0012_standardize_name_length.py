@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('secrets', '0011_secret_generic_assignments'),
+        ("secrets", "0011_secret_generic_assignments"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='secretrole',
-            name='name',
+            model_name="secretrole",
+            name="name",
             field=models.CharField(max_length=100, unique=True),
         ),
         migrations.AlterField(
-            model_name='secretrole',
-            name='slug',
+            model_name="secretrole",
+            name="slug",
             field=models.SlugField(max_length=100, unique=True),
         ),
     ]

@@ -22,7 +22,9 @@ __all__ = (
 )
 
 
-class ProviderFilterSet(BaseFilterSet, CustomFieldModelFilterSet, CreatedUpdatedFilterSet):
+class ProviderFilterSet(
+    BaseFilterSet, CustomFieldModelFilterSet, CreatedUpdatedFilterSet
+):
     q = django_filters.CharFilter(
         method="search",
         label="Search",
@@ -148,7 +150,9 @@ class CircuitFilterSet(
         ).distinct()
 
 
-class CircuitTerminationFilterSet(BaseFilterSet, CableTerminationFilterSet, PathEndpointFilterSet):
+class CircuitTerminationFilterSet(
+    BaseFilterSet, CableTerminationFilterSet, PathEndpointFilterSet
+):
     q = django_filters.CharFilter(
         method="search",
         label="Search",

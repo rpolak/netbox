@@ -58,8 +58,9 @@ class PathField(ArrayField):
     """
     An ArrayField which holds a set of objects, each identified by a (type, ID) tuple.
     """
+
     def __init__(self, **kwargs):
-        kwargs['base_field'] = models.CharField(max_length=40)
+        kwargs["base_field"] = models.CharField(max_length=40)
         super().__init__(**kwargs)
 
 

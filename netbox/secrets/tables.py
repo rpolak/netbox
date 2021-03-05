@@ -1,6 +1,12 @@
 import django_tables2 as tables
 
-from utilities.tables import BaseTable, ButtonsColumn, LinkedCountColumn, TagColumn, ToggleColumn
+from utilities.tables import (
+    BaseTable,
+    ButtonsColumn,
+    LinkedCountColumn,
+    TagColumn,
+    ToggleColumn,
+)
 from .models import SecretRole, Secret
 
 
@@ -13,11 +19,11 @@ class SecretRoleTable(BaseTable):
     pk = ToggleColumn()
     name = tables.LinkColumn()
     secret_count = LinkedCountColumn(
-        viewname='secrets:secret_list',
-        url_params={'role': 'slug'},
-        verbose_name='Secrets'
+        viewname="secrets:secret_list",
+        url_params={"role": "slug"},
+        verbose_name="Secrets",
     )
-    actions = ButtonsColumn(SecretRole, pk_field='slug')
+    actions = ButtonsColumn(SecretRole, pk_field="slug")
 
     class Meta(BaseTable.Meta):
         model = SecretRole
@@ -32,21 +38,28 @@ class SecretRoleTable(BaseTable):
 
 class SecretTable(BaseTable):
     pk = ToggleColumn()
-    id = tables.Column(  # Provides a link to the secret
-        linkify=True
-    )
-    assigned_object = tables.Column(
-        linkify=True,
-        verbose_name='Assigned object'
-    )
-    role = tables.Column(
-        linkify=True
-    )
-    tags = TagColumn(
-        url_name='secrets:secret_list'
-    )
+    id = tables.Column(linkify=True)  # Provides a link to the secret
+    assigned_object = tables.Column(linkify=True, verbose_name="Assigned object")
+    role = tables.Column(linkify=True)
+    tags = TagColumn(url_name="secrets:secret_list")
 
     class Meta(BaseTable.Meta):
         model = Secret
-        fields = ('pk', 'id', 'assigned_object', 'role', 'name', 'last_updated', 'hash', 'tags')
-        default_columns = ('pk', 'id', 'assigned_object', 'role', 'name', 'last_updated')
+        fields = (
+            "pk",
+            "id",
+            "assigned_object",
+            "role",
+            "name",
+            "last_updated",
+            "hash",
+            "tags",
+        )
+        default_columns = (
+            "pk",
+            "id",
+            "assigned_object",
+            "role",
+            "name",
+            "last_updated",
+        )

@@ -15,6 +15,7 @@ class ChoiceField(serializers.Field):
     :param choices: An iterable of choices in the form (value, key).
     :param allow_blank: Allow blank values in addition to the listed choices.
     """
+
     def __init__(self, choices, allow_blank=False, **kwargs):
         self.choiceset = choices
         self.allow_blank = allow_blank
@@ -36,32 +37,31 @@ class ChoiceField(serializers.Field):
             if self.allow_null:
                 return True, None
             else:
-                data = ''
+                data = ""
         return super().validate_empty_values(data)
 
     def to_representation(self, obj):
-        if obj == '':
+        if obj == "":
             return None
-        return OrderedDict([
-            ('value', obj),
-            ('label', self._choices[obj])
-        ])
+        return OrderedDict([("value", obj), ("label", self._choices[obj])])
 
     def to_internal_value(self, data):
-        if data == '':
+        if data == "":
             if self.allow_blank:
                 return data
             raise ValidationError("This field may not be blank.")
 
         # Provide an explicit error message if the request is trying to write a dict or list
         if isinstance(data, (dict, list)):
-            raise ValidationError('Value must be passed directly (e.g. "foo": 123); do not use a dictionary or list.')
+            raise ValidationError(
+                'Value must be passed directly (e.g. "foo": 123); do not use a dictionary or list.'
+            )
 
         # Check for string representations of boolean/integer values
-        if hasattr(data, 'lower'):
-            if data.lower() == 'true':
+        if hasattr(data, "lower"):
+            if data.lower() == "true":
                 data = True
-            elif data.lower() == 'false':
+            elif data.lower() == "false":
                 data = False
             else:
                 try:
@@ -86,6 +86,7 @@ class ContentTypeField(RelatedField):
     """
     Represent a ContentType as '<app_label>.<model>'
     """
+
     default_error_messages = {
         "does_not_exist": "Invalid content type: {content_type}",
         "invalid": "Invalid value. Specify a content type as '<app_label>.<model_name>'.",
@@ -93,12 +94,12 @@ class ContentTypeField(RelatedField):
 
     def to_internal_value(self, data):
         try:
-            app_label, model = data.split('.')
+            app_label, model = data.split(".")
             return self.queryset.get(app_label=app_label, model=model)
         except ObjectDoesNotExist:
-            self.fail('does_not_exist', content_type=data)
+            self.fail("does_not_exist", content_type=data)
         except (AttributeError, TypeError, ValueError):
-            self.fail('invalid')
+            self.fail("invalid")
 
     def to_representation(self, obj):
         return f"{obj.app_label}.{obj.model}"
@@ -108,6 +109,7 @@ class TimeZoneField(serializers.Field):
     """
     Represent a pytz time zone.
     """
+
     def to_representation(self, obj):
         return obj.zone if obj else None
 
@@ -115,7 +117,11 @@ class TimeZoneField(serializers.Field):
         if not data:
             return ""
         if data not in pytz.common_timezones:
-            raise ValidationError('Unknown time zone "{}" (see pytz.common_timezones for all options)'.format(data))
+            raise ValidationError(
+                'Unknown time zone "{}" (see pytz.common_timezones for all options)'.format(
+                    data
+                )
+            )
         return pytz.timezone(data)
 
 
@@ -124,10 +130,11 @@ class SerializedPKRelatedField(PrimaryKeyRelatedField):
     Extends PrimaryKeyRelatedField to return a serialized object on read. This is useful for representing related
     objects in a ManyToManyField while still allowing a set of primary keys to be written.
     """
+
     def __init__(self, serializer, **kwargs):
         self.serializer = serializer
-        self.pk_field = kwargs.pop('pk_field', None)
+        self.pk_field = kwargs.pop("pk_field", None)
         super().__init__(**kwargs)
 
     def to_representation(self, value):
-        return self.serializer(value, context={'request': self.context['request']}).data
+        return self.serializer(value, context={"request": self.context["request"]}).data

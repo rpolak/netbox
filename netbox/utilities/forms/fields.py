@@ -19,19 +19,19 @@ from .constants import *
 from .utils import expand_alphanumeric_pattern, expand_ipaddress_pattern
 
 __all__ = (
-    'CommentField',
-    'CSVChoiceField',
-    'CSVContentTypeField',
-    'CSVDataField',
-    'CSVModelChoiceField',
-    'DynamicModelChoiceField',
-    'DynamicModelMultipleChoiceField',
-    'ExpandableIPAddressField',
-    'ExpandableNameField',
-    'JSONField',
-    'LaxURLField',
-    'SlugField',
-    'TagFilterField',
+    "CommentField",
+    "CSVChoiceField",
+    "CSVContentTypeField",
+    "CSVDataField",
+    "CSVModelChoiceField",
+    "DynamicModelChoiceField",
+    "DynamicModelMultipleChoiceField",
+    "ExpandableIPAddressField",
+    "ExpandableNameField",
+    "JSONField",
+    "LaxURLField",
+    "SlugField",
+    "TagFilterField",
 )
 
 
@@ -127,6 +127,7 @@ class CSVChoiceField(forms.ChoiceField):
     """
     Invert the provided set of choices to take the human-friendly label as input, and return the database value.
     """
+
     STATIC_CHOICES = True
 
     def __init__(self, *, choices=(), **kwargs):
@@ -156,20 +157,23 @@ class CSVContentTypeField(CSVModelChoiceField):
     """
     Reference a ContentType in the form <app>.<model>
     """
+
     STATIC_CHOICES = True
 
     def prepare_value(self, value):
-        return f'{value.app_label}.{value.model}'
+        return f"{value.app_label}.{value.model}"
 
     def to_python(self, value):
         try:
-            app_label, model = value.split('.')
+            app_label, model = value.split(".")
         except ValueError:
-            raise forms.ValidationError(f'Object type must be specified as "<app>.<model>"')
+            raise forms.ValidationError(
+                f'Object type must be specified as "<app>.<model>"'
+            )
         try:
             return self.queryset.get(app_label=app_label, model=model)
         except ObjectDoesNotExist:
-            raise forms.ValidationError(f'Invalid object type')
+            raise forms.ValidationError(f"Invalid object type")
 
 
 class ExpandableNameField(forms.CharField):
@@ -229,9 +233,11 @@ class CommentField(forms.CharField):
     widget = forms.Textarea
     default_label = ""
     # TODO: Port Markdown cheat sheet to internal documentation
-    default_helptext = '<i class="mdi mdi-information-outline"></i> '\
-                       '<a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet" target="_blank">'\
-                       'Markdown</a> syntax is supported'
+    default_helptext = (
+        '<i class="mdi mdi-information-outline"></i> '
+        '<a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet" target="_blank">'
+        "Markdown</a> syntax is supported"
+    )
 
     def __init__(self, *args, **kwargs):
         required = kwargs.pop("required", False)

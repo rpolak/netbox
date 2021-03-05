@@ -86,13 +86,10 @@ class SecretRoleCSVForm(CSVModelForm):
 
 class SecretForm(BootstrapMixin, CustomFieldModelForm):
     device = DynamicModelChoiceField(
-        queryset=Device.objects.all(),
-        required=False,
-        display_field='display_name'
+        queryset=Device.objects.all(), required=False, display_field="display_name"
     )
     virtual_machine = DynamicModelChoiceField(
-        queryset=VirtualMachine.objects.all(),
-        required=False
+        queryset=VirtualMachine.objects.all(), required=False
     )
     plaintext = forms.CharField(
         max_length=SECRET_PLAINTEXT_MAX_LENGTH,
@@ -116,20 +113,26 @@ class SecretForm(BootstrapMixin, CustomFieldModelForm):
     class Meta:
         model = Secret
         fields = [
-            'device', 'virtual_machine', 'role', 'name', 'plaintext', 'plaintext2', 'tags',
+            "device",
+            "virtual_machine",
+            "role",
+            "name",
+            "plaintext",
+            "plaintext2",
+            "tags",
         ]
 
     def __init__(self, *args, **kwargs):
 
         # Initialize helper selectors
-        instance = kwargs.get('instance')
-        initial = kwargs.get('initial', {}).copy()
+        instance = kwargs.get("instance")
+        initial = kwargs.get("initial", {}).copy()
         if instance:
             if type(instance.assigned_object) is Device:
-                initial['device'] = instance.assigned_object
+                initial["device"] = instance.assigned_object
             elif type(instance.assigned_object) is VirtualMachine:
-                initial['virtual_machine'] = instance.assigned_object
-        kwargs['initial'] = initial
+                initial["virtual_machine"] = instance.assigned_object
+        kwargs["initial"] = initial
 
         super().__init__(*args, **kwargs)
 
@@ -140,11 +143,15 @@ class SecretForm(BootstrapMixin, CustomFieldModelForm):
     def clean(self):
         super().clean()
 
-        if not self.cleaned_data['device'] and not self.cleaned_data['virtual_machine']:
-            raise forms.ValidationError("Secrets must be assigned to a device or virtual machine.")
+        if not self.cleaned_data["device"] and not self.cleaned_data["virtual_machine"]:
+            raise forms.ValidationError(
+                "Secrets must be assigned to a device or virtual machine."
+            )
 
-        if self.cleaned_data['device'] and self.cleaned_data['virtual_machine']:
-            raise forms.ValidationError("Cannot select both a device and virtual machine for secret assignment.")
+        if self.cleaned_data["device"] and self.cleaned_data["virtual_machine"]:
+            raise forms.ValidationError(
+                "Cannot select both a device and virtual machine for secret assignment."
+            )
 
         # Verify that the provided plaintext values match
         if self.cleaned_data["plaintext"] != self.cleaned_data["plaintext2"]:
@@ -156,7 +163,9 @@ class SecretForm(BootstrapMixin, CustomFieldModelForm):
 
     def save(self, *args, **kwargs):
         # Set assigned object
-        self.instance.assigned_object = self.cleaned_data.get('device') or self.cleaned_data.get('virtual_machine')
+        self.instance.assigned_object = self.cleaned_data.get(
+            "device"
+        ) or self.cleaned_data.get("virtual_machine")
 
         return super().save(*args, **kwargs)
 
@@ -164,29 +173,27 @@ class SecretForm(BootstrapMixin, CustomFieldModelForm):
 class SecretCSVForm(CustomFieldModelCSVForm):
     role = CSVModelChoiceField(
         queryset=SecretRole.objects.all(),
-        to_field_name='name',
-        help_text='Assigned role'
+        to_field_name="name",
+        help_text="Assigned role",
     )
     device = CSVModelChoiceField(
         queryset=Device.objects.all(),
         required=False,
-        to_field_name='name',
-        help_text='Assigned device'
+        to_field_name="name",
+        help_text="Assigned device",
     )
     virtual_machine = CSVModelChoiceField(
         queryset=VirtualMachine.objects.all(),
         required=False,
-        to_field_name='name',
-        help_text='Assigned VM'
+        to_field_name="name",
+        help_text="Assigned VM",
     )
-    plaintext = forms.CharField(
-        help_text='Plaintext secret data'
-    )
+    plaintext = forms.CharField(help_text="Plaintext secret data")
     plaintext = forms.CharField(help_text="Plaintext secret data")
 
     class Meta:
         model = Secret
-        fields = ['role', 'name', 'plaintext', 'device', 'virtual_machine']
+        fields = ["role", "name", "plaintext", "device", "virtual_machine"]
         help_texts = {
             "name": "Name or username",
         }
@@ -194,24 +201,30 @@ class SecretCSVForm(CustomFieldModelCSVForm):
     def clean(self):
         super().clean()
 
-        device = self.cleaned_data.get('device')
-        virtual_machine = self.cleaned_data.get('virtual_machine')
+        device = self.cleaned_data.get("device")
+        virtual_machine = self.cleaned_data.get("virtual_machine")
 
         # Validate device OR VM is assigned
         if not device and not virtual_machine:
-            raise forms.ValidationError("Secret must be assigned to a device or a virtual machine")
+            raise forms.ValidationError(
+                "Secret must be assigned to a device or a virtual machine"
+            )
         if device and virtual_machine:
-            raise forms.ValidationError("Secret cannot be assigned to both a device and a virtual machine")
+            raise forms.ValidationError(
+                "Secret cannot be assigned to both a device and a virtual machine"
+            )
 
     def save(self, *args, **kwargs):
 
         # Set device/VM assignment
-        self.instance.assigned_object = self.cleaned_data['device'] or self.cleaned_data['virtual_machine']
+        self.instance.assigned_object = (
+            self.cleaned_data["device"] or self.cleaned_data["virtual_machine"]
+        )
 
         s = super().save(*args, **kwargs)
 
         # Set plaintext on instance
-        s.plaintext = str(self.cleaned_data['plaintext'])
+        s.plaintext = str(self.cleaned_data["plaintext"])
 
         return s
 

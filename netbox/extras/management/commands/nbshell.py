@@ -36,16 +36,17 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '-c', '--command',
-            help='Python code to execute (instead of starting an interactive shell)',
+            "-c",
+            "--command",
+            help="Python code to execute (instead of starting an interactive shell)",
         )
 
     def _lsmodels(self):
         for app, models in self.django_models.items():
             app_name = apps.get_app_config(app).verbose_name
-            print(f'{app_name}:')
+            print(f"{app_name}:")
             for m in models:
-                print(f'  {m}')
+                print(f"  {m}")
 
     def get_namespace(self):
         namespace = {}
@@ -61,7 +62,7 @@ class Command(BaseCommand):
 
             # Constants
             try:
-                app_constants = sys.modules[f'{app}.constants']
+                app_constants = sys.modules[f"{app}.constants"]
                 for name in dir(app_constants):
                     namespace[name] = getattr(app_constants, name)
             except KeyError:
@@ -82,8 +83,8 @@ class Command(BaseCommand):
 
     def handle(self, **options):
         # If Python code has been passed, execute it and exit.
-        if options['command']:
-            exec(options['command'], self.get_namespace())
+        if options["command"]:
+            exec(options["command"], self.get_namespace())
             return
 
         shell = code.interact(banner=BANNER_TEXT, local=self.get_namespace())

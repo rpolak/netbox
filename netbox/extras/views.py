@@ -32,10 +32,9 @@ from .scripts import get_scripts, run_script
 # Tags
 #
 
+
 class TagListView(generic.ObjectListView):
-    queryset = Tag.objects.annotate(
-        items=count_related(TaggedItem, 'tag')
-    )
+    queryset = Tag.objects.annotate(items=count_related(TaggedItem, "tag"))
     filterset = filters.TagFilterSet
     filterset_form = forms.TagFilterForm
     table = tables.TagTable
@@ -58,23 +57,20 @@ class TagBulkImportView(generic.BulkImportView):
 
 
 class TagBulkEditView(generic.BulkEditView):
-    queryset = Tag.objects.annotate(
-        items=count_related(TaggedItem, 'tag')
-    )
+    queryset = Tag.objects.annotate(items=count_related(TaggedItem, "tag"))
     table = tables.TagTable
     form = forms.TagBulkEditForm
 
 
 class TagBulkDeleteView(generic.BulkDeleteView):
-    queryset = Tag.objects.annotate(
-        items=count_related(TaggedItem, 'tag')
-    )
+    queryset = Tag.objects.annotate(items=count_related(TaggedItem, "tag"))
     table = tables.TagTable
 
 
 #
 # Config contexts
 #
+
 
 class ConfigContextListView(generic.ObjectListView):
     queryset = ConfigContext.objects.all()
@@ -98,10 +94,10 @@ class ConfigContextView(generic.ObjectView):
         elif request.user.is_authenticated:
             format = request.user.config.get("extras.configcontext.format", "json")
         else:
-            format = 'json'
+            format = "json"
 
         return {
-            'format': format,
+            "format": format,
         }
 
 
@@ -129,10 +125,12 @@ class ConfigContextBulkDeleteView(generic.BulkDeleteView):
 
 class ObjectConfigContextView(generic.ObjectView):
     base_template = None
-    template_name = 'extras/object_configcontext.html'
+    template_name = "extras/object_configcontext.html"
 
     def get_extra_context(self, request, instance):
-        source_contexts = ConfigContext.objects.restrict(request.user, 'view').get_for_object(instance)
+        source_contexts = ConfigContext.objects.restrict(
+            request.user, "view"
+        ).get_for_object(instance)
 
         # Determine user's preferred output format
         if request.GET.get("format") in ["json", "yaml"]:
@@ -144,20 +142,21 @@ class ObjectConfigContextView(generic.ObjectView):
         elif request.user.is_authenticated:
             format = request.user.config.get("extras.configcontext.format", "json")
         else:
-            format = 'json'
+            format = "json"
 
         return {
-            'rendered_context': instance.get_config_context(),
-            'source_contexts': source_contexts,
-            'format': format,
-            'base_template': self.base_template,
-            'active_tab': 'config-context',
+            "rendered_context": instance.get_config_context(),
+            "source_contexts": source_contexts,
+            "format": format,
+            "base_template": self.base_template,
+            "active_tab": "config-context",
         }
 
 
 #
 # Change logging
 #
+
 
 class ObjectChangeListView(generic.ObjectListView):
     queryset = ObjectChange.objects.all()
@@ -172,28 +171,32 @@ class ObjectChangeView(generic.ObjectView):
     queryset = ObjectChange.objects.all()
 
     def get_extra_context(self, request, instance):
-        related_changes = ObjectChange.objects.restrict(request.user, 'view').filter(
-            request_id=instance.request_id
-        ).exclude(
-            pk=instance.pk
+        related_changes = (
+            ObjectChange.objects.restrict(request.user, "view")
+            .filter(request_id=instance.request_id)
+            .exclude(pk=instance.pk)
         )
         related_changes_table = tables.ObjectChangeTable(
             data=related_changes[:50], orderable=False
         )
 
-        objectchanges = ObjectChange.objects.restrict(request.user, 'view').filter(
+        objectchanges = ObjectChange.objects.restrict(request.user, "view").filter(
             changed_object_type=instance.changed_object_type,
             changed_object_id=instance.changed_object_id,
         )
 
-        next_change = objectchanges.filter(time__gt=instance.time).order_by('time').first()
-        prev_change = objectchanges.filter(time__lt=instance.time).order_by('-time').first()
+        next_change = (
+            objectchanges.filter(time__gt=instance.time).order_by("time").first()
+        )
+        prev_change = (
+            objectchanges.filter(time__lt=instance.time).order_by("-time").first()
+        )
 
         if prev_change:
             diff_added = shallow_compare_dict(
                 prev_change.object_data,
                 instance.object_data,
-                exclude=['last_updated'],
+                exclude=["last_updated"],
             )
             diff_removed = {x: prev_change.object_data.get(x) for x in diff_added}
         else:
@@ -201,12 +204,12 @@ class ObjectChangeView(generic.ObjectView):
             diff_added = diff_removed = instance.object_data
 
         return {
-            'diff_added': diff_added,
-            'diff_removed': diff_removed,
-            'next_change': next_change,
-            'prev_change': prev_change,
-            'related_changes_table': related_changes_table,
-            'related_changes_count': related_changes.count()
+            "diff_added": diff_added,
+            "diff_removed": diff_removed,
+            "next_change": next_change,
+            "prev_change": prev_change,
+            "related_changes_table": related_changes_table,
+            "related_changes_count": related_changes.count(),
         }
 
 
@@ -216,6 +219,7 @@ class ObjectChangeLogView(View):
 
     base_template: The name of the template to extend. If not provided, "<app>/<model>.html" will be used.
     """
+
     base_template = None
 
     def get(self, request, model, **kwargs):
@@ -252,24 +256,31 @@ class ObjectChangeLogView(View):
         # Default to using "<app>/<model>.html" as the template, if it exists. Otherwise,
         # fall back to using base.html.
         if self.base_template is None:
-            self.base_template = f"{model._meta.app_label}/{model._meta.model_name}.html"
+            self.base_template = (
+                f"{model._meta.app_label}/{model._meta.model_name}.html"
+            )
             # TODO: This can be removed once an object view has been established for every model.
             try:
                 template.loader.get_template(self.base_template)
             except template.TemplateDoesNotExist:
-                self.base_template = 'base.html'
+                self.base_template = "base.html"
 
-        return render(request, 'extras/object_changelog.html', {
-            'object': obj,
-            'table': objectchanges_table,
-            'base_template': self.base_template,
-            'active_tab': 'changelog',
-        })
+        return render(
+            request,
+            "extras/object_changelog.html",
+            {
+                "object": obj,
+                "table": objectchanges_table,
+                "base_template": self.base_template,
+                "active_tab": "changelog",
+            },
+        )
 
 
 #
 # Image attachments
 #
+
 
 class ImageAttachmentEditView(generic.ObjectEditView):
     queryset = ImageAttachment.objects.all()

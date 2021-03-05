@@ -1,7 +1,11 @@
 from rest_framework.routers import APIRootView
 
 from dcim.models import Device
-from extras.api.views import ConfigContextQuerySetMixin, CustomFieldModelViewSet, ModelViewSet
+from extras.api.views import (
+    ConfigContextQuerySetMixin,
+    CustomFieldModelViewSet,
+    ModelViewSet,
+)
 from utilities.utils import count_related
 from virtualization import filters
 from virtualization.models import (
@@ -30,7 +34,7 @@ class VirtualizationRootView(APIRootView):
 
 class ClusterTypeViewSet(ModelViewSet):
     queryset = ClusterType.objects.annotate(
-        cluster_count=count_related(Cluster, 'type')
+        cluster_count=count_related(Cluster, "type")
     )
     serializer_class = serializers.ClusterTypeSerializer
     filterset_class = filters.ClusterTypeFilterSet
@@ -38,7 +42,7 @@ class ClusterTypeViewSet(ModelViewSet):
 
 class ClusterGroupViewSet(ModelViewSet):
     queryset = ClusterGroup.objects.annotate(
-        cluster_count=count_related(Cluster, 'group')
+        cluster_count=count_related(Cluster, "group")
     )
     serializer_class = serializers.ClusterGroupSerializer
     filterset_class = filters.ClusterGroupFilterSet
@@ -48,8 +52,8 @@ class ClusterViewSet(CustomFieldModelViewSet):
     queryset = Cluster.objects.prefetch_related(
         "type", "group", "tenant", "site", "tags"
     ).annotate(
-        device_count=count_related(Device, 'cluster'),
-        virtualmachine_count=count_related(VirtualMachine, 'cluster')
+        device_count=count_related(Device, "cluster"),
+        virtualmachine_count=count_related(VirtualMachine, "cluster"),
     )
     serializer_class = serializers.ClusterSerializer
     filterset_class = filters.ClusterFilterSet
@@ -58,6 +62,7 @@ class ClusterViewSet(CustomFieldModelViewSet):
 #
 # Virtual machines
 #
+
 
 class VirtualMachineViewSet(ConfigContextQuerySetMixin, CustomFieldModelViewSet):
     queryset = VirtualMachine.objects.prefetch_related(
@@ -98,4 +103,4 @@ class VMInterfaceViewSet(ModelViewSet):
     )
     serializer_class = serializers.VMInterfaceSerializer
     filterset_class = filters.VMInterfaceFilterSet
-    brief_prefetch_fields = ['virtual_machine']
+    brief_prefetch_fields = ["virtual_machine"]

@@ -6,7 +6,7 @@ router = OrderedDefaultRouter()
 router.APIRootView = views.ExtrasRootView
 
 # Custom fields
-router.register('custom-fields', views.CustomFieldViewSet)
+router.register("custom-fields", views.CustomFieldViewSet)
 
 # Export templates
 router.register("export-templates", views.ExportTemplateViewSet)
@@ -33,7 +33,7 @@ router.register("object-changes", views.ObjectChangeViewSet)
 router.register("job-results", views.JobResultViewSet)
 
 # ContentTypes
-router.register('content-types', views.ContentTypeViewSet)
+router.register("content-types", views.ContentTypeViewSet)
 
-app_name = 'extras-api'
+app_name = "extras-api"
 urlpatterns = router.urls

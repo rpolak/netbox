@@ -6,28 +6,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('virtualization', '0018_custom_field_data'),
+        ("virtualization", "0018_custom_field_data"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='clustergroup',
-            name='name',
+            model_name="clustergroup",
+            name="name",
             field=models.CharField(max_length=100, unique=True),
         ),
         migrations.AlterField(
-            model_name='clustergroup',
-            name='slug',
+            model_name="clustergroup",
+            name="slug",
             field=models.SlugField(max_length=100, unique=True),
         ),
         migrations.AlterField(
-            model_name='clustertype',
-            name='name',
+            model_name="clustertype",
+            name="name",
             field=models.CharField(max_length=100, unique=True),
         ),
         migrations.AlterField(
-            model_name='clustertype',
-            name='slug',
+            model_name="clustertype",
+            name="slug",
             field=models.SlugField(max_length=100, unique=True),
         ),
     ]

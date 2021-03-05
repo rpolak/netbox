@@ -8,7 +8,6 @@ from tenancy.models import Tenant
 
 
 class RackGroupTestCase(TestCase):
-
     def test_change_rackgroup_site(self):
         """
         Check that all child RackGroups and Racks get updated when a RackGroup is moved to a new Site. Topology:
@@ -18,18 +17,22 @@ class RackGroupTestCase(TestCase):
               - Rack 2
             - Rack 1
         """
-        site_a = Site.objects.create(name='Site A', slug='site-a')
-        site_b = Site.objects.create(name='Site B', slug='site-b')
+        site_a = Site.objects.create(name="Site A", slug="site-a")
+        site_b = Site.objects.create(name="Site B", slug="site-b")
 
-        rackgroup_a1 = RackGroup(site=site_a, name='RackGroup A1', slug='rackgroup-a1')
+        rackgroup_a1 = RackGroup(site=site_a, name="RackGroup A1", slug="rackgroup-a1")
         rackgroup_a1.save()
-        rackgroup_a2 = RackGroup(site=site_a, parent=rackgroup_a1, name='RackGroup A2', slug='rackgroup-a2')
+        rackgroup_a2 = RackGroup(
+            site=site_a, parent=rackgroup_a1, name="RackGroup A2", slug="rackgroup-a2"
+        )
         rackgroup_a2.save()
 
-        rack1 = Rack.objects.create(site=site_a, group=rackgroup_a1, name='Rack 1')
-        rack2 = Rack.objects.create(site=site_a, group=rackgroup_a2, name='Rack 2')
+        rack1 = Rack.objects.create(site=site_a, group=rackgroup_a1, name="Rack 1")
+        rack2 = Rack.objects.create(site=site_a, group=rackgroup_a2, name="Rack 2")
 
-        powerpanel1 = PowerPanel.objects.create(site=site_a, rack_group=rackgroup_a1, name='Power Panel 1')
+        powerpanel1 = PowerPanel.objects.create(
+            site=site_a, rack_group=rackgroup_a1, name="Power Panel 1"
+        )
 
         # Move RackGroup A1 to Site B
         rackgroup_a1.site = site_b
@@ -182,22 +185,26 @@ class RackTestCase(TestCase):
         """
         Check that child Devices get updated when a Rack is moved to a new Site.
         """
-        site_a = Site.objects.create(name='Site A', slug='site-a')
-        site_b = Site.objects.create(name='Site B', slug='site-b')
+        site_a = Site.objects.create(name="Site A", slug="site-a")
+        site_b = Site.objects.create(name="Site B", slug="site-b")
 
-        manufacturer = Manufacturer.objects.create(name='Manufacturer 1', slug='manufacturer-1')
+        manufacturer = Manufacturer.objects.create(
+            name="Manufacturer 1", slug="manufacturer-1"
+        )
         device_type = DeviceType.objects.create(
-            manufacturer=manufacturer, model='Device Type 1', slug='device-type-1'
+            manufacturer=manufacturer, model="Device Type 1", slug="device-type-1"
         )
         device_role = DeviceRole.objects.create(
-            name='Device Role 1', slug='device-role-1', color='ff0000'
+            name="Device Role 1", slug="device-role-1", color="ff0000"
         )
 
         # Create Rack1 in Site A
-        rack1 = Rack.objects.create(site=site_a, name='Rack 1')
+        rack1 = Rack.objects.create(site=site_a, name="Rack 1")
 
         # Create Device1 in Rack1
-        device1 = Device.objects.create(site=site_a, rack=rack1, device_type=device_type, device_role=device_role)
+        device1 = Device.objects.create(
+            site=site_a, rack=rack1, device_type=device_type, device_role=device_role
+        )
 
         # Move Rack1 to Site B
         rack1.site = site_b
@@ -469,11 +476,19 @@ class CableTestCase(TestCase):
         self.circuittermination2 = CircuitTermination.objects.create(
             circuit=self.circuit, site=site, term_side="Z", port_speed=1000
         )
-        self.provider = Provider.objects.create(name='Provider 1', slug='provider-1')
-        self.circuittype = CircuitType.objects.create(name='Circuit Type 1', slug='circuit-type-1')
-        self.circuit = Circuit.objects.create(provider=self.provider, type=self.circuittype, cid='1')
-        self.circuittermination1 = CircuitTermination.objects.create(circuit=self.circuit, site=site, term_side='A')
-        self.circuittermination2 = CircuitTermination.objects.create(circuit=self.circuit, site=site, term_side='Z')
+        self.provider = Provider.objects.create(name="Provider 1", slug="provider-1")
+        self.circuittype = CircuitType.objects.create(
+            name="Circuit Type 1", slug="circuit-type-1"
+        )
+        self.circuit = Circuit.objects.create(
+            provider=self.provider, type=self.circuittype, cid="1"
+        )
+        self.circuittermination1 = CircuitTermination.objects.create(
+            circuit=self.circuit, site=site, term_side="A"
+        )
+        self.circuittermination2 = CircuitTermination.objects.create(
+            circuit=self.circuit, site=site, term_side="Z"
+        )
 
     def test_cable_creation(self):
         """

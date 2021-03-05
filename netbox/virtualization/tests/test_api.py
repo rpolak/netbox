@@ -40,7 +40,7 @@ class ClusterTypeTest(APIViewTestCases.APIViewTestCase):
         },
     ]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
 
     @classmethod
@@ -72,7 +72,7 @@ class ClusterGroupTest(APIViewTestCases.APIViewTestCase):
         },
     ]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
 
     @classmethod
@@ -88,9 +88,9 @@ class ClusterGroupTest(APIViewTestCases.APIViewTestCase):
 
 class ClusterTest(APIViewTestCases.APIViewTestCase):
     model = Cluster
-    brief_fields = ['id', 'name', 'url', 'virtualmachine_count']
+    brief_fields = ["id", "name", "url", "virtualmachine_count"]
     bulk_update_data = {
-        'comments': 'New comment',
+        "comments": "New comment",
     }
 
     @classmethod
@@ -136,9 +136,9 @@ class ClusterTest(APIViewTestCases.APIViewTestCase):
 
 class VirtualMachineTest(APIViewTestCases.APIViewTestCase):
     model = VirtualMachine
-    brief_fields = ['id', 'name', 'url']
+    brief_fields = ["id", "name", "url"]
     bulk_update_data = {
-        'status': 'staged',
+        "status": "staged",
     }
 
     @classmethod
@@ -235,9 +235,9 @@ class VirtualMachineTest(APIViewTestCases.APIViewTestCase):
 
 class VMInterfaceTest(APIViewTestCases.APIViewTestCase):
     model = VMInterface
-    brief_fields = ['id', 'name', 'url', 'virtual_machine']
+    brief_fields = ["id", "name", "url", "virtual_machine"]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
 
     @classmethod

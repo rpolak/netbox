@@ -4,7 +4,18 @@ from netaddr import IPNetwork
 
 from dcim.models import Device, DeviceRole, DeviceType, Manufacturer, Site
 from ipam.choices import *
-from ipam.models import Aggregate, IPAddress, Prefix, RIR, Role, RouteTarget, Service, VLAN, VLANGroup, VRF
+from ipam.models import (
+    Aggregate,
+    IPAddress,
+    Prefix,
+    RIR,
+    Role,
+    RouteTarget,
+    Service,
+    VLAN,
+    VLANGroup,
+    VRF,
+)
 from tenancy.models import Tenant
 from utilities.testing import ViewTestCases
 
@@ -61,24 +72,24 @@ class RouteTargetTestCase(ViewTestCases.PrimaryObjectViewTestCase):
     def setUpTestData(cls):
 
         tenants = (
-            Tenant(name='Tenant A', slug='tenant-a'),
-            Tenant(name='Tenant B', slug='tenant-b'),
+            Tenant(name="Tenant A", slug="tenant-a"),
+            Tenant(name="Tenant B", slug="tenant-b"),
         )
         Tenant.objects.bulk_create(tenants)
 
-        tags = cls.create_tags('Alpha', 'Bravo', 'Charlie')
+        tags = cls.create_tags("Alpha", "Bravo", "Charlie")
 
         route_targets = (
-            RouteTarget(name='65000:1001', tenant=tenants[0]),
-            RouteTarget(name='65000:1002', tenant=tenants[1]),
-            RouteTarget(name='65000:1003'),
+            RouteTarget(name="65000:1001", tenant=tenants[0]),
+            RouteTarget(name="65000:1002", tenant=tenants[1]),
+            RouteTarget(name="65000:1003"),
         )
         RouteTarget.objects.bulk_create(route_targets)
 
         cls.form_data = {
-            'name': '65000:100',
-            'description': 'A new route target',
-            'tags': [t.pk for t in tags],
+            "name": "65000:100",
+            "description": "A new route target",
+            "tags": [t.pk for t in tags],
         }
 
         cls.csv_data = (
@@ -89,8 +100,8 @@ class RouteTargetTestCase(ViewTestCases.PrimaryObjectViewTestCase):
         )
 
         cls.bulk_edit_data = {
-            'tenant': tenants[1].pk,
-            'description': 'New description',
+            "tenant": tenants[1].pk,
+            "description": "New description",
         }
 
 
@@ -469,23 +480,40 @@ class ServiceTestCase(
             name="Device 1", site=site, device_type=devicetype, device_role=devicerole
         )
 
-        Service.objects.bulk_create([
-            Service(device=device, name='Service 1', protocol=ServiceProtocolChoices.PROTOCOL_TCP, ports=[101]),
-            Service(device=device, name='Service 2', protocol=ServiceProtocolChoices.PROTOCOL_TCP, ports=[102]),
-            Service(device=device, name='Service 3', protocol=ServiceProtocolChoices.PROTOCOL_TCP, ports=[103]),
-        ])
+        Service.objects.bulk_create(
+            [
+                Service(
+                    device=device,
+                    name="Service 1",
+                    protocol=ServiceProtocolChoices.PROTOCOL_TCP,
+                    ports=[101],
+                ),
+                Service(
+                    device=device,
+                    name="Service 2",
+                    protocol=ServiceProtocolChoices.PROTOCOL_TCP,
+                    ports=[102],
+                ),
+                Service(
+                    device=device,
+                    name="Service 3",
+                    protocol=ServiceProtocolChoices.PROTOCOL_TCP,
+                    ports=[103],
+                ),
+            ]
+        )
 
         tags = cls.create_tags("Alpha", "Bravo", "Charlie")
 
         cls.form_data = {
-            'device': device.pk,
-            'virtual_machine': None,
-            'name': 'Service X',
-            'protocol': ServiceProtocolChoices.PROTOCOL_TCP,
-            'ports': '104,105',
-            'ipaddresses': [],
-            'description': 'A new service',
-            'tags': [t.pk for t in tags],
+            "device": device.pk,
+            "virtual_machine": None,
+            "name": "Service X",
+            "protocol": ServiceProtocolChoices.PROTOCOL_TCP,
+            "ports": "104,105",
+            "ipaddresses": [],
+            "description": "A new service",
+            "tags": [t.pk for t in tags],
         }
 
         cls.csv_data = (
@@ -496,7 +524,7 @@ class ServiceTestCase(
         )
 
         cls.bulk_edit_data = {
-            'protocol': ServiceProtocolChoices.PROTOCOL_UDP,
-            'ports': '106,107',
-            'description': 'New description',
+            "protocol": ServiceProtocolChoices.PROTOCOL_UDP,
+            "ports": "106,107",
+            "description": "New description",
         }

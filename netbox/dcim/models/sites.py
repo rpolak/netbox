@@ -38,20 +38,11 @@ class Region(MPTTModel, ChangeLoggedModel):
         related_name="children",
         blank=True,
         null=True,
-        db_index=True
+        db_index=True,
     )
-    name = models.CharField(
-        max_length=100,
-        unique=True
-    )
-    slug = models.SlugField(
-        max_length=100,
-        unique=True
-    )
-    description = models.CharField(
-        max_length=200,
-        blank=True
-    )
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
+    description = models.CharField(max_length=200, blank=True)
     name = models.CharField(max_length=50, unique=True)
     slug = models.SlugField(unique=True)
     description = models.CharField(max_length=200, blank=True)
@@ -98,25 +89,17 @@ class Region(MPTTModel, ChangeLoggedModel):
 # Sites
 #
 
-@extras_features('custom_fields', 'custom_links', 'export_templates', 'webhooks')
+
+@extras_features("custom_fields", "custom_links", "export_templates", "webhooks")
 class Site(ChangeLoggedModel, CustomFieldModel):
     """
     A Site represents a geographic location within a network; typically a building or campus. The optional facility
     field can be used to include an external designation, such as a data center name (e.g. Equinix SV6).
     """
-    name = models.CharField(
-        max_length=100,
-        unique=True
-    )
-    _name = NaturalOrderingField(
-        target_field='name',
-        max_length=100,
-        blank=True
-    )
-    slug = models.SlugField(
-        max_length=100,
-        unique=True
-    )
+
+    name = models.CharField(max_length=100, unique=True)
+    _name = NaturalOrderingField(target_field="name", max_length=100, blank=True)
+    slug = models.SlugField(max_length=100, unique=True)
     status = models.CharField(
         max_length=50,
         choices=SiteStatusChoices,
@@ -163,9 +146,7 @@ class Site(ChangeLoggedModel, CustomFieldModel):
         null=True,
         help_text="GPS coordinate (longitude)",
     )
-    images = GenericRelation(
-        to='extras.ImageAttachment'
-    )
+    images = GenericRelation(to="extras.ImageAttachment")
     images = GenericRelation(to="extras.ImageAttachment")
     tags = TaggableManager(through=TaggedItem)
 

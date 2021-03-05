@@ -36,9 +36,7 @@ class SecretsRootView(APIRootView):
 
 
 class SecretRoleViewSet(ModelViewSet):
-    queryset = SecretRole.objects.annotate(
-        secret_count=count_related(Secret, 'role')
-    )
+    queryset = SecretRole.objects.annotate(secret_count=count_related(Secret, "role"))
     serializer_class = serializers.SecretRoleSerializer
     filterset_class = filters.SecretRoleFilterSet
 
@@ -49,7 +47,7 @@ class SecretRoleViewSet(ModelViewSet):
 
 
 class SecretViewSet(ModelViewSet):
-    queryset = Secret.objects.prefetch_related('role', 'tags')
+    queryset = Secret.objects.prefetch_related("role", "tags")
     serializer_class = serializers.SecretSerializer
     filterset_class = filters.SecretFilterSet
 

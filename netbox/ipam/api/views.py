@@ -11,7 +11,18 @@ from rest_framework.routers import APIRootView
 
 from extras.api.views import CustomFieldModelViewSet
 from ipam import filters
-from ipam.models import Aggregate, IPAddress, Prefix, RIR, Role, RouteTarget, Service, VLAN, VLANGroup, VRF
+from ipam.models import (
+    Aggregate,
+    IPAddress,
+    Prefix,
+    RIR,
+    Role,
+    RouteTarget,
+    Service,
+    VLAN,
+    VLANGroup,
+    VRF,
+)
 from netbox.api.views import ModelViewSet
 from utilities.constants import ADVISORY_LOCK_KEYS
 from utilities.utils import count_related
@@ -33,11 +44,13 @@ class IPAMRootView(APIRootView):
 
 
 class VRFViewSet(CustomFieldModelViewSet):
-    queryset = VRF.objects.prefetch_related('tenant').prefetch_related(
-        'import_targets', 'export_targets', 'tags'
-    ).annotate(
-        ipaddress_count=count_related(IPAddress, 'vrf'),
-        prefix_count=count_related(Prefix, 'vrf')
+    queryset = (
+        VRF.objects.prefetch_related("tenant")
+        .prefetch_related("import_targets", "export_targets", "tags")
+        .annotate(
+            ipaddress_count=count_related(IPAddress, "vrf"),
+            prefix_count=count_related(Prefix, "vrf"),
+        )
     )
     serializer_class = serializers.VRFSerializer
     filterset_class = filters.VRFFilterSet
@@ -47,8 +60,9 @@ class VRFViewSet(CustomFieldModelViewSet):
 # Route targets
 #
 
+
 class RouteTargetViewSet(CustomFieldModelViewSet):
-    queryset = RouteTarget.objects.prefetch_related('tenant').prefetch_related('tags')
+    queryset = RouteTarget.objects.prefetch_related("tenant").prefetch_related("tags")
     serializer_class = serializers.RouteTargetSerializer
     filterset_class = filters.RouteTargetFilterSet
 
@@ -59,9 +73,7 @@ class RouteTargetViewSet(CustomFieldModelViewSet):
 
 
 class RIRViewSet(ModelViewSet):
-    queryset = RIR.objects.annotate(
-        aggregate_count=count_related(Aggregate, 'rir')
-    )
+    queryset = RIR.objects.annotate(aggregate_count=count_related(Aggregate, "rir"))
     serializer_class = serializers.RIRSerializer
     filterset_class = filters.RIRFilterSet
 
@@ -84,8 +96,8 @@ class AggregateViewSet(CustomFieldModelViewSet):
 
 class RoleViewSet(ModelViewSet):
     queryset = Role.objects.annotate(
-        prefix_count=count_related(Prefix, 'role'),
-        vlan_count=count_related(VLAN, 'role')
+        prefix_count=count_related(Prefix, "role"),
+        vlan_count=count_related(VLAN, "role"),
     )
     serializer_class = serializers.RoleSerializer
     filterset_class = filters.RoleFilterSet
@@ -200,11 +212,21 @@ class PrefixViewSet(CustomFieldModelViewSet):
 
             return Response(serializer.data)
 
-    @swagger_auto_schema(method='get', responses={200: serializers.AvailableIPSerializer(many=True)})
-    @swagger_auto_schema(method='post', responses={201: serializers.AvailableIPSerializer(many=True)},
-                         request_body=serializers.AvailableIPSerializer(many=True))
-    @action(detail=True, url_path='available-ips', methods=['get', 'post'], queryset=IPAddress.objects.all())
-    @advisory_lock(ADVISORY_LOCK_KEYS['available-ips'])
+    @swagger_auto_schema(
+        method="get", responses={200: serializers.AvailableIPSerializer(many=True)}
+    )
+    @swagger_auto_schema(
+        method="post",
+        responses={201: serializers.AvailableIPSerializer(many=True)},
+        request_body=serializers.AvailableIPSerializer(many=True),
+    )
+    @action(
+        detail=True,
+        url_path="available-ips",
+        methods=["get", "post"],
+        queryset=IPAddress.objects.all(),
+    )
+    @advisory_lock(ADVISORY_LOCK_KEYS["available-ips"])
     def available_ips(self, request, pk=None):
         """
         A convenience method for returning available IP addresses within a prefix. By default, the number of IPs
@@ -316,8 +338,8 @@ class IPAddressViewSet(CustomFieldModelViewSet):
 
 
 class VLANGroupViewSet(ModelViewSet):
-    queryset = VLANGroup.objects.prefetch_related('site').annotate(
-        vlan_count=count_related(VLAN, 'group')
+    queryset = VLANGroup.objects.prefetch_related("site").annotate(
+        vlan_count=count_related(VLAN, "group")
     )
     serializer_class = serializers.VLANGroupSerializer
     filterset_class = filters.VLANGroupFilterSet
@@ -330,10 +352,8 @@ class VLANGroupViewSet(ModelViewSet):
 
 class VLANViewSet(CustomFieldModelViewSet):
     queryset = VLAN.objects.prefetch_related(
-        'site', 'group', 'tenant', 'role', 'tags'
-    ).annotate(
-        prefix_count=count_related(Prefix, 'vlan')
-    )
+        "site", "group", "tenant", "role", "tags"
+    ).annotate(prefix_count=count_related(Prefix, "vlan"))
     serializer_class = serializers.VLANSerializer
     filterset_class = filters.VLANFilterSet
 

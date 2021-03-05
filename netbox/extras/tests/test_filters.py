@@ -7,7 +7,13 @@ from django.test import TestCase
 from dcim.models import DeviceRole, Platform, Rack, Region, Site
 from extras.choices import ObjectChangeActionChoices
 from extras.filters import *
-from extras.models import ConfigContext, ExportTemplate, ImageAttachment, ObjectChange, Tag
+from extras.models import (
+    ConfigContext,
+    ExportTemplate,
+    ImageAttachment,
+    ObjectChange,
+    Tag,
+)
 from ipam.models import IPAddress
 from tenancy.models import Tenant, TenantGroup
 from virtualization.models import Cluster, ClusterGroup, ClusterType
@@ -23,9 +29,21 @@ class ExportTemplateTestCase(TestCase):
         content_types = ContentType.objects.filter(model__in=["site", "rack", "device"])
 
         export_templates = (
-            ExportTemplate(name='Export Template 1', content_type=content_types[0], template_code='TESTING'),
-            ExportTemplate(name='Export Template 2', content_type=content_types[1], template_code='TESTING'),
-            ExportTemplate(name='Export Template 3', content_type=content_types[2], template_code='TESTING'),
+            ExportTemplate(
+                name="Export Template 1",
+                content_type=content_types[0],
+                template_code="TESTING",
+            ),
+            ExportTemplate(
+                name="Export Template 2",
+                content_type=content_types[1],
+                template_code="TESTING",
+            ),
+            ExportTemplate(
+                name="Export Template 3",
+                content_type=content_types[2],
+                template_code="TESTING",
+            ),
         )
         ExportTemplate.objects.bulk_create(export_templates)
 
@@ -109,13 +127,15 @@ class ImageAttachmentTestCase(TestCase):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_content_type(self):
-        params = {'content_type': 'dcim.site'}
+        params = {"content_type": "dcim.site"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_content_type_id_and_object_id(self):
         params = {
-            'content_type_id': ContentType.objects.get(app_label='dcim', model='site').pk,
-            'object_id': [Site.objects.first().pk],
+            "content_type_id": ContentType.objects.get(
+                app_label="dcim", model="site"
+            ).pk,
+            "object_id": [Site.objects.first().pk],
         }
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
 
@@ -312,14 +332,14 @@ class ObjectChangeTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         users = (
-            User(username='user1'),
-            User(username='user2'),
-            User(username='user3'),
+            User(username="user1"),
+            User(username="user2"),
+            User(username="user3"),
         )
         User.objects.bulk_create(users)
 
-        site = Site.objects.create(name='Test Site 1', slug='test-site-1')
-        ipaddress = IPAddress.objects.create(address='192.0.2.1/24')
+        site = Site.objects.create(name="Test Site 1", slug="test-site-1")
+        ipaddress = IPAddress.objects.create(address="192.0.2.1/24")
 
         object_changes = (
             ObjectChange(
@@ -329,7 +349,7 @@ class ObjectChangeTestCase(TestCase):
                 action=ObjectChangeActionChoices.ACTION_CREATE,
                 changed_object=site,
                 object_repr=str(site),
-                object_data={'name': site.name, 'slug': site.slug}
+                object_data={"name": site.name, "slug": site.slug},
             ),
             ObjectChange(
                 user=users[0],
@@ -338,7 +358,7 @@ class ObjectChangeTestCase(TestCase):
                 action=ObjectChangeActionChoices.ACTION_UPDATE,
                 changed_object=site,
                 object_repr=str(site),
-                object_data={'name': site.name, 'slug': site.slug}
+                object_data={"name": site.name, "slug": site.slug},
             ),
             ObjectChange(
                 user=users[1],
@@ -347,7 +367,7 @@ class ObjectChangeTestCase(TestCase):
                 action=ObjectChangeActionChoices.ACTION_DELETE,
                 changed_object=site,
                 object_repr=str(site),
-                object_data={'name': site.name, 'slug': site.slug}
+                object_data={"name": site.name, "slug": site.slug},
             ),
             ObjectChange(
                 user=users[1],
@@ -356,7 +376,7 @@ class ObjectChangeTestCase(TestCase):
                 action=ObjectChangeActionChoices.ACTION_CREATE,
                 changed_object=ipaddress,
                 object_repr=str(ipaddress),
-                object_data={'address': ipaddress.address, 'status': ipaddress.status}
+                object_data={"address": ipaddress.address, "status": ipaddress.status},
             ),
             ObjectChange(
                 user=users[2],
@@ -365,7 +385,7 @@ class ObjectChangeTestCase(TestCase):
                 action=ObjectChangeActionChoices.ACTION_UPDATE,
                 changed_object=ipaddress,
                 object_repr=str(ipaddress),
-                object_data={'address': ipaddress.address, 'status': ipaddress.status}
+                object_data={"address": ipaddress.address, "status": ipaddress.status},
             ),
             ObjectChange(
                 user=users[2],
@@ -374,29 +394,37 @@ class ObjectChangeTestCase(TestCase):
                 action=ObjectChangeActionChoices.ACTION_DELETE,
                 changed_object=ipaddress,
                 object_repr=str(ipaddress),
-                object_data={'address': ipaddress.address, 'status': ipaddress.status}
+                object_data={"address": ipaddress.address, "status": ipaddress.status},
             ),
         )
         ObjectChange.objects.bulk_create(object_changes)
 
     def test_id(self):
-        params = {'id': self.queryset.values_list('pk', flat=True)[:3]}
+        params = {"id": self.queryset.values_list("pk", flat=True)[:3]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
 
     def test_user(self):
-        params = {'user_id': User.objects.filter(username__in=['user1', 'user2']).values_list('pk', flat=True)}
+        params = {
+            "user_id": User.objects.filter(username__in=["user1", "user2"]).values_list(
+                "pk", flat=True
+            )
+        }
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
-        params = {'user': ['user1', 'user2']}
+        params = {"user": ["user1", "user2"]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
 
     def test_user_name(self):
-        params = {'user_name': ['user1', 'user2']}
+        params = {"user_name": ["user1", "user2"]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
 
     def test_changed_object_type(self):
-        params = {'changed_object_type': 'dcim.site'}
+        params = {"changed_object_type": "dcim.site"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
 
     def test_changed_object_type_id(self):
-        params = {'changed_object_type_id': ContentType.objects.get(app_label='dcim', model='site').pk}
+        params = {
+            "changed_object_type_id": ContentType.objects.get(
+                app_label="dcim", model="site"
+            ).pk
+        }
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)

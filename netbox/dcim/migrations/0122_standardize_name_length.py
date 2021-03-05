@@ -6,93 +6,93 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcim', '0121_cablepath'),
+        ("dcim", "0121_cablepath"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='devicerole',
-            name='name',
+            model_name="devicerole",
+            name="name",
             field=models.CharField(max_length=100, unique=True),
         ),
         migrations.AlterField(
-            model_name='devicerole',
-            name='slug',
+            model_name="devicerole",
+            name="slug",
             field=models.SlugField(max_length=100, unique=True),
         ),
         migrations.AlterField(
-            model_name='devicetype',
-            name='model',
+            model_name="devicetype",
+            name="model",
             field=models.CharField(max_length=100),
         ),
         migrations.AlterField(
-            model_name='devicetype',
-            name='slug',
+            model_name="devicetype",
+            name="slug",
             field=models.SlugField(max_length=100),
         ),
         migrations.AlterField(
-            model_name='manufacturer',
-            name='name',
+            model_name="manufacturer",
+            name="name",
             field=models.CharField(max_length=100, unique=True),
         ),
         migrations.AlterField(
-            model_name='manufacturer',
-            name='slug',
+            model_name="manufacturer",
+            name="slug",
             field=models.SlugField(max_length=100, unique=True),
         ),
         migrations.AlterField(
-            model_name='powerfeed',
-            name='name',
+            model_name="powerfeed",
+            name="name",
             field=models.CharField(max_length=100),
         ),
         migrations.AlterField(
-            model_name='powerpanel',
-            name='name',
+            model_name="powerpanel",
+            name="name",
             field=models.CharField(max_length=100),
         ),
         migrations.AlterField(
-            model_name='rack',
-            name='name',
+            model_name="rack",
+            name="name",
             field=models.CharField(max_length=100),
         ),
         migrations.AlterField(
-            model_name='rackgroup',
-            name='name',
+            model_name="rackgroup",
+            name="name",
             field=models.CharField(max_length=100),
         ),
         migrations.AlterField(
-            model_name='rackgroup',
-            name='slug',
+            model_name="rackgroup",
+            name="slug",
             field=models.SlugField(max_length=100),
         ),
         migrations.AlterField(
-            model_name='rackrole',
-            name='name',
+            model_name="rackrole",
+            name="name",
             field=models.CharField(max_length=100, unique=True),
         ),
         migrations.AlterField(
-            model_name='rackrole',
-            name='slug',
+            model_name="rackrole",
+            name="slug",
             field=models.SlugField(max_length=100, unique=True),
         ),
         migrations.AlterField(
-            model_name='region',
-            name='name',
+            model_name="region",
+            name="name",
             field=models.CharField(max_length=100, unique=True),
         ),
         migrations.AlterField(
-            model_name='region',
-            name='slug',
+            model_name="region",
+            name="slug",
             field=models.SlugField(max_length=100, unique=True),
         ),
         migrations.AlterField(
-            model_name='site',
-            name='name',
+            model_name="site",
+            name="name",
             field=models.CharField(max_length=100, unique=True),
         ),
         migrations.AlterField(
-            model_name='site',
-            name='slug',
+            model_name="site",
+            name="slug",
             field=models.SlugField(max_length=100, unique=True),
         ),
     ]

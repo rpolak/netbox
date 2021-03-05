@@ -62,10 +62,12 @@ class ObjectPermissionViewSet(ModelViewSet):
 # User preferences
 #
 
+
 class UserConfigViewSet(ViewSet):
     """
     An API endpoint via which a user can update his or her own UserConfig data (but no one else's).
     """
+
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):

@@ -145,18 +145,17 @@ class ObjectPermissionTest(APIViewTestCases.APIViewTestCase):
         ]
 
         cls.bulk_update_data = {
-            'description': 'New description',
+            "description": "New description",
         }
 
 
 class UserConfigTest(APITestCase):
-
     def test_get(self):
         """
         Retrieve user configuration via GET request.
         """
         userconfig = self.user.config
-        url = reverse('users-api:userconfig-list')
+        url = reverse("users-api:userconfig-list")
 
         response = self.client.get(url, **self.header)
         self.assertEqual(response.data, {})
@@ -176,7 +175,7 @@ class UserConfigTest(APITestCase):
         Set user config via PATCH requests.
         """
         userconfig = self.user.config
-        url = reverse('users-api:userconfig-list')
+        url = reverse("users-api:userconfig-list")
 
         data = {
             "a": {
@@ -185,17 +184,17 @@ class UserConfigTest(APITestCase):
             },
             "b": {
                 "b1": "Z",
-            }
+            },
         }
-        response = self.client.patch(url, data=data, format='json', **self.header)
+        response = self.client.patch(url, data=data, format="json", **self.header)
         self.assertDictEqual(response.data, data)
         userconfig.refresh_from_db()
         self.assertDictEqual(userconfig.data, data)
 
-        update_data = {
-            "c": 123
-        }
-        response = self.client.patch(url, data=update_data, format='json', **self.header)
+        update_data = {"c": 123}
+        response = self.client.patch(
+            url, data=update_data, format="json", **self.header
+        )
         new_data = deepmerge(data, update_data)
         self.assertDictEqual(response.data, new_data)
         userconfig.refresh_from_db()

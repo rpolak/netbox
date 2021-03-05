@@ -71,6 +71,7 @@ class ObjectChangeMiddleware(object):
     have been created. Conversely, deletions are acted upon immediately, so that the serialized representation of the
     object is recorded before it (and any related objects) are actually deleted from the database.
     """
+
     def __init__(self, get_response):
         self.get_response = get_response
 

@@ -22,19 +22,20 @@ from netbox.api.exceptions import SerializerNotFound
 from utilities.api import get_serializer_for_model
 
 HTTP_ACTIONS = {
-    'GET': 'view',
-    'OPTIONS': None,
-    'HEAD': 'view',
-    'POST': 'add',
-    'PUT': 'change',
-    'PATCH': 'change',
-    'DELETE': 'delete',
+    "GET": "view",
+    "OPTIONS": None,
+    "HEAD": "view",
+    "POST": "add",
+    "PUT": "change",
+    "PATCH": "change",
+    "DELETE": "delete",
 }
 
 
 #
 # Mixins
 #
+
 
 class BulkUpdateModelMixin:
     """
@@ -54,18 +55,15 @@ class BulkUpdateModelMixin:
         }
     ]
     """
+
     def bulk_update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
+        partial = kwargs.pop("partial", False)
         serializer = BulkOperationSerializer(data=request.data, many=True)
         serializer.is_valid(raise_exception=True)
-        qs = self.get_queryset().filter(
-            pk__in=[o['id'] for o in serializer.data]
-        )
+        qs = self.get_queryset().filter(pk__in=[o["id"] for o in serializer.data])
 
         # Map update data by object ID
-        update_data = {
-            obj.pop('id'): obj for obj in request.data
-        }
+        update_data = {obj.pop("id"): obj for obj in request.data}
 
         data = self.perform_bulk_update(qs, update_data, partial=partial)
 
@@ -84,7 +82,7 @@ class BulkUpdateModelMixin:
             return data_list
 
     def bulk_partial_update(self, request, *args, **kwargs):
-        kwargs['partial'] = True
+        kwargs["partial"] = True
         return self.bulk_update(request, *args, **kwargs)
 
 
@@ -99,12 +97,11 @@ class BulkDestroyModelMixin:
         {"id": 456}
     ]
     """
+
     def bulk_destroy(self, request, *args, **kwargs):
         serializer = BulkOperationSerializer(data=request.data, many=True)
         serializer.is_valid(raise_exception=True)
-        qs = self.get_queryset().filter(
-            pk__in=[o['id'] for o in serializer.data]
-        )
+        qs = self.get_queryset().filter(pk__in=[o["id"] for o in serializer.data])
 
         self.perform_bulk_destroy(qs)
 
@@ -120,29 +117,35 @@ class BulkDestroyModelMixin:
 # Viewsets
 #
 
+
 class ModelViewSet(BulkUpdateModelMixin, BulkDestroyModelMixin, ModelViewSet_):
     """
     Extend DRF's ModelViewSet to support bulk update and delete functions.
     """
+
     brief = False
     brief_prefetch_fields = []
 
     def get_serializer(self, *args, **kwargs):
 
         # If a list of objects has been provided, initialize the serializer with many=True
-        if isinstance(kwargs.get('data', {}), list):
-            kwargs['many'] = True
+        if isinstance(kwargs.get("data", {}), list):
+            kwargs["many"] = True
 
         return super().get_serializer(*args, **kwargs)
 
     def get_serializer_class(self):
-        logger = logging.getLogger('netbox.api.views.ModelViewSet')
+        logger = logging.getLogger("netbox.api.views.ModelViewSet")
 
         # If using 'brief' mode, find and return the nested serializer for this model, if one exists
         if self.brief:
-            logger.debug("Request is for 'brief' format; initializing nested serializer")
+            logger.debug(
+                "Request is for 'brief' format; initializing nested serializer"
+            )
             try:
-                serializer = get_serializer_for_model(self.queryset.model, prefix='Nested')
+                serializer = get_serializer_for_model(
+                    self.queryset.model, prefix="Nested"
+                )
                 logger.debug(f"Using serializer {serializer}")
                 return serializer
             except SerializerNotFound:
@@ -155,13 +158,18 @@ class ModelViewSet(BulkUpdateModelMixin, BulkDestroyModelMixin, ModelViewSet_):
     def get_queryset(self):
         # If using brief mode, clear all prefetches from the queryset and append only brief_prefetch_fields (if any)
         if self.brief:
-            return super().get_queryset().prefetch_related(None).prefetch_related(*self.brief_prefetch_fields)
+            return (
+                super()
+                .get_queryset()
+                .prefetch_related(None)
+                .prefetch_related(*self.brief_prefetch_fields)
+            )
 
         return super().get_queryset()
 
     def initialize_request(self, request, *args, **kwargs):
         # Check if brief=True has been passed
-        if request.method == 'GET' and request.GET.get('brief'):
+        if request.method == "GET" and request.GET.get("brief"):
             self.brief = True
 
         return super().initialize_request(request, *args, **kwargs)
@@ -178,20 +186,17 @@ class ModelViewSet(BulkUpdateModelMixin, BulkDestroyModelMixin, ModelViewSet_):
             self.queryset = self.queryset.restrict(request.user, action)
 
     def dispatch(self, request, *args, **kwargs):
-        logger = logging.getLogger('netbox.api.views.ModelViewSet')
+        logger = logging.getLogger("netbox.api.views.ModelViewSet")
 
         try:
             return super().dispatch(request, *args, **kwargs)
         except ProtectedError as e:
             protected_objects = list(e.protected_objects)
-            msg = f'Unable to delete object. {len(protected_objects)} dependent objects were found: '
-            msg += ', '.join([f'{obj} ({obj.pk})' for obj in protected_objects])
+            msg = f"Unable to delete object. {len(protected_objects)} dependent objects were found: "
+            msg += ", ".join([f"{obj} ({obj.pk})" for obj in protected_objects])
             logger.warning(msg)
             return self.finalize_response(
-                request,
-                Response({'detail': msg}, status=409),
-                *args,
-                **kwargs
+                request, Response({"detail": msg}, status=409), *args, **kwargs
             )
 
     def _validate_objects(self, instance):
@@ -201,7 +206,9 @@ class ModelViewSet(BulkUpdateModelMixin, BulkDestroyModelMixin, ModelViewSet_):
         """
         if type(instance) is list:
             # Check that all instances are still included in the view's queryset
-            conforming_count = self.queryset.filter(pk__in=[obj.pk for obj in instance]).count()
+            conforming_count = self.queryset.filter(
+                pk__in=[obj.pk for obj in instance]
+            ).count()
             if conforming_count != len(instance):
                 raise ObjectDoesNotExist
         else:
@@ -210,7 +217,7 @@ class ModelViewSet(BulkUpdateModelMixin, BulkDestroyModelMixin, ModelViewSet_):
 
     def perform_create(self, serializer):
         model = self.queryset.model
-        logger = logging.getLogger('netbox.api.views.ModelViewSet')
+        logger = logging.getLogger("netbox.api.views.ModelViewSet")
         logger.info(f"Creating new {model._meta.verbose_name}")
 
         # Enforce object-level permissions on save()
@@ -223,8 +230,10 @@ class ModelViewSet(BulkUpdateModelMixin, BulkDestroyModelMixin, ModelViewSet_):
 
     def perform_update(self, serializer):
         model = self.queryset.model
-        logger = logging.getLogger('netbox.api.views.ModelViewSet')
-        logger.info(f"Updating {model._meta.verbose_name} {serializer.instance} (PK: {serializer.instance.pk})")
+        logger = logging.getLogger("netbox.api.views.ModelViewSet")
+        logger.info(
+            f"Updating {model._meta.verbose_name} {serializer.instance} (PK: {serializer.instance.pk})"
+        )
 
         # Enforce object-level permissions on save()
         try:
@@ -236,8 +245,10 @@ class ModelViewSet(BulkUpdateModelMixin, BulkDestroyModelMixin, ModelViewSet_):
 
     def perform_destroy(self, instance):
         model = self.queryset.model
-        logger = logging.getLogger('netbox.api.views.ModelViewSet')
-        logger.info(f"Deleting {model._meta.verbose_name} {instance} (PK: {instance.pk})")
+        logger = logging.getLogger("netbox.api.views.ModelViewSet")
+        logger.info(
+            f"Deleting {model._meta.verbose_name} {instance} (PK: {instance.pk})"
+        )
 
         return super().perform_destroy(instance)
 
@@ -246,10 +257,12 @@ class ModelViewSet(BulkUpdateModelMixin, BulkDestroyModelMixin, ModelViewSet_):
 # Views
 #
 
+
 class APIRootView(APIView):
     """
     This is the root of NetBox's REST API. API endpoints are arranged by app and model name; e.g. `/api/dcim/sites/`.
     """
+
     _ignore_model_permissions = True
     exclude_from_schema = True
     swagger_schema = None
@@ -259,24 +272,62 @@ class APIRootView(APIView):
 
     def get(self, request, format=None):
 
-        return Response(OrderedDict((
-            ('circuits', reverse('circuits-api:api-root', request=request, format=format)),
-            ('dcim', reverse('dcim-api:api-root', request=request, format=format)),
-            ('extras', reverse('extras-api:api-root', request=request, format=format)),
-            ('ipam', reverse('ipam-api:api-root', request=request, format=format)),
-            ('plugins', reverse('plugins-api:api-root', request=request, format=format)),
-            ('secrets', reverse('secrets-api:api-root', request=request, format=format)),
-            ('status', reverse('api-status', request=request, format=format)),
-            ('tenancy', reverse('tenancy-api:api-root', request=request, format=format)),
-            ('users', reverse('users-api:api-root', request=request, format=format)),
-            ('virtualization', reverse('virtualization-api:api-root', request=request, format=format)),
-        )))
+        return Response(
+            OrderedDict(
+                (
+                    (
+                        "circuits",
+                        reverse(
+                            "circuits-api:api-root", request=request, format=format
+                        ),
+                    ),
+                    (
+                        "dcim",
+                        reverse("dcim-api:api-root", request=request, format=format),
+                    ),
+                    (
+                        "extras",
+                        reverse("extras-api:api-root", request=request, format=format),
+                    ),
+                    (
+                        "ipam",
+                        reverse("ipam-api:api-root", request=request, format=format),
+                    ),
+                    (
+                        "plugins",
+                        reverse("plugins-api:api-root", request=request, format=format),
+                    ),
+                    (
+                        "secrets",
+                        reverse("secrets-api:api-root", request=request, format=format),
+                    ),
+                    ("status", reverse("api-status", request=request, format=format)),
+                    (
+                        "tenancy",
+                        reverse("tenancy-api:api-root", request=request, format=format),
+                    ),
+                    (
+                        "users",
+                        reverse("users-api:api-root", request=request, format=format),
+                    ),
+                    (
+                        "virtualization",
+                        reverse(
+                            "virtualization-api:api-root",
+                            request=request,
+                            format=format,
+                        ),
+                    ),
+                )
+            )
+        )
 
 
 class StatusView(APIView):
     """
     A lightweight read-only endpoint for conveying NetBox's current operational status.
     """
+
     permission_classes = [IsAuthenticatedOrLoginNotRequired]
 
     def get(self, request):
@@ -284,26 +335,28 @@ class StatusView(APIView):
         installed_apps = {}
         for app_config in apps.get_app_configs():
             app = app_config.module
-            version = getattr(app, 'VERSION', getattr(app, '__version__', None))
+            version = getattr(app, "VERSION", getattr(app, "__version__", None))
             if version:
                 if type(version) is tuple:
-                    version = '.'.join(str(n) for n in version)
+                    version = ".".join(str(n) for n in version)
                 installed_apps[app_config.name] = version
         installed_apps = {k: v for k, v in sorted(installed_apps.items())}
 
         # Gather installed plugins
         plugins = {}
         for plugin_name in settings.PLUGINS:
-            plugin_name = plugin_name.rsplit('.', 1)[-1]
+            plugin_name = plugin_name.rsplit(".", 1)[-1]
             plugin_config = apps.get_app_config(plugin_name)
-            plugins[plugin_name] = getattr(plugin_config, 'version', None)
+            plugins[plugin_name] = getattr(plugin_config, "version", None)
         plugins = {k: v for k, v in sorted(plugins.items())}
 
-        return Response({
-            'django-version': DJANGO_VERSION,
-            'installed-apps': installed_apps,
-            'netbox-version': settings.VERSION,
-            'plugins': plugins,
-            'python-version': platform.python_version(),
-            'rq-workers-running': Worker.count(get_connection('default')),
-        })
+        return Response(
+            {
+                "django-version": DJANGO_VERSION,
+                "installed-apps": installed_apps,
+                "netbox-version": settings.VERSION,
+                "plugins": plugins,
+                "python-version": platform.python_version(),
+                "rq-workers-running": Worker.count(get_connection("default")),
+            }
+        )

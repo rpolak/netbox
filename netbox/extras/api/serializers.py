@@ -14,16 +14,33 @@ from dcim.api.nested_serializers import (
 from dcim.models import Device, DeviceRole, Platform, Rack, Region, Site
 from extras.choices import *
 from extras.models import (
-    ConfigContext, CustomField, ExportTemplate, ImageAttachment, ObjectChange, JobResult, Tag,
+    ConfigContext,
+    CustomField,
+    ExportTemplate,
+    ImageAttachment,
+    ObjectChange,
+    JobResult,
+    Tag,
 )
 from extras.utils import FeatureQuery
-from netbox.api import ChoiceField, ContentTypeField, SerializedPKRelatedField, ValidatedModelSerializer
+from netbox.api import (
+    ChoiceField,
+    ContentTypeField,
+    SerializedPKRelatedField,
+    ValidatedModelSerializer,
+)
 from netbox.api.exceptions import SerializerNotFound
-from tenancy.api.nested_serializers import NestedTenantSerializer, NestedTenantGroupSerializer
+from tenancy.api.nested_serializers import (
+    NestedTenantSerializer,
+    NestedTenantGroupSerializer,
+)
 from tenancy.models import Tenant, TenantGroup
 from users.api.nested_serializers import NestedUserSerializer
 from utilities.api import get_serializer_for_model
-from virtualization.api.nested_serializers import NestedClusterGroupSerializer, NestedClusterSerializer
+from virtualization.api.nested_serializers import (
+    NestedClusterGroupSerializer,
+    NestedClusterSerializer,
+)
 from virtualization.models import Cluster, ClusterGroup
 from .nested_serializers import *
 
@@ -32,11 +49,14 @@ from .nested_serializers import *
 # Custom fields
 #
 
+
 class CustomFieldSerializer(ValidatedModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='extras-api:customfield-detail')
+    url = serializers.HyperlinkedIdentityField(
+        view_name="extras-api:customfield-detail"
+    )
     content_types = ContentTypeField(
-        queryset=ContentType.objects.filter(FeatureQuery('custom_fields').get_query()),
-        many=True
+        queryset=ContentType.objects.filter(FeatureQuery("custom_fields").get_query()),
+        many=True,
     )
     type = ChoiceField(choices=CustomFieldTypeChoices)
     filter_logic = ChoiceField(choices=CustomFieldFilterLogicChoices, required=False)
@@ -44,8 +64,21 @@ class CustomFieldSerializer(ValidatedModelSerializer):
     class Meta:
         model = CustomField
         fields = [
-            'id', 'url', 'content_types', 'type', 'name', 'label', 'description', 'required', 'filter_logic',
-            'default', 'weight', 'validation_minimum', 'validation_maximum', 'validation_regex', 'choices',
+            "id",
+            "url",
+            "content_types",
+            "type",
+            "name",
+            "label",
+            "description",
+            "required",
+            "filter_logic",
+            "default",
+            "weight",
+            "validation_minimum",
+            "validation_maximum",
+            "validation_regex",
+            "choices",
         ]
 
 
@@ -66,7 +99,16 @@ class ExportTemplateSerializer(ValidatedModelSerializer):
 
     class Meta:
         model = ExportTemplate
-        fields = ['id', 'url', 'content_type', 'name', 'description', 'template_code', 'mime_type', 'file_extension']
+        fields = [
+            "id",
+            "url",
+            "content_type",
+            "name",
+            "description",
+            "template_code",
+            "mime_type",
+            "file_extension",
+        ]
 
 
 #
@@ -409,13 +451,16 @@ class ObjectChangeSerializer(serializers.ModelSerializer):
 # ContentTypes
 #
 
+
 class ContentTypeSerializer(serializers.ModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='extras-api:contenttype-detail')
+    url = serializers.HyperlinkedIdentityField(
+        view_name="extras-api:contenttype-detail"
+    )
     display_name = serializers.SerializerMethodField()
 
     class Meta:
         model = ContentType
-        fields = ['id', 'url', 'app_label', 'model', 'display_name']
+        fields = ["id", "url", "app_label", "model", "display_name"]
 
     @swagger_serializer_method(serializer_or_field=serializers.CharField)
     def get_display_name(self, obj):

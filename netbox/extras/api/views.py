@@ -12,7 +12,13 @@ from rq import Worker
 from extras import filters
 from extras.choices import JobResultStatusChoices
 from extras.models import (
-    ConfigContext, ExportTemplate, ImageAttachment, ObjectChange, JobResult, Tag, TaggedItem,
+    ConfigContext,
+    ExportTemplate,
+    ImageAttachment,
+    ObjectChange,
+    JobResult,
+    Tag,
+    TaggedItem,
 )
 from extras.models import CustomField
 from extras.reports import get_report, get_reports, run_report
@@ -29,8 +35,9 @@ class ExtrasRootView(APIRootView):
     """
     Extras API root view
     """
+
     def get_view_name(self):
-        return 'Extras'
+        return "Extras"
 
 
 class ConfigContextQuerySetMixin:
@@ -39,6 +46,7 @@ class ConfigContextQuerySetMixin:
     Provides a get_queryset() method which deals with adding the config context
     data annotation or not.
     """
+
     def get_queryset(self):
         """
         Build the proper queryset based on the request context
@@ -49,8 +57,8 @@ class ConfigContextQuerySetMixin:
         Else, return the queryset annotated with config context data
         """
         queryset = super().get_queryset()
-        request = self.get_serializer_context()['request']
-        if self.brief or 'config_context' in request.query_params.get('exclude', []):
+        request = self.get_serializer_context()["request"]
+        if self.brief or "config_context" in request.query_params.get("exclude", []):
             return queryset
         return queryset.annotate_config_context_data()
 
@@ -59,12 +67,12 @@ class ConfigContextQuerySetMixin:
 # Custom fields
 #
 
+
 class CustomFieldViewSet(ModelViewSet):
     metadata_class = ContentTypeMetadata
     queryset = CustomField.objects.all()
     serializer_class = serializers.CustomFieldSerializer
     filterset_class = filters.CustomFieldFilterSet
-
 
 
 class CustomFieldModelViewSet(ModelViewSet):
@@ -79,9 +87,11 @@ class CustomFieldModelViewSet(ModelViewSet):
         custom_fields = content_type.custom_fields.all()
 
         context = super().get_serializer_context()
-        context.update({
-            'custom_fields': custom_fields,
-        })
+        context.update(
+            {
+                "custom_fields": custom_fields,
+            }
+        )
         return context
 
 
@@ -103,9 +113,7 @@ class ExportTemplateViewSet(ModelViewSet):
 
 
 class TagViewSet(ModelViewSet):
-    queryset = Tag.objects.annotate(
-        tagged_items=count_related(TaggedItem, 'tag')
-    )
+    queryset = Tag.objects.annotate(tagged_items=count_related(TaggedItem, "tag"))
     serializer_class = serializers.TagSerializer
     filterset_class = filters.TagFilterSet
 
@@ -386,10 +394,12 @@ class JobResultViewSet(ReadOnlyModelViewSet):
 # ContentTypes
 #
 
+
 class ContentTypeViewSet(ReadOnlyModelViewSet):
     """
     Read-only list of ContentTypes. Limit results to ContentTypes pertinent to NetBox objects.
     """
-    queryset = ContentType.objects.order_by('app_label', 'model')
+
+    queryset = ContentType.objects.order_by("app_label", "model")
     serializer_class = serializers.ContentTypeSerializer
     filterset_class = filters.ContentTypeFilterSet

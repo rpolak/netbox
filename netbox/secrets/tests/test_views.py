@@ -91,17 +91,34 @@ class SecretTestCase(
         SecretRole.objects.bulk_create(secretroles)
 
         # Create one secret per device to allow bulk-editing of names (which must be unique per device/role)
-        Secret.objects.bulk_create((
-            Secret(assigned_object=devices[0], role=secretroles[0], name='Secret 1', ciphertext=b'1234567890'),
-            Secret(assigned_object=devices[1], role=secretroles[0], name='Secret 2', ciphertext=b'1234567890'),
-            Secret(assigned_object=devices[2], role=secretroles[0], name='Secret 3', ciphertext=b'1234567890'),
-        ))
+        Secret.objects.bulk_create(
+            (
+                Secret(
+                    assigned_object=devices[0],
+                    role=secretroles[0],
+                    name="Secret 1",
+                    ciphertext=b"1234567890",
+                ),
+                Secret(
+                    assigned_object=devices[1],
+                    role=secretroles[0],
+                    name="Secret 2",
+                    ciphertext=b"1234567890",
+                ),
+                Secret(
+                    assigned_object=devices[2],
+                    role=secretroles[0],
+                    name="Secret 3",
+                    ciphertext=b"1234567890",
+                ),
+            )
+        )
 
         cls.form_data = {
-            'assigned_object_type': 'dcim.device',
-            'assigned_object_id': devices[1].pk,
-            'role': secretroles[1].pk,
-            'name': 'Secret X',
+            "assigned_object_type": "dcim.device",
+            "assigned_object_id": devices[1].pk,
+            "role": secretroles[1].pk,
+            "name": "Secret X",
         }
 
         cls.bulk_edit_data = {
@@ -124,7 +141,7 @@ class SecretTestCase(
     def test_import_objects(self):
         self.add_permissions("secrets.add_secret")
 
-        device = Device.objects.get(name='Device 1')
+        device = Device.objects.get(name="Device 1")
         csv_data = (
             "device,role,name,plaintext",
             f"{device.name},Secret Role 1,Secret 4,abcdefghij",

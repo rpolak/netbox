@@ -112,10 +112,31 @@ urlpatterns = [
         name="circuit_terminations_swap",
     ),
     # Circuit terminations
-    path('circuits/<int:circuit>/terminations/add/', views.CircuitTerminationEditView.as_view(), name='circuittermination_add'),
-    path('circuit-terminations/<int:pk>/edit/', views.CircuitTerminationEditView.as_view(), name='circuittermination_edit'),
-    path('circuit-terminations/<int:pk>/delete/', views.CircuitTerminationDeleteView.as_view(), name='circuittermination_delete'),
-    path('circuit-terminations/<int:termination_a_id>/connect/<str:termination_b_type>/', CableCreateView.as_view(), name='circuittermination_connect', kwargs={'termination_a_type': CircuitTermination}),
-    path('circuit-terminations/<int:pk>/trace/', PathTraceView.as_view(), name='circuittermination_trace', kwargs={'model': CircuitTermination}),
-
+    path(
+        "circuits/<int:circuit>/terminations/add/",
+        views.CircuitTerminationEditView.as_view(),
+        name="circuittermination_add",
+    ),
+    path(
+        "circuit-terminations/<int:pk>/edit/",
+        views.CircuitTerminationEditView.as_view(),
+        name="circuittermination_edit",
+    ),
+    path(
+        "circuit-terminations/<int:pk>/delete/",
+        views.CircuitTerminationDeleteView.as_view(),
+        name="circuittermination_delete",
+    ),
+    path(
+        "circuit-terminations/<int:termination_a_id>/connect/<str:termination_b_type>/",
+        CableCreateView.as_view(),
+        name="circuittermination_connect",
+        kwargs={"termination_a_type": CircuitTermination},
+    ),
+    path(
+        "circuit-terminations/<int:pk>/trace/",
+        PathTraceView.as_view(),
+        name="circuittermination_trace",
+        kwargs={"model": CircuitTermination},
+    ),
 ]

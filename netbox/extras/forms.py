@@ -47,10 +47,12 @@ class CustomFieldModelForm(forms.ModelForm):
         """
         # Append form fields; assign initial values if modifying and existing object
         for cf in CustomField.objects.filter(content_types=self.obj_type):
-            field_name = 'cf_{}'.format(cf.name)
+            field_name = "cf_{}".format(cf.name)
             if self.instance.pk:
                 self.fields[field_name] = cf.to_form_field(set_initial=False)
-                self.fields[field_name].initial = self.instance.custom_field_data.get(cf.name)
+                self.fields[field_name].initial = self.instance.custom_field_data.get(
+                    cf.name
+                )
             else:
                 self.fields[field_name] = cf.to_form_field()
 
@@ -61,7 +63,9 @@ class CustomFieldModelForm(forms.ModelForm):
 
         # Save custom field data on instance
         for cf_name in self.custom_fields:
-            self.instance.custom_field_data[cf_name[3:]] = self.cleaned_data.get(cf_name)
+            self.instance.custom_field_data[cf_name[3:]] = self.cleaned_data.get(
+                cf_name
+            )
 
         return super().clean()
 
@@ -71,7 +75,7 @@ class CustomFieldModelCSVForm(CSVModelForm, CustomFieldModelForm):
 
         # Append form fields
         for cf in CustomField.objects.filter(content_types=self.obj_type):
-            field_name = 'cf_{}'.format(cf.name)
+            field_name = "cf_{}".format(cf.name)
             self.fields[field_name] = cf.to_form_field(for_csv_import=True)
 
             # Annotate the field in the list of CustomField form fields
@@ -325,11 +329,11 @@ class ObjectChangeFilterForm(BootstrapMixin, forms.Form):
     changed_object_type_id = DynamicModelMultipleChoiceField(
         queryset=ContentType.objects.all(),
         required=False,
-        display_field='display_name',
-        label='Object Type',
+        display_field="display_name",
+        label="Object Type",
         widget=APISelectMultiple(
-            api_url='/api/extras/content-types/',
-        )
+            api_url="/api/extras/content-types/",
+        ),
     )
 
 

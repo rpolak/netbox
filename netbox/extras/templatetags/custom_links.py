@@ -64,8 +64,10 @@ def custom_links(context, obj):
                         link_rendered, link_target, cl.button_class, text_rendered
                     )
             except Exception as e:
-                template_code += '<a class="btn btn-sm btn-default" disabled="disabled" title="{}">' \
-                                 '<i class="mdi mdi-alert"></i> {}</a>\n'.format(e, cl.name)
+                template_code += (
+                    '<a class="btn btn-sm btn-default" disabled="disabled" title="{}">'
+                    '<i class="mdi mdi-alert"></i> {}</a>\n'.format(e, cl.name)
+                )
 
     # Add grouped links to template
     for group, links in group_names.items():
@@ -84,7 +86,9 @@ def custom_links(context, obj):
             except Exception as e:
                 links_rendered.append(
                     '<li><a disabled="disabled" title="{}"><span class="text-muted">'
-                    '<i class="mdi mdi-alert"></i> {}</span></a></li>'.format(e, cl.name)
+                    '<i class="mdi mdi-alert"></i> {}</span></a></li>'.format(
+                        e, cl.name
+                    )
                 )
 
         if links_rendered:

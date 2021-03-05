@@ -7,7 +7,16 @@ from django.db import transaction
 from django.dispatch import receiver
 
 from .choices import CableStatusChoices
-from .models import Cable, CablePath, Device, PathEndpoint, PowerPanel, Rack, RackGroup, VirtualChassis
+from .models import (
+    Cable,
+    CablePath,
+    Device,
+    PathEndpoint,
+    PowerPanel,
+    Rack,
+    RackGroup,
+    VirtualChassis,
+)
 
 
 def create_cablepath(node):
@@ -40,6 +49,7 @@ def rebuild_paths(obj):
 # Site/rack/device assignment
 #
 
+
 @receiver(post_save, sender=RackGroup)
 def handle_rackgroup_site_change(instance, created, **kwargs):
     """
@@ -53,7 +63,9 @@ def handle_rackgroup_site_change(instance, created, **kwargs):
         for rack in Rack.objects.filter(group=instance).exclude(site=instance.site):
             rack.site = instance.site
             rack.save()
-        for powerpanel in PowerPanel.objects.filter(rack_group=instance).exclude(site=instance.site):
+        for powerpanel in PowerPanel.objects.filter(rack_group=instance).exclude(
+            site=instance.site
+        ):
             powerpanel.site = instance.site
             powerpanel.save()
 
@@ -72,6 +84,7 @@ def handle_rack_site_change(instance, created, **kwargs):
 #
 # Virtual chassis
 #
+
 
 @receiver(post_save, sender=VirtualChassis)
 def assign_virtualchassis_master(instance, created, **kwargs):
@@ -107,7 +120,7 @@ def update_connected_endpoints(instance, created, raw=False, **kwargs):
     """
     When a Cable is saved, check for and update its two connected endpoints
     """
-    logger = logging.getLogger('netbox.dcim.cable')
+    logger = logging.getLogger("netbox.dcim.cable")
     if raw:
         logger.debug(f"Skipping endpoint updates for imported cable {instance}")
         return
@@ -166,10 +179,12 @@ def nullify_connected_endpoints(instance, **kwargs):
         if cp:
             CablePath.objects.filter(pk=cablepath.pk).update(
                 path=cp.path,
-                destination_type=ContentType.objects.get_for_model(cp.destination) if cp.destination else None,
+                destination_type=ContentType.objects.get_for_model(cp.destination)
+                if cp.destination
+                else None,
                 destination_id=cp.destination.pk if cp.destination else None,
                 is_active=cp.is_active,
-                is_split=cp.is_split
+                is_split=cp.is_split,
             )
         else:
             cablepath.delete()

@@ -225,9 +225,9 @@ class ObjectPermissionAPIViewTestCase(TestCase):
 
         # Assign object permission
         obj_perm = ObjectPermission(
-            name='Test permission',
-            constraints={'site__name': 'Site 1'},
-            actions=['view']
+            name="Test permission",
+            constraints={"site__name": "Site 1"},
+            actions=["view"],
         )
         obj_perm.save()
         obj_perm.users.add(self.user)
@@ -253,9 +253,9 @@ class ObjectPermissionAPIViewTestCase(TestCase):
 
         # Assign object permission
         obj_perm = ObjectPermission(
-            name='Test permission',
-            constraints={'site__name': 'Site 1'},
-            actions=['view']
+            name="Test permission",
+            constraints={"site__name": "Site 1"},
+            actions=["view"],
         )
         obj_perm.save()
         obj_perm.users.add(self.user)
@@ -281,9 +281,9 @@ class ObjectPermissionAPIViewTestCase(TestCase):
 
         # Assign object permission
         obj_perm = ObjectPermission(
-            name='Test permission',
-            constraints={'site__name': 'Site 1'},
-            actions=['add']
+            name="Test permission",
+            constraints={"site__name": "Site 1"},
+            actions=["add"],
         )
         obj_perm.save()
         obj_perm.users.add(self.user)
@@ -311,9 +311,9 @@ class ObjectPermissionAPIViewTestCase(TestCase):
 
         # Assign object permission
         obj_perm = ObjectPermission(
-            name='Test permission',
-            constraints={'site__name': 'Site 1'},
-            actions=['change']
+            name="Test permission",
+            constraints={"site__name": "Site 1"},
+            actions=["change"],
         )
         obj_perm.save()
         obj_perm.users.add(self.user)
@@ -347,9 +347,9 @@ class ObjectPermissionAPIViewTestCase(TestCase):
 
         # Assign object permission
         obj_perm = ObjectPermission(
-            name='Test permission',
-            constraints={'site__name': 'Site 1'},
-            actions=['delete']
+            name="Test permission",
+            constraints={"site__name": "Site 1"},
+            actions=["delete"],
         )
         obj_perm.save()
         obj_perm.users.add(self.user)

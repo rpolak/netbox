@@ -25,10 +25,30 @@ from ipam.models import IPAddress, VLAN
 from tenancy.forms import TenancyFilterForm, TenancyForm
 from tenancy.models import Tenant, TenantGroup
 from utilities.forms import (
-    APISelect, APISelectMultiple, add_blank_choice, BootstrapMixin, BulkEditForm, BulkEditNullBooleanSelect,
-    ColorSelect, CommentField, CSVChoiceField, CSVContentTypeField, CSVModelChoiceField, CSVModelForm,
-    DynamicModelChoiceField, DynamicModelMultipleChoiceField, ExpandableNameField, form_from_model, JSONField,
-    NumericArrayField, SelectWithPK, SmallTextarea, SlugField, StaticSelect2, StaticSelect2Multiple, TagFilterField,
+    APISelect,
+    APISelectMultiple,
+    add_blank_choice,
+    BootstrapMixin,
+    BulkEditForm,
+    BulkEditNullBooleanSelect,
+    ColorSelect,
+    CommentField,
+    CSVChoiceField,
+    CSVContentTypeField,
+    CSVModelChoiceField,
+    CSVModelForm,
+    DynamicModelChoiceField,
+    DynamicModelMultipleChoiceField,
+    ExpandableNameField,
+    form_from_model,
+    JSONField,
+    NumericArrayField,
+    SelectWithPK,
+    SmallTextarea,
+    SlugField,
+    StaticSelect2,
+    StaticSelect2Multiple,
+    TagFilterField,
     BOOLEAN_WITH_BLANK_CHOICES,
 )
 from virtualization.models import Cluster, ClusterGroup
@@ -111,12 +131,11 @@ class DeviceComponentFilterForm(BootstrapMixin, forms.Form):
 
 
 class InterfaceCommonForm(forms.Form):
-
     def clean(self):
         super().clean()
 
-        parent_field = 'device' if 'device' in self.cleaned_data else 'virtual_machine'
-        tagged_vlans = self.cleaned_data['tagged_vlans']
+        parent_field = "device" if "device" in self.cleaned_data else "virtual_machine"
+        tagged_vlans = self.cleaned_data["tagged_vlans"]
 
         # Untagged interfaces cannot be assigned tagged VLANs
         if (
@@ -132,15 +151,17 @@ class InterfaceCommonForm(forms.Form):
             self.cleaned_data["tagged_vlans"] = []
 
         # Validate tagged VLANs; must be a global VLAN or in the same site
-        elif self.cleaned_data['mode'] == InterfaceModeChoices.MODE_TAGGED:
+        elif self.cleaned_data["mode"] == InterfaceModeChoices.MODE_TAGGED:
             valid_sites = [None, self.cleaned_data[parent_field].site]
             invalid_vlans = [str(v) for v in tagged_vlans if v.site not in valid_sites]
 
             if invalid_vlans:
-                raise forms.ValidationError({
-                    'tagged_vlans': f"The tagged VLANs ({', '.join(invalid_vlans)}) must belong to the same site as "
-                                    f"the interface's parent device/VM, or they must be global"
-                })
+                raise forms.ValidationError(
+                    {
+                        "tagged_vlans": f"The tagged VLANs ({', '.join(invalid_vlans)}) must belong to the same site as "
+                        f"the interface's parent device/VM, or they must be global"
+                    }
+                )
 
 
 class ComponentForm(BootstrapMixin, forms.Form):
@@ -670,14 +691,10 @@ class RackFilterForm(BootstrapMixin, TenancyFilterForm, CustomFieldFilterForm):
         choices=RackStatusChoices, required=False, widget=StaticSelect2Multiple()
     )
     type = forms.MultipleChoiceField(
-        choices=RackTypeChoices,
-        required=False,
-        widget=StaticSelect2Multiple()
+        choices=RackTypeChoices, required=False, widget=StaticSelect2Multiple()
     )
     width = forms.MultipleChoiceField(
-        choices=RackWidthChoices,
-        required=False,
-        widget=StaticSelect2Multiple()
+        choices=RackWidthChoices, required=False, widget=StaticSelect2Multiple()
     )
     role = DynamicModelMultipleChoiceField(
         queryset=RackRole.objects.all(),
@@ -720,6 +737,7 @@ class RackElevationFilterForm(RackFilterForm):
 #
 # Rack reservations
 #
+
 
 class RackReservationForm(BootstrapMixin, TenancyForm, CustomFieldModelForm):
     region = DynamicModelChoiceField(
@@ -815,7 +833,9 @@ class RackReservationCSVForm(CustomFieldModelCSVForm):
             self.fields["rack"].queryset = self.fields["rack"].queryset.filter(**params)
 
 
-class RackReservationBulkEditForm(BootstrapMixin, AddRemoveTagsForm, CustomFieldBulkEditForm):
+class RackReservationBulkEditForm(
+    BootstrapMixin, AddRemoveTagsForm, CustomFieldBulkEditForm
+):
     pk = forms.ModelMultipleChoiceField(
         queryset=RackReservation.objects.all(), widget=forms.MultipleHiddenInput()
     )
@@ -833,11 +853,16 @@ class RackReservationBulkEditForm(BootstrapMixin, AddRemoveTagsForm, CustomField
 
 class RackReservationFilterForm(BootstrapMixin, TenancyFilterForm):
     model = RackReservation
-    field_order = ['q', 'region', 'site', 'group_id', 'user_id', 'tenant_group', 'tenant']
-    q = forms.CharField(
-        required=False,
-        label='Search'
-    )
+    field_order = [
+        "q",
+        "region",
+        "site",
+        "group_id",
+        "user_id",
+        "tenant_group",
+        "tenant",
+    ]
+    q = forms.CharField(required=False, label="Search")
     region = DynamicModelMultipleChoiceField(
         queryset=Region.objects.all(), to_field_name="slug", required=False
     )
@@ -856,11 +881,11 @@ class RackReservationFilterForm(BootstrapMixin, TenancyFilterForm):
     user_id = DynamicModelMultipleChoiceField(
         queryset=User.objects.all(),
         required=False,
-        display_field='username',
-        label='User',
+        display_field="username",
+        label="User",
         widget=APISelectMultiple(
-            api_url='/api/users/users/',
-        )
+            api_url="/api/users/users/",
+        ),
     )
     tag = TagFilterField(model)
 
@@ -915,14 +940,14 @@ class DeviceTypeForm(BootstrapMixin, CustomFieldModelForm):
             "tags",
         ]
         widgets = {
-            'subdevice_role': StaticSelect2(),
+            "subdevice_role": StaticSelect2(),
             # Exclude SVG images (unsupported by PIL)
-            'front_image': forms.FileInput(attrs={
-                'accept': 'image/bmp,image/gif,image/jpeg,image/png,image/tiff'
-            }),
-            'rear_image': forms.FileInput(attrs={
-                'accept': 'image/bmp,image/gif,image/jpeg,image/png,image/tiff'
-            })
+            "front_image": forms.FileInput(
+                attrs={"accept": "image/bmp,image/gif,image/jpeg,image/png,image/tiff"}
+            ),
+            "rear_image": forms.FileInput(
+                attrs={"accept": "image/bmp,image/gif,image/jpeg,image/png,image/tiff"}
+            ),
         }
 
 
@@ -1857,10 +1882,10 @@ class DeviceForm(BootstrapMixin, TenancyForm, CustomFieldModelForm):
             "config context",
         }
         widgets = {
-            'face': StaticSelect2(),
-            'status': StaticSelect2(),
-            'primary_ip4': StaticSelect2(),
-            'primary_ip6': StaticSelect2(),
+            "face": StaticSelect2(),
+            "status": StaticSelect2(),
+            "primary_ip4": StaticSelect2(),
+            "primary_ip6": StaticSelect2(),
         }
 
     def __init__(self, *args, **kwargs):
@@ -1915,11 +1940,13 @@ class DeviceForm(BootstrapMixin, TenancyForm, CustomFieldModelForm):
             )
 
             # Disable rack assignment if this is a child device installed in a parent device
-            if self.instance.device_type.is_child_device and hasattr(self.instance, 'parent_bay'):
-                self.fields['site'].disabled = True
-                self.fields['rack'].disabled = True
-                self.initial['site'] = self.instance.parent_bay.device.site_id
-                self.initial['rack'] = self.instance.parent_bay.device.rack_id
+            if self.instance.device_type.is_child_device and hasattr(
+                self.instance, "parent_bay"
+            ):
+                self.fields["site"].disabled = True
+                self.fields["rack"].disabled = True
+                self.initial["site"] = self.instance.parent_bay.device.site_id
+                self.initial["rack"] = self.instance.parent_bay.device.rack_id
 
         else:
 
@@ -1930,9 +1957,9 @@ class DeviceForm(BootstrapMixin, TenancyForm, CustomFieldModelForm):
             self.fields["primary_ip6"].widget.attrs["readonly"] = True
 
         # Rack position
-        position = self.data.get('position') or self.initial.get('position')
+        position = self.data.get("position") or self.initial.get("position")
         if position:
-            self.fields['position'].widget.choices = [(position, f'U{position}')]
+            self.fields["position"].widget.choices = [(position, f"U{position}")]
 
 
 class BaseDeviceCSVForm(CustomFieldModelCSVForm):
@@ -2350,14 +2377,9 @@ class ConsolePortBulkEditForm(
 
 
 class ConsolePortCSVForm(CSVModelForm):
-    device = CSVModelChoiceField(
-        queryset=Device.objects.all(),
-        to_field_name='name'
-    )
+    device = CSVModelChoiceField(queryset=Device.objects.all(), to_field_name="name")
     type = CSVChoiceField(
-        choices=ConsolePortTypeChoices,
-        required=False,
-        help_text='Port type'
+        choices=ConsolePortTypeChoices, required=False, help_text="Port type"
     )
 
     class Meta:
@@ -2433,14 +2455,9 @@ class ConsoleServerPortBulkEditForm(
 
 
 class ConsoleServerPortCSVForm(CSVModelForm):
-    device = CSVModelChoiceField(
-        queryset=Device.objects.all(),
-        to_field_name='name'
-    )
+    device = CSVModelChoiceField(queryset=Device.objects.all(), to_field_name="name")
     type = CSVChoiceField(
-        choices=ConsolePortTypeChoices,
-        required=False,
-        help_text='Port type'
+        choices=ConsolePortTypeChoices, required=False, help_text="Port type"
     )
 
     class Meta:
@@ -2537,14 +2554,9 @@ class PowerPortBulkEditForm(
 
 
 class PowerPortCSVForm(CSVModelForm):
-    device = CSVModelChoiceField(
-        queryset=Device.objects.all(),
-        to_field_name='name'
-    )
+    device = CSVModelChoiceField(queryset=Device.objects.all(), to_field_name="name")
     type = CSVChoiceField(
-        choices=PowerPortTypeChoices,
-        required=False,
-        help_text='Port type'
+        choices=PowerPortTypeChoices, required=False, help_text="Port type"
     )
 
     class Meta:
@@ -2677,14 +2689,9 @@ class PowerOutletBulkEditForm(
 
 
 class PowerOutletCSVForm(CSVModelForm):
-    device = CSVModelChoiceField(
-        queryset=Device.objects.all(),
-        to_field_name='name'
-    )
+    device = CSVModelChoiceField(queryset=Device.objects.all(), to_field_name="name")
     type = CSVChoiceField(
-        choices=PowerOutletTypeChoices,
-        required=False,
-        help_text='Outlet type'
+        choices=PowerOutletTypeChoices, required=False, help_text="Outlet type"
     )
     power_port = CSVModelChoiceField(
         queryset=PowerPort.objects.all(),
@@ -2736,21 +2743,12 @@ class InterfaceFilterForm(DeviceComponentFilterForm):
         choices=InterfaceTypeChoices, required=False, widget=StaticSelect2Multiple()
     )
     enabled = forms.NullBooleanField(
-        required=False,
-        widget=StaticSelect2(
-            choices=BOOLEAN_WITH_BLANK_CHOICES
-        )
+        required=False, widget=StaticSelect2(choices=BOOLEAN_WITH_BLANK_CHOICES)
     )
     mgmt_only = forms.NullBooleanField(
-        required=False,
-        widget=StaticSelect2(
-            choices=BOOLEAN_WITH_BLANK_CHOICES
-        )
+        required=False, widget=StaticSelect2(choices=BOOLEAN_WITH_BLANK_CHOICES)
     )
-    mac_address = forms.CharField(
-        required=False,
-        label='MAC address'
-    )
+    mac_address = forms.CharField(required=False, label="MAC address")
     mac_address = forms.CharField(required=False, label="MAC address")
     tag = TagFilterField(model)
 
@@ -2930,9 +2928,9 @@ class InterfaceBulkCreateForm(
 
 
 class InterfaceBulkEditForm(
-    form_from_model(Interface, [
-        'label', 'type', 'lag', 'mac_address', 'mtu', 'description', 'mode'
-    ]),
+    form_from_model(
+        Interface, ["label", "type", "lag", "mac_address", "mtu", "description", "mode"]
+    ),
     BootstrapMixin,
     AddRemoveTagsForm,
     BulkEditForm,
@@ -2946,14 +2944,9 @@ class InterfaceBulkEditForm(
         disabled=True,
         widget=forms.HiddenInput(),
     )
-    enabled = forms.NullBooleanField(
-        required=False,
-        widget=BulkEditNullBooleanSelect
-    )
+    enabled = forms.NullBooleanField(required=False, widget=BulkEditNullBooleanSelect)
     mgmt_only = forms.NullBooleanField(
-        required=False,
-        widget=BulkEditNullBooleanSelect,
-        label='Management only'
+        required=False, widget=BulkEditNullBooleanSelect, label="Management only"
     )
     untagged_vlan = DynamicModelChoiceField(
         queryset=VLAN.objects.all(),
@@ -3500,9 +3493,7 @@ class InventoryItemForm(BootstrapMixin, forms.ModelForm):
     parent = DynamicModelChoiceField(
         queryset=InventoryItem.objects.all(),
         required=False,
-        query_params={
-            'device_id': '$device'
-        }
+        query_params={"device_id": "$device"},
     )
     manufacturer = DynamicModelChoiceField(
         queryset=Manufacturer.objects.all(), required=False
@@ -3512,28 +3503,29 @@ class InventoryItemForm(BootstrapMixin, forms.ModelForm):
     class Meta:
         model = InventoryItem
         fields = [
-            'device', 'parent', 'name', 'label', 'manufacturer', 'part_id', 'serial', 'asset_tag', 'description',
-            'tags',
+            "device",
+            "parent",
+            "name",
+            "label",
+            "manufacturer",
+            "part_id",
+            "serial",
+            "asset_tag",
+            "description",
+            "tags",
         ]
 
 
 class InventoryItemCreateForm(ComponentCreateForm):
     manufacturer = DynamicModelChoiceField(
-        queryset=Manufacturer.objects.all(),
-        required=False
+        queryset=Manufacturer.objects.all(), required=False
     )
     parent = DynamicModelChoiceField(
         queryset=InventoryItem.objects.all(),
         required=False,
-        query_params={
-            'device_id': '$device'
-        }
+        query_params={"device_id": "$device"},
     )
-    part_id = forms.CharField(
-        max_length=50,
-        required=False,
-        label='Part ID'
-    )
+    part_id = forms.CharField(max_length=50, required=False, label="Part ID")
     part_id = forms.CharField(max_length=50, required=False, label="Part ID")
     serial = forms.CharField(
         max_length=50,
@@ -3544,8 +3536,16 @@ class InventoryItemCreateForm(ComponentCreateForm):
         required=False,
     )
     field_order = (
-        'device', 'parent', 'name_pattern', 'label_pattern', 'manufacturer', 'part_id', 'serial', 'asset_tag',
-        'description', 'tags',
+        "device",
+        "parent",
+        "name_pattern",
+        "label_pattern",
+        "manufacturer",
+        "part_id",
+        "serial",
+        "asset_tag",
+        "description",
+        "tags",
     )
 
 
@@ -3612,6 +3612,7 @@ class InventoryItemFilterForm(DeviceComponentFilterForm):
 #
 # Cables
 #
+
 
 class ConnectCableToDeviceForm(BootstrapMixin, CustomFieldModelForm):
     """
@@ -3848,10 +3849,7 @@ class ConnectCableToPowerFeedForm(BootstrapMixin, CustomFieldModelForm):
 
 
 class CableForm(BootstrapMixin, CustomFieldModelForm):
-    tags = DynamicModelMultipleChoiceField(
-        queryset=Tag.objects.all(),
-        required=False
-    )
+    tags = DynamicModelMultipleChoiceField(queryset=Tag.objects.all(), required=False)
 
     class Meta:
         model = Cable
@@ -3880,11 +3878,9 @@ class CableCSVForm(CustomFieldModelCSVForm):
     side_a_type = CSVContentTypeField(
         queryset=ContentType.objects.all(),
         limit_choices_to=CABLE_TERMINATION_MODELS,
-        help_text='Side A type'
+        help_text="Side A type",
     )
-    side_a_name = forms.CharField(
-        help_text='Side A component name'
-    )
+    side_a_name = forms.CharField(help_text="Side A component name")
     side_a_name = forms.CharField(help_text="Side A component name")
 
     # Termination B
@@ -3894,11 +3890,9 @@ class CableCSVForm(CustomFieldModelCSVForm):
     side_b_type = CSVContentTypeField(
         queryset=ContentType.objects.all(),
         limit_choices_to=CABLE_TERMINATION_MODELS,
-        help_text='Side B type'
+        help_text="Side B type",
     )
-    side_b_name = forms.CharField(
-        help_text='Side B component name'
-    )
+    side_b_name = forms.CharField(help_text="Side B component name")
     side_b_name = forms.CharField(help_text="Side B component name")
 
     # Cable attributes
@@ -3940,11 +3934,11 @@ class CableCSVForm(CustomFieldModelCSVForm):
 
         :param side: 'a' or 'b'
         """
-        assert side in 'ab', f"Invalid side designation: {side}"
+        assert side in "ab", f"Invalid side designation: {side}"
 
-        device = self.cleaned_data.get(f'side_{side}_device')
-        content_type = self.cleaned_data.get(f'side_{side}_type')
-        name = self.cleaned_data.get(f'side_{side}_name')
+        device = self.cleaned_data.get(f"side_{side}_device")
+        content_type = self.cleaned_data.get(f"side_{side}_type")
+        name = self.cleaned_data.get(f"side_{side}_name")
         if not device or not content_type or not name:
             return None
 
@@ -3952,18 +3946,22 @@ class CableCSVForm(CustomFieldModelCSVForm):
         try:
             termination_object = model.objects.get(device=device, name=name)
             if termination_object.cable is not None:
-                raise forms.ValidationError(f"Side {side.upper()}: {device} {termination_object} is already connected")
+                raise forms.ValidationError(
+                    f"Side {side.upper()}: {device} {termination_object} is already connected"
+                )
         except ObjectDoesNotExist:
-            raise forms.ValidationError(f"{side.upper()} side termination not found: {device} {name}")
+            raise forms.ValidationError(
+                f"{side.upper()} side termination not found: {device} {name}"
+            )
 
-        setattr(self.instance, f'termination_{side}', termination_object)
+        setattr(self.instance, f"termination_{side}", termination_object)
         return termination_object
 
     def clean_side_a_name(self):
-        return self._clean_side('a')
+        return self._clean_side("a")
 
     def clean_side_b_name(self):
-        return self._clean_side('b')
+        return self._clean_side("b")
 
     def clean_length_unit(self):
         # Avoid trying to save as NULL
@@ -4317,7 +4315,9 @@ class VCMemberSelectForm(BootstrapMixin, forms.Form):
         return device
 
 
-class VirtualChassisBulkEditForm(BootstrapMixin, AddRemoveTagsForm, CustomFieldBulkEditForm):
+class VirtualChassisBulkEditForm(
+    BootstrapMixin, AddRemoveTagsForm, CustomFieldBulkEditForm
+):
     pk = forms.ModelMultipleChoiceField(
         queryset=VirtualChassis.objects.all(), widget=forms.MultipleHiddenInput()
     )
@@ -4372,6 +4372,7 @@ class VirtualChassisFilterForm(BootstrapMixin, CustomFieldFilterForm):
 # Power panels
 #
 
+
 class PowerPanelForm(BootstrapMixin, CustomFieldModelForm):
     region = DynamicModelChoiceField(
         queryset=Region.objects.all(), required=False, initial_params={"sites": "$site"}
@@ -4423,7 +4424,9 @@ class PowerPanelCSVForm(CustomFieldModelCSVForm):
             ].queryset.filter(**params)
 
 
-class PowerPanelBulkEditForm(BootstrapMixin, AddRemoveTagsForm, CustomFieldBulkEditForm):
+class PowerPanelBulkEditForm(
+    BootstrapMixin, AddRemoveTagsForm, CustomFieldBulkEditForm
+):
     pk = forms.ModelMultipleChoiceField(
         queryset=PowerPanel.objects.all(), widget=forms.MultipleHiddenInput
     )
@@ -4442,7 +4445,7 @@ class PowerPanelBulkEditForm(BootstrapMixin, AddRemoveTagsForm, CustomFieldBulkE
     )
 
     class Meta:
-        nullable_fields = ['rack_group']
+        nullable_fields = ["rack_group"]
 
 
 class PowerPanelFilterForm(BootstrapMixin, CustomFieldFilterForm):

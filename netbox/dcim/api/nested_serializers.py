@@ -262,7 +262,7 @@ class NestedConsoleServerPortSerializer(WritableNestedSerializer):
 
     class Meta:
         model = models.ConsoleServerPort
-        fields = ['id', 'url', 'device', 'name', 'cable']
+        fields = ["id", "url", "device", "name", "cable"]
 
 
 class NestedConsolePortSerializer(WritableNestedSerializer):
@@ -271,7 +271,7 @@ class NestedConsolePortSerializer(WritableNestedSerializer):
 
     class Meta:
         model = models.ConsolePort
-        fields = ['id', 'url', 'device', 'name', 'cable']
+        fields = ["id", "url", "device", "name", "cable"]
 
 
 class NestedPowerOutletSerializer(WritableNestedSerializer):
@@ -280,7 +280,7 @@ class NestedPowerOutletSerializer(WritableNestedSerializer):
 
     class Meta:
         model = models.PowerOutlet
-        fields = ['id', 'url', 'device', 'name', 'cable']
+        fields = ["id", "url", "device", "name", "cable"]
 
 
 class NestedPowerPortSerializer(WritableNestedSerializer):
@@ -289,16 +289,16 @@ class NestedPowerPortSerializer(WritableNestedSerializer):
 
     class Meta:
         model = models.PowerPort
-        fields = ['id', 'url', 'device', 'name', 'cable']
+        fields = ["id", "url", "device", "name", "cable"]
 
 
 class NestedInterfaceSerializer(WritableNestedSerializer):
     device = NestedDeviceSerializer(read_only=True)
-    url = serializers.HyperlinkedIdentityField(view_name='dcim-api:interface-detail')
+    url = serializers.HyperlinkedIdentityField(view_name="dcim-api:interface-detail")
 
     class Meta:
         model = models.Interface
-        fields = ['id', 'url', 'device', 'name', 'cable']
+        fields = ["id", "url", "device", "name", "cable"]
 
 
 class NestedRearPortSerializer(WritableNestedSerializer):
@@ -333,11 +333,11 @@ class NestedInventoryItemSerializer(WritableNestedSerializer):
         view_name="dcim-api:inventoryitem-detail"
     )
     device = NestedDeviceSerializer(read_only=True)
-    _depth = serializers.IntegerField(source='level', read_only=True)
+    _depth = serializers.IntegerField(source="level", read_only=True)
 
     class Meta:
         model = models.InventoryItem
-        fields = ['id', 'url', 'device', 'name', '_depth']
+        fields = ["id", "url", "device", "name", "_depth"]
 
 
 #

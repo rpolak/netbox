@@ -423,9 +423,60 @@ class RackTestCase(TestCase):
         Tenant.objects.bulk_create(tenants)
 
         racks = (
-            Rack(name='Rack 1', facility_id='rack-1', site=sites[0], group=rack_groups[0], tenant=tenants[0], status=RackStatusChoices.STATUS_ACTIVE, role=rack_roles[0], serial='ABC', asset_tag='1001', type=RackTypeChoices.TYPE_2POST, width=RackWidthChoices.WIDTH_19IN, u_height=42, desc_units=False, outer_width=100, outer_depth=100, outer_unit=RackDimensionUnitChoices.UNIT_MILLIMETER),
-            Rack(name='Rack 2', facility_id='rack-2', site=sites[1], group=rack_groups[1], tenant=tenants[1], status=RackStatusChoices.STATUS_PLANNED, role=rack_roles[1], serial='DEF', asset_tag='1002', type=RackTypeChoices.TYPE_4POST, width=RackWidthChoices.WIDTH_21IN, u_height=43, desc_units=False, outer_width=200, outer_depth=200, outer_unit=RackDimensionUnitChoices.UNIT_MILLIMETER),
-            Rack(name='Rack 3', facility_id='rack-3', site=sites[2], group=rack_groups[2], tenant=tenants[2], status=RackStatusChoices.STATUS_RESERVED, role=rack_roles[2], serial='GHI', asset_tag='1003', type=RackTypeChoices.TYPE_CABINET, width=RackWidthChoices.WIDTH_23IN, u_height=44, desc_units=True, outer_width=300, outer_depth=300, outer_unit=RackDimensionUnitChoices.UNIT_INCH),
+            Rack(
+                name="Rack 1",
+                facility_id="rack-1",
+                site=sites[0],
+                group=rack_groups[0],
+                tenant=tenants[0],
+                status=RackStatusChoices.STATUS_ACTIVE,
+                role=rack_roles[0],
+                serial="ABC",
+                asset_tag="1001",
+                type=RackTypeChoices.TYPE_2POST,
+                width=RackWidthChoices.WIDTH_19IN,
+                u_height=42,
+                desc_units=False,
+                outer_width=100,
+                outer_depth=100,
+                outer_unit=RackDimensionUnitChoices.UNIT_MILLIMETER,
+            ),
+            Rack(
+                name="Rack 2",
+                facility_id="rack-2",
+                site=sites[1],
+                group=rack_groups[1],
+                tenant=tenants[1],
+                status=RackStatusChoices.STATUS_PLANNED,
+                role=rack_roles[1],
+                serial="DEF",
+                asset_tag="1002",
+                type=RackTypeChoices.TYPE_4POST,
+                width=RackWidthChoices.WIDTH_21IN,
+                u_height=43,
+                desc_units=False,
+                outer_width=200,
+                outer_depth=200,
+                outer_unit=RackDimensionUnitChoices.UNIT_MILLIMETER,
+            ),
+            Rack(
+                name="Rack 3",
+                facility_id="rack-3",
+                site=sites[2],
+                group=rack_groups[2],
+                tenant=tenants[2],
+                status=RackStatusChoices.STATUS_RESERVED,
+                role=rack_roles[2],
+                serial="GHI",
+                asset_tag="1003",
+                type=RackTypeChoices.TYPE_CABINET,
+                width=RackWidthChoices.WIDTH_23IN,
+                u_height=44,
+                desc_units=True,
+                outer_width=300,
+                outer_depth=300,
+                outer_unit=RackDimensionUnitChoices.UNIT_INCH,
+            ),
         )
         Rack.objects.bulk_create(racks)
 
@@ -446,11 +497,11 @@ class RackTestCase(TestCase):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_type(self):
-        params = {'type': [RackTypeChoices.TYPE_2POST, RackTypeChoices.TYPE_4POST]}
+        params = {"type": [RackTypeChoices.TYPE_2POST, RackTypeChoices.TYPE_4POST]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_width(self):
-        params = {'width': [RackWidthChoices.WIDTH_19IN, RackWidthChoices.WIDTH_21IN]}
+        params = {"width": [RackWidthChoices.WIDTH_19IN, RackWidthChoices.WIDTH_21IN]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_u_height(self):
@@ -620,7 +671,7 @@ class RackReservationTestCase(TestCase):
         users = User.objects.all()[:2]
         params = {"user_id": [users[0].pk, users[1].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
-        params = {'user': [users[0].username, users[1].username]}
+        params = {"user": [users[0].username, users[1].username]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_tenant(self):
@@ -1957,9 +2008,9 @@ class ConsolePortTestCase(TestCase):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_connected(self):
-        params = {'connected': True}
+        params = {"connected": True}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
-        params = {'connected': False}
+        params = {"connected": False}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
 
     def test_region(self):
@@ -2091,9 +2142,9 @@ class ConsoleServerPortTestCase(TestCase):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_connected(self):
-        params = {'connected': True}
+        params = {"connected": True}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
-        params = {'connected': False}
+        params = {"connected": False}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
 
     def test_region(self):
@@ -2241,9 +2292,9 @@ class PowerPortTestCase(TestCase):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_connected(self):
-        params = {'connected': True}
+        params = {"connected": True}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
-        params = {'connected': False}
+        params = {"connected": False}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
 
     def test_region(self):
@@ -2385,9 +2436,9 @@ class PowerOutletTestCase(TestCase):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
 
     def test_connected(self):
-        params = {'connected': True}
+        params = {"connected": True}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
-        params = {'connected': False}
+        params = {"connected": False}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
 
     def test_region(self):
@@ -2550,9 +2601,9 @@ class InterfaceTestCase(TestCase):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_connected(self):
-        params = {'connected': True}
+        params = {"connected": True}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
-        params = {'connected': False}
+        params = {"connected": False}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_enabled(self):
@@ -3327,9 +3378,9 @@ class VirtualChassisTestCase(TestCase):
         Device.objects.bulk_create(devices)
 
         virtual_chassis = (
-            VirtualChassis(name='VC 1', master=devices[0], domain='Domain 1'),
-            VirtualChassis(name='VC 2', master=devices[2], domain='Domain 2'),
-            VirtualChassis(name='VC 3', master=devices[4], domain='Domain 3'),
+            VirtualChassis(name="VC 1", master=devices[0], domain="Domain 1"),
+            VirtualChassis(name="VC 2", master=devices[2], domain="Domain 2"),
+            VirtualChassis(name="VC 3", master=devices[4], domain="Domain 3"),
         )
         VirtualChassis.objects.bulk_create(virtual_chassis)
 
@@ -3353,13 +3404,13 @@ class VirtualChassisTestCase(TestCase):
 
     def test_master(self):
         masters = Device.objects.all()
-        params = {'master_id': [masters[0].pk, masters[2].pk]}
+        params = {"master_id": [masters[0].pk, masters[2].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
-        params = {'master': [masters[0].name, masters[2].name]}
+        params = {"master": [masters[0].name, masters[2].name]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_name(self):
-        params = {'name': ['VC 1', 'VC 2']}
+        params = {"name": ["VC 1", "VC 2"]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_region(self):
@@ -3795,13 +3846,22 @@ class PowerFeedTestCase(TestCase):
         )
         PowerFeed.objects.bulk_create(power_feeds)
 
-        manufacturer = Manufacturer.objects.create(name='Manufacturer', slug='manufacturer')
-        device_type = DeviceType.objects.create(manufacturer=manufacturer, model='Model', slug='model')
-        device_role = DeviceRole.objects.create(name='Device Role', slug='device-role')
-        device = Device.objects.create(name='Device', device_type=device_type, device_role=device_role, site=sites[0])
+        manufacturer = Manufacturer.objects.create(
+            name="Manufacturer", slug="manufacturer"
+        )
+        device_type = DeviceType.objects.create(
+            manufacturer=manufacturer, model="Model", slug="model"
+        )
+        device_role = DeviceRole.objects.create(name="Device Role", slug="device-role")
+        device = Device.objects.create(
+            name="Device",
+            device_type=device_type,
+            device_role=device_role,
+            site=sites[0],
+        )
         power_ports = [
-            PowerPort(device=device, name='Power Port 1'),
-            PowerPort(device=device, name='Power Port 2'),
+            PowerPort(device=device, name="Power Port 1"),
+            PowerPort(device=device, name="Power Port 2"),
         ]
         PowerPort.objects.bulk_create(power_ports)
         Cable(termination_a=power_feeds[0], termination_b=power_ports[0]).save()
@@ -3869,15 +3929,15 @@ class PowerFeedTestCase(TestCase):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_cabled(self):
-        params = {'cabled': 'true'}
+        params = {"cabled": "true"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
-        params = {'cabled': 'false'}
+        params = {"cabled": "false"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
 
     def test_connected(self):
-        params = {'connected': True}
+        params = {"connected": True}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
-        params = {'connected': False}
+        params = {"connected": False}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
 
 

@@ -25,12 +25,12 @@ class CircuitStatusChoices(ChoiceSet):
     )
 
     CSS_CLASSES = {
-        STATUS_DEPROVISIONING: 'warning',
-        STATUS_ACTIVE: 'success',
-        STATUS_PLANNED: 'info',
-        STATUS_PROVISIONING: 'primary',
-        STATUS_OFFLINE: 'danger',
-        STATUS_DECOMMISSIONED: 'default',
+        STATUS_DEPROVISIONING: "warning",
+        STATUS_ACTIVE: "success",
+        STATUS_PLANNED: "info",
+        STATUS_PROVISIONING: "primary",
+        STATUS_OFFLINE: "danger",
+        STATUS_DECOMMISSIONED: "default",
     }
 
 

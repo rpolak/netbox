@@ -9,20 +9,28 @@ from tenancy.models import Tenant, TenantGroup
 from utilities.filters import BaseFilterSet, ContentTypeFilter
 from virtualization.models import Cluster, ClusterGroup
 from .choices import *
-from .models import ConfigContext, CustomField, ExportTemplate, ImageAttachment, JobResult, ObjectChange, Tag
+from .models import (
+    ConfigContext,
+    CustomField,
+    ExportTemplate,
+    ImageAttachment,
+    JobResult,
+    ObjectChange,
+    Tag,
+)
 
 
 __all__ = (
-    'ConfigContextFilterSet',
-    'ContentTypeFilterSet',
-    'CreatedUpdatedFilterSet',
-    'CustomFieldFilter',
-    'CustomFieldModelFilterSet',
-    'ExportTemplateFilterSet',
-    'ImageAttachmentFilterSet',
-    'LocalConfigContextFilterSet',
-    'ObjectChangeFilterSet',
-    'TagFilterSet',
+    "ConfigContextFilterSet",
+    "ContentTypeFilterSet",
+    "CreatedUpdatedFilterSet",
+    "CustomFieldFilter",
+    "CustomFieldModelFilterSet",
+    "ExportTemplateFilterSet",
+    "ImageAttachmentFilterSet",
+    "LocalConfigContextFilterSet",
+    "ObjectChangeFilterSet",
+    "TagFilterSet",
 )
 
 EXACT_FILTER_TYPES = (
@@ -37,6 +45,7 @@ class CustomFieldFilter(django_filters.Filter):
     """
     Filter objects by the presence of a CustomFieldValue. The filter's name is used as the CustomField name.
     """
+
     def __init__(self, custom_field, *args, **kwargs):
         self.custom_field = custom_field
 
@@ -49,25 +58,24 @@ class CustomFieldFilter(django_filters.Filter):
 
         super().__init__(*args, **kwargs)
 
-        self.field_name = f'custom_field_data__{self.field_name}'
+        self.field_name = f"custom_field_data__{self.field_name}"
 
         if custom_field.type not in EXACT_FILTER_TYPES:
             if custom_field.filter_logic == CustomFieldFilterLogicChoices.FILTER_LOOSE:
-                self.lookup_expr = 'icontains'
+                self.lookup_expr = "icontains"
 
 
 class CustomFieldModelFilterSet(django_filters.FilterSet):
     """
     Dynamically add a Filter for each CustomField applicable to the parent model.
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         custom_fields = CustomField.objects.filter(
             content_types=ContentType.objects.get_for_model(self._meta.model)
-        ).exclude(
-            filter_logic=CustomFieldFilterLogicChoices.FILTER_DISABLED
-        )
+        ).exclude(filter_logic=CustomFieldFilterLogicChoices.FILTER_DISABLED)
         for cf in custom_fields:
             self.filters["cf_{}".format(cf.name)] = CustomFieldFilter(
                 field_name=cf.name, custom_field=cf
@@ -75,16 +83,15 @@ class CustomFieldModelFilterSet(django_filters.FilterSet):
 
 
 class CustomFieldFilterSet(django_filters.FilterSet):
-
     class Meta:
         model = CustomField
-        fields = ['id', 'content_types', 'name', 'required', 'filter_logic', 'weight']
+        fields = ["id", "content_types", "name", "required", "filter_logic", "weight"]
 
 
 class ExportTemplateFilterSet(BaseFilterSet):
     class Meta:
         model = ExportTemplate
-        fields = ['id', 'content_type', 'name']
+        fields = ["id", "content_type", "name"]
 
 
 class ImageAttachmentFilterSet(BaseFilterSet):
@@ -92,7 +99,7 @@ class ImageAttachmentFilterSet(BaseFilterSet):
 
     class Meta:
         model = ImageAttachment
-        fields = ['id', 'content_type_id', 'object_id', 'name']
+        fields = ["id", "content_type_id", "object_id", "name"]
 
 
 class TagFilterSet(BaseFilterSet):
@@ -255,8 +262,14 @@ class ObjectChangeFilterSet(BaseFilterSet):
     class Meta:
         model = ObjectChange
         fields = [
-            'id', 'user', 'user_name', 'request_id', 'action', 'changed_object_type_id', 'changed_object_id',
-            'object_repr',
+            "id",
+            "user",
+            "user_name",
+            "request_id",
+            "action",
+            "changed_object_type_id",
+            "changed_object_id",
+            "object_repr",
         ]
 
     def search(self, queryset, name, value):
@@ -303,17 +316,15 @@ class JobResultFilterSet(BaseFilterSet):
     def search(self, queryset, name, value):
         if not value.strip():
             return queryset
-        return queryset.filter(
-            Q(user__username__icontains=value)
-        )
+        return queryset.filter(Q(user__username__icontains=value))
 
 
 #
 # ContentTypes
 #
 
-class ContentTypeFilterSet(django_filters.FilterSet):
 
+class ContentTypeFilterSet(django_filters.FilterSet):
     class Meta:
         model = ContentType
-        fields = ['id', 'app_label', 'model']
+        fields = ["id", "app_label", "model"]

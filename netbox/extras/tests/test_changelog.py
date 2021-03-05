@@ -28,9 +28,9 @@ class ChangeLogViewTest(ModelViewTestCase):
         # Create a select custom field on the Site model
         cf_select = CustomField(
             type=CustomFieldTypeChoices.TYPE_SELECT,
-            name='my_field_select',
+            name="my_field_select",
             required=False,
-            choices=['Bar', 'Foo']
+            choices=["Bar", "Foo"],
         )
         cf_select.save()
         cf_select.content_types.set([ct])
@@ -38,12 +38,12 @@ class ChangeLogViewTest(ModelViewTestCase):
     def test_create_object(self):
         tags = self.create_tags("Tag 1", "Tag 2")
         form_data = {
-            'name': 'Test Site 1',
-            'slug': 'test-site-1',
-            'status': SiteStatusChoices.STATUS_ACTIVE,
-            'cf_my_field': 'ABC',
-            'cf_my_field_select': 'Bar',
-            'tags': [tag.pk for tag in tags],
+            "name": "Test Site 1",
+            "slug": "test-site-1",
+            "status": SiteStatusChoices.STATUS_ACTIVE,
+            "cf_my_field": "ABC",
+            "cf_my_field_select": "Bar",
+            "tags": [tag.pk for tag in tags],
         }
 
         request = {
@@ -62,8 +62,14 @@ class ChangeLogViewTest(ModelViewTestCase):
         ).order_by("pk")
         self.assertEqual(oc_list[0].changed_object, site)
         self.assertEqual(oc_list[0].action, ObjectChangeActionChoices.ACTION_CREATE)
-        self.assertEqual(oc_list[0].object_data['custom_fields']['my_field'], form_data['cf_my_field'])
-        self.assertEqual(oc_list[0].object_data['custom_fields']['my_field_select'], form_data['cf_my_field_select'])
+        self.assertEqual(
+            oc_list[0].object_data["custom_fields"]["my_field"],
+            form_data["cf_my_field"],
+        )
+        self.assertEqual(
+            oc_list[0].object_data["custom_fields"]["my_field_select"],
+            form_data["cf_my_field_select"],
+        )
         self.assertEqual(oc_list[1].action, ObjectChangeActionChoices.ACTION_UPDATE)
         self.assertEqual(oc_list[1].object_data["tags"], ["Tag 1", "Tag 2"])
 
@@ -74,12 +80,12 @@ class ChangeLogViewTest(ModelViewTestCase):
         site.tags.set("Tag 1", "Tag 2")
 
         form_data = {
-            'name': 'Test Site X',
-            'slug': 'test-site-x',
-            'status': SiteStatusChoices.STATUS_PLANNED,
-            'cf_my_field': 'DEF',
-            'cf_my_field_select': 'Foo',
-            'tags': [tags[2].pk],
+            "name": "Test Site X",
+            "slug": "test-site-x",
+            "status": SiteStatusChoices.STATUS_PLANNED,
+            "cf_my_field": "DEF",
+            "cf_my_field_select": "Foo",
+            "tags": [tags[2].pk],
         }
 
         request = {
@@ -98,22 +104,24 @@ class ChangeLogViewTest(ModelViewTestCase):
         ).first()
         self.assertEqual(oc.changed_object, site)
         self.assertEqual(oc.action, ObjectChangeActionChoices.ACTION_UPDATE)
-        self.assertEqual(oc.object_data['custom_fields']['my_field'], form_data['cf_my_field'])
-        self.assertEqual(oc.object_data['custom_fields']['my_field_select'], form_data['cf_my_field_select'])
-        self.assertEqual(oc.object_data['tags'], ['Tag 3'])
+        self.assertEqual(
+            oc.object_data["custom_fields"]["my_field"], form_data["cf_my_field"]
+        )
+        self.assertEqual(
+            oc.object_data["custom_fields"]["my_field_select"],
+            form_data["cf_my_field_select"],
+        )
+        self.assertEqual(oc.object_data["tags"], ["Tag 3"])
 
     def test_delete_object(self):
         site = Site(
-            name='Test Site 1',
-            slug='test-site-1',
-            custom_field_data={
-                'my_field': 'ABC',
-                'my_field_select': 'Bar'
-            }
+            name="Test Site 1",
+            slug="test-site-1",
+            custom_field_data={"my_field": "ABC", "my_field_select": "Bar"},
         )
         site.save()
-        self.create_tags('Tag 1', 'Tag 2')
-        site.tags.set('Tag 1', 'Tag 2')
+        self.create_tags("Tag 1", "Tag 2")
+        site.tags.set("Tag 1", "Tag 2")
 
         request = {
             "path": self._get_url("delete", instance=site),
@@ -127,9 +135,9 @@ class ChangeLogViewTest(ModelViewTestCase):
         self.assertEqual(oc.changed_object, None)
         self.assertEqual(oc.object_repr, site.name)
         self.assertEqual(oc.action, ObjectChangeActionChoices.ACTION_DELETE)
-        self.assertEqual(oc.object_data['custom_fields']['my_field'], 'ABC')
-        self.assertEqual(oc.object_data['custom_fields']['my_field_select'], 'Bar')
-        self.assertEqual(oc.object_data['tags'], ['Tag 1', 'Tag 2'])
+        self.assertEqual(oc.object_data["custom_fields"]["my_field"], "ABC")
+        self.assertEqual(oc.object_data["custom_fields"]["my_field_select"], "Bar")
+        self.assertEqual(oc.object_data["tags"], ["Tag 1", "Tag 2"])
 
 
 class ChangeLogAPITest(APITestCase):
@@ -147,9 +155,9 @@ class ChangeLogAPITest(APITestCase):
         # Create a select custom field on the Site model
         cf_select = CustomField(
             type=CustomFieldTypeChoices.TYPE_SELECT,
-            name='my_field_select',
+            name="my_field_select",
             required=False,
-            choices=['Bar', 'Foo']
+            choices=["Bar", "Foo"],
         )
         cf_select.save()
         cf_select.content_types.set([ct])
@@ -164,16 +172,16 @@ class ChangeLogAPITest(APITestCase):
 
     def test_create_object(self):
         data = {
-            'name': 'Test Site 1',
-            'slug': 'test-site-1',
-            'custom_fields': {
-                'my_field': 'ABC',
-                'my_field_select': 'Bar',
+            "name": "Test Site 1",
+            "slug": "test-site-1",
+            "custom_fields": {
+                "my_field": "ABC",
+                "my_field_select": "Bar",
             },
-            'tags': [
-                {'name': 'Tag 1'},
-                {'name': 'Tag 2'},
-            ]
+            "tags": [
+                {"name": "Tag 1"},
+                {"name": "Tag 2"},
+            ],
         }
         self.assertEqual(ObjectChange.objects.count(), 0)
         url = reverse("dcim-api:site-list")
@@ -199,15 +207,13 @@ class ChangeLogAPITest(APITestCase):
         site.save()
 
         data = {
-            'name': 'Test Site X',
-            'slug': 'test-site-x',
-            'custom_fields': {
-                'my_field': 'DEF',
-                'my_field_select': 'Foo',
+            "name": "Test Site X",
+            "slug": "test-site-x",
+            "custom_fields": {
+                "my_field": "DEF",
+                "my_field_select": "Foo",
             },
-            'tags': [
-                {'name': 'Tag 3'}
-            ]
+            "tags": [{"name": "Tag 3"}],
         }
         self.assertEqual(ObjectChange.objects.count(), 0)
         self.add_permissions("dcim.change_site")
@@ -229,12 +235,9 @@ class ChangeLogAPITest(APITestCase):
 
     def test_delete_object(self):
         site = Site(
-            name='Test Site 1',
-            slug='test-site-1',
-            custom_field_data={
-                'my_field': 'ABC',
-                'my_field_select': 'Bar'
-            }
+            name="Test Site 1",
+            slug="test-site-1",
+            custom_field_data={"my_field": "ABC", "my_field_select": "Bar"},
         )
         site.save()
         site.tags.set(*Tag.objects.all()[:2])
@@ -250,6 +253,6 @@ class ChangeLogAPITest(APITestCase):
         self.assertEqual(oc.changed_object, None)
         self.assertEqual(oc.object_repr, site.name)
         self.assertEqual(oc.action, ObjectChangeActionChoices.ACTION_DELETE)
-        self.assertEqual(oc.object_data['custom_fields']['my_field'], 'ABC')
-        self.assertEqual(oc.object_data['custom_fields']['my_field_select'], 'Bar')
-        self.assertEqual(oc.object_data['tags'], ['Tag 1', 'Tag 2'])
+        self.assertEqual(oc.object_data["custom_fields"]["my_field"], "ABC")
+        self.assertEqual(oc.object_data["custom_fields"]["my_field_select"], "Bar")
+        self.assertEqual(oc.object_data["tags"], ["Tag 1", "Tag 2"])

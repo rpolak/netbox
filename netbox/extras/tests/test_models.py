@@ -1,6 +1,14 @@
 from django.test import TestCase
 
-from dcim.models import Device, DeviceRole, DeviceType, Manufacturer, Platform, Site, Region
+from dcim.models import (
+    Device,
+    DeviceRole,
+    DeviceType,
+    Manufacturer,
+    Platform,
+    Site,
+    Region,
+)
 from extras.models import ConfigContext, Tag
 from tenancy.models import Tenant, TenantGroup
 from virtualization.models import Cluster, ClusterGroup, ClusterType, VirtualMachine
@@ -228,7 +236,9 @@ class ConfigContextTest(TestCase):
             name=device.name
         ).annotate_config_context_data()
         self.assertEqual(ConfigContext.objects.get_for_object(device).count(), 1)
-        self.assertEqual(device.get_config_context(), annotated_queryset[0].get_config_context())
+        self.assertEqual(
+            device.get_config_context(), annotated_queryset[0].get_config_context()
+        )
 
     def test_multiple_tags_return_distinct_objects_with_seperate_config_contexts(self):
         """
@@ -242,19 +252,11 @@ class ConfigContextTest(TestCase):
         See https://github.com/netbox-community/netbox/issues/5387
         """
         tag_context_1 = ConfigContext.objects.create(
-            name="tag-1",
-            weight=100,
-            data={
-                "tag": 1
-            }
+            name="tag-1", weight=100, data={"tag": 1}
         )
         tag_context_1.tags.add(self.tag)
         tag_context_2 = ConfigContext.objects.create(
-            name="tag-2",
-            weight=100,
-            data={
-                "tag": 1
-            }
+            name="tag-2", weight=100, data={"tag": 1}
         )
         tag_context_2.tags.add(self.tag2)
 
@@ -264,11 +266,15 @@ class ConfigContextTest(TestCase):
             tenant=self.tenant,
             platform=self.platform,
             device_role=self.devicerole,
-            device_type=self.devicetype
+            device_type=self.devicetype,
         )
         device.tags.add(self.tag)
         device.tags.add(self.tag2)
 
-        annotated_queryset = Device.objects.filter(name=device.name).annotate_config_context_data()
+        annotated_queryset = Device.objects.filter(
+            name=device.name
+        ).annotate_config_context_data()
         self.assertEqual(ConfigContext.objects.get_for_object(device).count(), 2)
-        self.assertEqual(device.get_config_context(), annotated_queryset[0].get_config_context())
+        self.assertEqual(
+            device.get_config_context(), annotated_queryset[0].get_config_context()
+        )

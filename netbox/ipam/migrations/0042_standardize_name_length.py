@@ -6,48 +6,48 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ipam', '0041_routetarget'),
+        ("ipam", "0041_routetarget"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='rir',
-            name='name',
+            model_name="rir",
+            name="name",
             field=models.CharField(max_length=100, unique=True),
         ),
         migrations.AlterField(
-            model_name='rir',
-            name='slug',
+            model_name="rir",
+            name="slug",
             field=models.SlugField(max_length=100, unique=True),
         ),
         migrations.AlterField(
-            model_name='role',
-            name='name',
+            model_name="role",
+            name="name",
             field=models.CharField(max_length=100, unique=True),
         ),
         migrations.AlterField(
-            model_name='role',
-            name='slug',
+            model_name="role",
+            name="slug",
             field=models.SlugField(max_length=100, unique=True),
         ),
         migrations.AlterField(
-            model_name='service',
-            name='name',
+            model_name="service",
+            name="name",
             field=models.CharField(max_length=100),
         ),
         migrations.AlterField(
-            model_name='vlangroup',
-            name='name',
+            model_name="vlangroup",
+            name="name",
             field=models.CharField(max_length=100),
         ),
         migrations.AlterField(
-            model_name='vlangroup',
-            name='slug',
+            model_name="vlangroup",
+            name="slug",
             field=models.SlugField(max_length=100),
         ),
         migrations.AlterField(
-            model_name='vrf',
-            name='name',
+            model_name="vrf",
+            name="name",
             field=models.CharField(max_length=100),
         ),
     ]

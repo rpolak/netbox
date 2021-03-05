@@ -28,12 +28,12 @@ from .device_components import *
 
 
 __all__ = (
-    'Device',
-    'DeviceRole',
-    'DeviceType',
-    'Manufacturer',
-    'Platform',
-    'VirtualChassis',
+    "Device",
+    "DeviceRole",
+    "DeviceType",
+    "Manufacturer",
+    "Platform",
+    "VirtualChassis",
 )
 
 
@@ -47,18 +47,10 @@ class Manufacturer(ChangeLoggedModel):
     """
     A Manufacturer represents a company which produces hardware devices; for example, Juniper or Dell.
     """
-    name = models.CharField(
-        max_length=100,
-        unique=True
-    )
-    slug = models.SlugField(
-        max_length=100,
-        unique=True
-    )
-    description = models.CharField(
-        max_length=200,
-        blank=True
-    )
+
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
+    description = models.CharField(max_length=200, blank=True)
 
     objects = RestrictedQuerySet.as_manager()
 
@@ -95,16 +87,10 @@ class DeviceType(ChangeLoggedModel, CustomFieldModel):
     """
 
     manufacturer = models.ForeignKey(
-        to='dcim.Manufacturer',
-        on_delete=models.PROTECT,
-        related_name='device_types'
+        to="dcim.Manufacturer", on_delete=models.PROTECT, related_name="device_types"
     )
-    model = models.CharField(
-        max_length=100
-    )
-    slug = models.SlugField(
-        max_length=100
-    )
+    model = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=100)
     part_number = models.CharField(
         max_length=50, blank=True, help_text="Discrete part number (optional)"
     )
@@ -338,17 +324,10 @@ class DeviceRole(ChangeLoggedModel):
     color to be used when displaying rack elevations. The vm_role field determines whether the role is applicable to
     virtual machines as well.
     """
-    name = models.CharField(
-        max_length=100,
-        unique=True
-    )
-    slug = models.SlugField(
-        max_length=100,
-        unique=True
-    )
-    color = ColorField(
-        default=ColorChoices.COLOR_GREY
-    )
+
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
+    color = ColorField(default=ColorChoices.COLOR_GREY)
     vm_role = models.BooleanField(
         default=True,
         verbose_name="VM Role",
@@ -385,14 +364,9 @@ class Platform(ChangeLoggedModel):
     NetBox uses Platforms to determine how to interact with devices when pulling inventory data or other information by
     specifying a NAPALM driver.
     """
-    name = models.CharField(
-        max_length=100,
-        unique=True
-    )
-    slug = models.SlugField(
-        max_length=100,
-        unique=True
-    )
+
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
     manufacturer = models.ForeignKey(
         to="dcim.Manufacturer",
         on_delete=models.PROTECT,
@@ -446,7 +420,7 @@ class Platform(ChangeLoggedModel):
         )
 
 
-@extras_features('custom_fields', 'custom_links', 'export_templates', 'webhooks')
+@extras_features("custom_fields", "custom_links", "export_templates", "webhooks")
 class Device(ChangeLoggedModel, ConfigContextModel, CustomFieldModel):
     """
     A Device represents a piece of physical hardware mounted within a Rack. Each Device is assigned a DeviceType,
@@ -554,14 +528,12 @@ class Device(ChangeLoggedModel, ConfigContextModel, CustomFieldModel):
     vc_priority = models.PositiveSmallIntegerField(
         blank=True, null=True, validators=[MaxValueValidator(255)]
     )
-    images = GenericRelation(
-        to='extras.ImageAttachment'
-    )
+    images = GenericRelation(to="extras.ImageAttachment")
     secrets = GenericRelation(
-        to='secrets.Secret',
-        content_type_field='assigned_object_type',
-        object_id_field='assigned_object_id',
-        related_query_name='device'
+        to="secrets.Secret",
+        content_type_field="assigned_object_type",
+        object_id_field="assigned_object_id",
+        related_query_name="device",
     )
     tags = TaggableManager(through=TaggedItem)
 
@@ -629,9 +601,11 @@ class Device(ChangeLoggedModel, ConfigContextModel, CustomFieldModel):
 
         # Validate site/rack combination
         if self.rack and self.site != self.rack.site:
-            raise ValidationError({
-                'rack': f"Rack {self.rack} does not belong to site {self.site}.",
-            })
+            raise ValidationError(
+                {
+                    "rack": f"Rack {self.rack} does not belong to site {self.site}.",
+                }
+            )
 
         if self.rack is None:
             if self.face:
@@ -641,9 +615,11 @@ class Device(ChangeLoggedModel, ConfigContextModel, CustomFieldModel):
                     }
                 )
             if self.position:
-                raise ValidationError({
-                    'position': "Cannot select a rack position without assigning a rack.",
-                })
+                raise ValidationError(
+                    {
+                        "position": "Cannot select a rack position without assigning a rack.",
+                    }
+                )
 
         # Validate position/face combination
         if self.position and not self.face:
@@ -655,9 +631,11 @@ class Device(ChangeLoggedModel, ConfigContextModel, CustomFieldModel):
 
         # Prevent 0U devices from being assigned to a specific position
         if self.position and self.device_type.u_height == 0:
-            raise ValidationError({
-                'position': f"A U0 device type ({self.device_type}) cannot be assigned to a rack position."
-            })
+            raise ValidationError(
+                {
+                    "position": f"A U0 device type ({self.device_type}) cannot be assigned to a rack position."
+                }
+            )
 
         if self.rack:
 
@@ -687,10 +665,12 @@ class Device(ChangeLoggedModel, ConfigContextModel, CustomFieldModel):
                     exclude=exclude_list,
                 )
                 if self.position and self.position not in available_units:
-                    raise ValidationError({
-                        'position': f"U{self.position} is already occupied or does not have sufficient space to "
-                                    f"accommodate this device type: {self.device_type} ({self.device_type.u_height}U)"
-                    })
+                    raise ValidationError(
+                        {
+                            "position": f"U{self.position} is already occupied or does not have sufficient space to "
+                            f"accommodate this device type: {self.device_type} ({self.device_type.u_height}U)"
+                        }
+                    )
 
             except DeviceType.DoesNotExist:
                 pass
@@ -894,6 +874,7 @@ class Device(ChangeLoggedModel, ConfigContextModel, CustomFieldModel):
         Return a QuerySet or PK list matching all Cables connected to a component of this Device.
         """
         from .cables import Cable
+
         cable_pks = []
         for component_model in [
             ConsolePort,
@@ -925,7 +906,8 @@ class Device(ChangeLoggedModel, ConfigContextModel, CustomFieldModel):
 # Virtual chassis
 #
 
-@extras_features('custom_fields', 'custom_links', 'export_templates', 'webhooks')
+
+@extras_features("custom_fields", "custom_links", "export_templates", "webhooks")
 class VirtualChassis(ChangeLoggedModel, CustomFieldModel):
     """
     A collection of Devices which operate with a shared control plane (e.g. a switch stack).

@@ -80,11 +80,12 @@ def _handle_deleted_object(request, sender, instance, **kwargs):
 # Custom fields
 #
 
+
 def handle_cf_removed_obj_types(instance, action, pk_set, **kwargs):
     """
     Handle the cleanup of old custom field data when a CustomField is removed from one or more ContentTypes.
     """
-    if action == 'post_remove':
+    if action == "post_remove":
         instance.remove_stale_data(ContentType.objects.filter(pk__in=pk_set))
 
 
@@ -95,7 +96,9 @@ def handle_cf_deleted(instance, **kwargs):
     instance.remove_stale_data(instance.content_types.all())
 
 
-m2m_changed.connect(handle_cf_removed_obj_types, sender=CustomField.content_types.through)
+m2m_changed.connect(
+    handle_cf_removed_obj_types, sender=CustomField.content_types.through
+)
 pre_delete.connect(handle_cf_deleted, sender=CustomField)
 
 

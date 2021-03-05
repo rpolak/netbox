@@ -20,7 +20,13 @@ from dcim.models import (
     Site,
 )
 from extras.api.views import ReportViewSet, ScriptViewSet
-from extras.models import ConfigContext, CustomField, ExportTemplate, ImageAttachment, Tag
+from extras.models import (
+    ConfigContext,
+    CustomField,
+    ExportTemplate,
+    ImageAttachment,
+    Tag,
+)
 from extras.reports import Report
 from extras.scripts import BooleanVar, IntegerVar, Script, StringVar
 from utilities.testing import APITestCase, APIViewTestCases
@@ -40,26 +46,26 @@ class AppTest(APITestCase):
 
 class CustomFieldTest(APIViewTestCases.APIViewTestCase):
     model = CustomField
-    brief_fields = ['id', 'name', 'url']
+    brief_fields = ["id", "name", "url"]
     create_data = [
         {
-            'content_types': ['dcim.site'],
-            'name': 'cf4',
-            'type': 'date',
+            "content_types": ["dcim.site"],
+            "name": "cf4",
+            "type": "date",
         },
         {
-            'content_types': ['dcim.site'],
-            'name': 'cf5',
-            'type': 'url',
+            "content_types": ["dcim.site"],
+            "name": "cf5",
+            "type": "url",
         },
         {
-            'content_types': ['dcim.site'],
-            'name': 'cf6',
-            'type': 'select',
+            "content_types": ["dcim.site"],
+            "name": "cf6",
+            "type": "select",
         },
     ]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
 
     @classmethod
@@ -67,18 +73,9 @@ class CustomFieldTest(APIViewTestCases.APIViewTestCase):
         site_ct = ContentType.objects.get_for_model(Site)
 
         custom_fields = (
-            CustomField(
-                name='cf1',
-                type='text'
-            ),
-            CustomField(
-                name='cf2',
-                type='integer'
-            ),
-            CustomField(
-                name='cf3',
-                type='boolean'
-            ),
+            CustomField(name="cf1", type="text"),
+            CustomField(name="cf2", type="integer"),
+            CustomField(name="cf3", type="boolean"),
         )
         CustomField.objects.bulk_create(custom_fields)
         for cf in custom_fields:
@@ -106,7 +103,7 @@ class ExportTemplateTest(APIViewTestCases.APIViewTestCase):
         },
     ]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
 
     @classmethod
@@ -151,7 +148,7 @@ class TagTest(APIViewTestCases.APIViewTestCase):
         },
     ]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
 
     @classmethod
@@ -227,7 +224,7 @@ class ConfigContextTest(APIViewTestCases.APIViewTestCase):
         },
     ]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
 
     @classmethod
@@ -472,23 +469,24 @@ class CreatedUpdatedFilterTest(APITestCase):
             **self.header
         )
 
-        self.assertEqual(response.data['count'], 1)
-        self.assertEqual(response.data['results'][0]['id'], self.rack2.pk)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"][0]["id"], self.rack2.pk)
 
 
 class ContentTypeTest(APITestCase):
-
-    @override_settings(EXEMPT_VIEW_PERMISSIONS=['contenttypes.contenttype'])
+    @override_settings(EXEMPT_VIEW_PERMISSIONS=["contenttypes.contenttype"])
     def test_list_objects(self):
         contenttype_count = ContentType.objects.count()
 
-        response = self.client.get(reverse('extras-api:contenttype-list'), **self.header)
+        response = self.client.get(
+            reverse("extras-api:contenttype-list"), **self.header
+        )
         self.assertHttpStatus(response, status.HTTP_200_OK)
-        self.assertEqual(response.data['count'], contenttype_count)
+        self.assertEqual(response.data["count"], contenttype_count)
 
-    @override_settings(EXEMPT_VIEW_PERMISSIONS=['contenttypes.contenttype'])
+    @override_settings(EXEMPT_VIEW_PERMISSIONS=["contenttypes.contenttype"])
     def test_get_object(self):
         contenttype = ContentType.objects.first()
 
-        url = reverse('extras-api:contenttype-detail', kwargs={'pk': contenttype.pk})
+        url = reverse("extras-api:contenttype-detail", kwargs={"pk": contenttype.pk})
         self.assertHttpStatus(self.client.get(url, **self.header), status.HTTP_200_OK)

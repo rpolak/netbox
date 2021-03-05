@@ -30,8 +30,8 @@ class WebhookForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        if 'content_types' in self.fields:
-            order_content_types(self.fields['content_types'])
+        if "content_types" in self.fields:
+            order_content_types(self.fields["content_types"])
 
 
 @admin.register(Webhook)
@@ -48,29 +48,35 @@ class WebhookAdmin(admin.ModelAdmin):
         "ssl_verification",
     ]
     list_filter = [
-        'enabled', 'type_create', 'type_update', 'type_delete', 'content_types',
+        "enabled",
+        "type_create",
+        "type_update",
+        "type_delete",
+        "content_types",
     ]
     form = WebhookForm
     fieldsets = (
-        (None, {
-            'fields': ('name', 'content_types', 'enabled')
-        }),
-        ('Events', {
-            'fields': ('type_create', 'type_update', 'type_delete')
-        }),
-        ('HTTP Request', {
-            'fields': (
-                'payload_url', 'http_method', 'http_content_type', 'additional_headers', 'body_template', 'secret',
-            ),
-            'classes': ('monospace',)
-        }),
-        ('SSL', {
-            'fields': ('ssl_verification', 'ca_file_path')
-        })
+        (None, {"fields": ("name", "content_types", "enabled")}),
+        ("Events", {"fields": ("type_create", "type_update", "type_delete")}),
+        (
+            "HTTP Request",
+            {
+                "fields": (
+                    "payload_url",
+                    "http_method",
+                    "http_content_type",
+                    "additional_headers",
+                    "body_template",
+                    "secret",
+                ),
+                "classes": ("monospace",),
+            },
+        ),
+        ("SSL", {"fields": ("ssl_verification", "ca_file_path")}),
     )
 
     def models(self, obj):
-        return ', '.join([ct.name for ct in obj.content_types.all()])
+        return ", ".join([ct.name for ct in obj.content_types.all()])
 
 
 #
@@ -83,19 +89,19 @@ class CustomFieldForm(forms.ModelForm):
         model = CustomField
         exclude = []
         widgets = {
-            'default': forms.TextInput(),
-            'validation_regex': forms.Textarea(
+            "default": forms.TextInput(),
+            "validation_regex": forms.Textarea(
                 attrs={
-                    'cols': 80,
-                    'rows': 3,
+                    "cols": 80,
+                    "rows": 3,
                 }
-            )
+            ),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        order_content_types(self.fields['content_types'])
+        order_content_types(self.fields["content_types"])
 
 
 @admin.register(CustomField)
@@ -113,28 +119,55 @@ class CustomFieldAdmin(admin.ModelAdmin):
         "description",
     ]
     list_filter = [
-        'type', 'required', 'content_types',
+        "type",
+        "required",
+        "content_types",
     ]
     fieldsets = (
-        ('Custom Field', {
-            'fields': ('type', 'name', 'weight', 'label', 'description', 'required', 'default', 'filter_logic')
-        }),
-        ('Assignment', {
-            'description': 'A custom field must be assigned to one or more object types.',
-            'fields': ('content_types',)
-        }),
-        ('Validation Rules', {
-            'fields': ('validation_minimum', 'validation_maximum', 'validation_regex'),
-            'classes': ('monospace',)
-        }),
-        ('Choices', {
-            'description': 'A selection field must have two or more choices assigned to it.',
-            'fields': ('choices',)
-        })
+        (
+            "Custom Field",
+            {
+                "fields": (
+                    "type",
+                    "name",
+                    "weight",
+                    "label",
+                    "description",
+                    "required",
+                    "default",
+                    "filter_logic",
+                )
+            },
+        ),
+        (
+            "Assignment",
+            {
+                "description": "A custom field must be assigned to one or more object types.",
+                "fields": ("content_types",),
+            },
+        ),
+        (
+            "Validation Rules",
+            {
+                "fields": (
+                    "validation_minimum",
+                    "validation_maximum",
+                    "validation_regex",
+                ),
+                "classes": ("monospace",),
+            },
+        ),
+        (
+            "Choices",
+            {
+                "description": "A selection field must have two or more choices assigned to it.",
+                "fields": ("choices",),
+            },
+        ),
     )
 
     def models(self, obj):
-        return ', '.join([ct.name for ct in obj.content_types.all()])
+        return ", ".join([ct.name for ct in obj.content_types.all()])
 
 
 #
@@ -217,13 +250,19 @@ class ExportTemplateForm(forms.ModelForm):
 @admin.register(ExportTemplate)
 class ExportTemplateAdmin(admin.ModelAdmin):
     fieldsets = (
-        ('Export Template', {
-            'fields': ('content_type', 'name', 'description', 'mime_type', 'file_extension')
-        }),
-        ('Content', {
-            'fields': ('template_code',),
-            'classes': ('monospace',)
-        })
+        (
+            "Export Template",
+            {
+                "fields": (
+                    "content_type",
+                    "name",
+                    "description",
+                    "mime_type",
+                    "file_extension",
+                )
+            },
+        ),
+        ("Content", {"fields": ("template_code",), "classes": ("monospace",)}),
     )
     list_display = [
         "name",

@@ -103,9 +103,9 @@ class APIViewTestCases:
 
             # Add object-level permission
             obj_perm = ObjectPermission(
-                name='Test permission',
-                constraints={'pk': instance1.pk},
-                actions=['view']
+                name="Test permission",
+                constraints={"pk": instance1.pk},
+                actions=["view"],
             )
             obj_perm.save()
             obj_perm.users.add(self.user)
@@ -123,7 +123,7 @@ class APIViewTestCases:
                 self.client.get(url, **self.header), status.HTTP_404_NOT_FOUND
             )
 
-        @override_settings(EXEMPT_VIEW_PERMISSIONS=['*'])
+        @override_settings(EXEMPT_VIEW_PERMISSIONS=["*"])
         def test_options_object(self):
             """
             Make an OPTIONS request for a single object.
@@ -200,9 +200,9 @@ class APIViewTestCases:
 
             # Add object-level permission
             obj_perm = ObjectPermission(
-                name='Test permission',
-                constraints={'pk__in': [instance1.pk, instance2.pk]},
-                actions=['view']
+                name="Test permission",
+                constraints={"pk__in": [instance1.pk, instance2.pk]},
+                actions=["view"],
             )
             obj_perm.save()
             obj_perm.users.add(self.user)
@@ -213,7 +213,7 @@ class APIViewTestCases:
             self.assertHttpStatus(response, status.HTTP_200_OK)
             self.assertEqual(len(response.data["results"]), 2)
 
-        @override_settings(EXEMPT_VIEW_PERMISSIONS=['*'])
+        @override_settings(EXEMPT_VIEW_PERMISSIONS=["*"])
         def test_options_objects(self):
             """
             Make an OPTIONS request for a list endpoint.
@@ -243,10 +243,7 @@ class APIViewTestCases:
             POST a single object with permission.
             """
             # Add object-level permission
-            obj_perm = ObjectPermission(
-                name='Test permission',
-                actions=['add']
-            )
+            obj_perm = ObjectPermission(name="Test permission", actions=["add"])
             obj_perm.save()
             obj_perm.users.add(self.user)
             obj_perm.object_types.add(ContentType.objects.get_for_model(self.model))
@@ -269,10 +266,7 @@ class APIViewTestCases:
             POST a set of objects in a single request.
             """
             # Add object-level permission
-            obj_perm = ObjectPermission(
-                name='Test permission',
-                actions=['add']
-            )
+            obj_perm = ObjectPermission(name="Test permission", actions=["add"])
             obj_perm.save()
             obj_perm.users.add(self.user)
             obj_perm.object_types.add(ContentType.objects.get_for_model(self.model))
@@ -289,7 +283,11 @@ class APIViewTestCases:
             for i, obj in enumerate(response.data):
                 for field in self.create_data[i]:
                     if field not in self.validation_excluded_fields:
-                        self.assertIn(field, obj, f"Bulk create field '{field}' missing from object {i} in response")
+                        self.assertIn(
+                            field,
+                            obj,
+                            f"Bulk create field '{field}' missing from object {i} in response",
+                        )
             for i, obj in enumerate(response.data):
                 self.assertInstanceEqual(
                     self._get_queryset().get(pk=obj["id"]),
@@ -326,10 +324,7 @@ class APIViewTestCases:
             update_data = self.update_data or getattr(self, "create_data")[0]
 
             # Add object-level permission
-            obj_perm = ObjectPermission(
-                name='Test permission',
-                actions=['change']
-            )
+            obj_perm = ObjectPermission(name="Test permission", actions=["change"])
             obj_perm.save()
             obj_perm.users.add(self.user)
             obj_perm.object_types.add(ContentType.objects.get_for_model(self.model))
@@ -349,25 +344,28 @@ class APIViewTestCases:
                 self.skipTest("Bulk update data not set")
 
             # Add object-level permission
-            obj_perm = ObjectPermission(
-                name='Test permission',
-                actions=['change']
-            )
+            obj_perm = ObjectPermission(name="Test permission", actions=["change"])
             obj_perm.save()
             obj_perm.users.add(self.user)
             obj_perm.object_types.add(ContentType.objects.get_for_model(self.model))
 
-            id_list = self._get_queryset().values_list('id', flat=True)[:3]
-            self.assertEqual(len(id_list), 3, "Insufficient number of objects to test bulk update")
-            data = [
-                {'id': id, **self.bulk_update_data} for id in id_list
-            ]
+            id_list = self._get_queryset().values_list("id", flat=True)[:3]
+            self.assertEqual(
+                len(id_list), 3, "Insufficient number of objects to test bulk update"
+            )
+            data = [{"id": id, **self.bulk_update_data} for id in id_list]
 
-            response = self.client.patch(self._get_list_url(), data, format='json', **self.header)
+            response = self.client.patch(
+                self._get_list_url(), data, format="json", **self.header
+            )
             self.assertHttpStatus(response, status.HTTP_200_OK)
             for i, obj in enumerate(response.data):
                 for field in self.bulk_update_data:
-                    self.assertIn(field, obj, f"Bulk update field '{field}' missing from object {i} in response")
+                    self.assertIn(
+                        field,
+                        obj,
+                        f"Bulk update field '{field}' missing from object {i} in response",
+                    )
             for instance in self._get_queryset().filter(pk__in=id_list):
                 self.assertInstanceEqual(instance, self.bulk_update_data, api=True)
 
@@ -391,10 +389,7 @@ class APIViewTestCases:
             url = self._get_detail_url(instance)
 
             # Add object-level permission
-            obj_perm = ObjectPermission(
-                name='Test permission',
-                actions=['delete']
-            )
+            obj_perm = ObjectPermission(name="Test permission", actions=["delete"])
             obj_perm.save()
             obj_perm.users.add(self.user)
             obj_perm.object_types.add(ContentType.objects.get_for_model(self.model))
@@ -408,22 +403,25 @@ class APIViewTestCases:
             DELETE a set of objects in a single request.
             """
             # Add object-level permission
-            obj_perm = ObjectPermission(
-                name='Test permission',
-                actions=['delete']
-            )
+            obj_perm = ObjectPermission(name="Test permission", actions=["delete"])
             obj_perm.save()
             obj_perm.users.add(self.user)
             obj_perm.object_types.add(ContentType.objects.get_for_model(self.model))
 
             # Target the three most recently created objects to avoid triggering recursive deletions
             # (e.g. with MPTT objects)
-            id_list = self._get_queryset().order_by('-id').values_list('id', flat=True)[:3]
-            self.assertEqual(len(id_list), 3, "Insufficient number of objects to test bulk deletion")
+            id_list = (
+                self._get_queryset().order_by("-id").values_list("id", flat=True)[:3]
+            )
+            self.assertEqual(
+                len(id_list), 3, "Insufficient number of objects to test bulk deletion"
+            )
             data = [{"id": id} for id in id_list]
 
             initial_count = self._get_queryset().count()
-            response = self.client.delete(self._get_list_url(), data, format='json', **self.header)
+            response = self.client.delete(
+                self._get_list_url(), data, format="json", **self.header
+            )
             self.assertHttpStatus(response, status.HTTP_204_NO_CONTENT)
             self.assertEqual(self._get_queryset().count(), initial_count - 3)
 

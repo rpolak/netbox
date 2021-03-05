@@ -5,21 +5,23 @@ from netbox.api import ChoiceField, WritableNestedSerializer
 from users.api.nested_serializers import NestedUserSerializer
 
 __all__ = [
-    'NestedConfigContextSerializer',
-    'NestedCustomFieldSerializer',
-    'NestedExportTemplateSerializer',
-    'NestedImageAttachmentSerializer',
-    'NestedJobResultSerializer',
-    'NestedTagSerializer',
+    "NestedConfigContextSerializer",
+    "NestedCustomFieldSerializer",
+    "NestedExportTemplateSerializer",
+    "NestedImageAttachmentSerializer",
+    "NestedJobResultSerializer",
+    "NestedTagSerializer",
 ]
 
 
 class NestedCustomFieldSerializer(WritableNestedSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='extras-api:customfield-detail')
+    url = serializers.HyperlinkedIdentityField(
+        view_name="extras-api:customfield-detail"
+    )
 
     class Meta:
         model = models.CustomField
-        fields = ['id', 'url', 'name']
+        fields = ["id", "url", "name"]
 
 
 class NestedConfigContextSerializer(WritableNestedSerializer):

@@ -47,12 +47,9 @@ class RackGroup(MPTTModel, ChangeLoggedModel):
     example, if a Site spans a corporate campus, a RackGroup might be defined to represent each building within that
     campus. If a Site instead represents a single building, a RackGroup might represent a single room or floor.
     """
-    name = models.CharField(
-        max_length=100
-    )
-    slug = models.SlugField(
-        max_length=100
-    )
+
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=100)
     site = models.ForeignKey(
         to="dcim.Site", on_delete=models.CASCADE, related_name="rack_groups"
     )
@@ -120,17 +117,10 @@ class RackRole(ChangeLoggedModel):
     """
     Racks can be organized by functional role, similar to Devices.
     """
-    name = models.CharField(
-        max_length=100,
-        unique=True
-    )
-    slug = models.SlugField(
-        max_length=100,
-        unique=True
-    )
-    color = ColorField(
-        default=ColorChoices.COLOR_GREY
-    )
+
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
+    color = ColorField(default=ColorChoices.COLOR_GREY)
     description = models.CharField(
         max_length=200,
         blank=True,
@@ -164,14 +154,9 @@ class Rack(ChangeLoggedModel, CustomFieldModel):
     Devices are housed within Racks. Each rack has a defined height measured in rack units, and a front and rear face.
     Each Rack is assigned to a Site and (optionally) a RackGroup.
     """
-    name = models.CharField(
-        max_length=100
-    )
-    _name = NaturalOrderingField(
-        target_field='name',
-        max_length=100,
-        blank=True
-    )
+
+    name = models.CharField(max_length=100)
+    _name = NaturalOrderingField(target_field="name", max_length=100, blank=True)
     facility_id = models.CharField(
         max_length=50,
         blank=True,
@@ -250,12 +235,8 @@ class Rack(ChangeLoggedModel, CustomFieldModel):
         choices=RackDimensionUnitChoices,
         blank=True,
     )
-    comments = models.TextField(
-        blank=True
-    )
-    images = GenericRelation(
-        to='extras.ImageAttachment'
-    )
+    comments = models.TextField(blank=True)
+    images = GenericRelation(to="extras.ImageAttachment")
     images = GenericRelation(to="extras.ImageAttachment")
     tags = TaggableManager(through=TaggedItem)
 
@@ -319,7 +300,9 @@ class Rack(ChangeLoggedModel, CustomFieldModel):
 
         # Validate group/site assignment
         if self.site and self.group and self.group.site != self.site:
-            raise ValidationError(f"Assigned rack group must belong to parent site ({self.site}).")
+            raise ValidationError(
+                f"Assigned rack group must belong to parent site ({self.site})."
+            )
 
         # Validate outer dimensions and unit
         if (
@@ -576,18 +559,21 @@ class Rack(ChangeLoggedModel, CustomFieldModel):
 
         pf_powerports = PowerPort.objects.filter(
             _cable_peer_type=ContentType.objects.get_for_model(PowerFeed),
-            _cable_peer_id__in=powerfeeds.values_list('id', flat=True)
+            _cable_peer_id__in=powerfeeds.values_list("id", flat=True),
         )
         poweroutlets = PowerOutlet.objects.filter(power_port_id__in=pf_powerports)
-        allocated_draw_total = PowerPort.objects.filter(
-            _cable_peer_type=ContentType.objects.get_for_model(PowerOutlet),
-            _cable_peer_id__in=poweroutlets.values_list('id', flat=True)
-        ).aggregate(Sum('allocated_draw'))['allocated_draw__sum'] or 0
+        allocated_draw_total = (
+            PowerPort.objects.filter(
+                _cable_peer_type=ContentType.objects.get_for_model(PowerOutlet),
+                _cable_peer_id__in=poweroutlets.values_list("id", flat=True),
+            ).aggregate(Sum("allocated_draw"))["allocated_draw__sum"]
+            or 0
+        )
 
         return int(allocated_draw_total / available_power_total * 100)
 
 
-@extras_features('custom_fields', 'custom_links', 'export_templates', 'webhooks')
+@extras_features("custom_fields", "custom_links", "export_templates", "webhooks")
 class RackReservation(ChangeLoggedModel, CustomFieldModel):
     """
     One or more reserved units within a Rack.

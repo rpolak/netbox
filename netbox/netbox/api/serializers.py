@@ -1,4 +1,8 @@
-from django.core.exceptions import FieldError, MultipleObjectsReturned, ObjectDoesNotExist
+from django.core.exceptions import (
+    FieldError,
+    MultipleObjectsReturned,
+    ObjectDoesNotExist,
+)
 from django.db.models import ManyToManyField
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -11,12 +15,13 @@ class ValidatedModelSerializer(serializers.ModelSerializer):
     Extends the built-in ModelSerializer to enforce calling full_clean() on a copy of the associated instance during
     validation. (DRF does not do this by default; see https://github.com/encode/django-rest-framework/issues/3144)
     """
+
     def validate(self, data):
 
         # Remove custom fields data and tags (if any) prior to model validation
         attrs = data.copy()
-        attrs.pop('custom_fields', None)
-        attrs.pop('tags', None)
+        attrs.pop("custom_fields", None)
+        attrs.pop("tags", None)
 
         # Skip ManyToManyFields
         for field in self.Meta.model._meta.get_fields():
@@ -53,7 +58,9 @@ class WritableNestedSerializer(serializers.ModelSerializer):
                 return queryset.get(**params)
             except ObjectDoesNotExist:
                 raise ValidationError(
-                    "Related object not found using the provided attributes: {}".format(params)
+                    "Related object not found using the provided attributes: {}".format(
+                        params
+                    )
                 )
             except MultipleObjectsReturned:
                 raise ValidationError(

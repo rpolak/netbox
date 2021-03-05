@@ -2,11 +2,11 @@ from django.contrib.contenttypes.models import ContentType
 
 
 def compile_path_node(ct_id, object_id):
-    return f'{ct_id}:{object_id}'
+    return f"{ct_id}:{object_id}"
 
 
 def decompile_path_node(repr):
-    ct_id, object_id = repr.split(':')
+    ct_id, object_id = repr.split(":")
     return int(ct_id), int(object_id)
 
 

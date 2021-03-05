@@ -49,10 +49,12 @@ class ProviderTestCase(TestCase):
         )
         Circuit.objects.bulk_create(circuits)
 
-        CircuitTermination.objects.bulk_create((
-            CircuitTermination(circuit=circuits[0], site=sites[0], term_side='A'),
-            CircuitTermination(circuit=circuits[1], site=sites[0], term_side='A'),
-        ))
+        CircuitTermination.objects.bulk_create(
+            (
+                CircuitTermination(circuit=circuits[0], site=sites[0], term_side="A"),
+                CircuitTermination(circuit=circuits[1], site=sites[0], term_side="A"),
+            )
+        )
 
     def test_id(self):
         params = {"id": self.queryset.values_list("pk", flat=True)[:2]}
@@ -225,11 +227,11 @@ class CircuitTestCase(TestCase):
         )
         Circuit.objects.bulk_create(circuits)
 
-        circuit_terminations = ((
-            CircuitTermination(circuit=circuits[0], site=sites[0], term_side='A'),
-            CircuitTermination(circuit=circuits[1], site=sites[1], term_side='A'),
-            CircuitTermination(circuit=circuits[2], site=sites[2], term_side='A'),
-        ))
+        circuit_terminations = (
+            CircuitTermination(circuit=circuits[0], site=sites[0], term_side="A"),
+            CircuitTermination(circuit=circuits[1], site=sites[1], term_side="A"),
+            CircuitTermination(circuit=circuits[2], site=sites[2], term_side="A"),
+        )
         CircuitTermination.objects.bulk_create(circuit_terminations)
 
     def test_id(self):
@@ -381,7 +383,9 @@ class CircuitTerminationTestCase(TestCase):
         )
         CircuitTermination.objects.bulk_create(circuit_terminations)
 
-        Cable(termination_a=circuit_terminations[0], termination_b=circuit_terminations[1]).save()
+        Cable(
+            termination_a=circuit_terminations[0], termination_b=circuit_terminations[1]
+        ).save()
 
     def test_term_side(self):
         params = {"term_side": "A"}
@@ -412,11 +416,11 @@ class CircuitTerminationTestCase(TestCase):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
 
     def test_cabled(self):
-        params = {'cabled': True}
+        params = {"cabled": True}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_connected(self):
-        params = {'connected': True}
+        params = {"connected": True}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
-        params = {'connected': False}
+        params = {"connected": False}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)

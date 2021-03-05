@@ -26,10 +26,9 @@ def get_session_key(request):
 # Secret roles
 #
 
+
 class SecretRoleListView(generic.ObjectListView):
-    queryset = SecretRole.objects.annotate(
-        secret_count=count_related(Secret, 'role')
-    )
+    queryset = SecretRole.objects.annotate(secret_count=count_related(Secret, "role"))
     table = tables.SecretRoleTable
 
 
@@ -49,15 +48,14 @@ class SecretRoleBulkImportView(generic.BulkImportView):
 
 
 class SecretRoleBulkDeleteView(generic.BulkDeleteView):
-    queryset = SecretRole.objects.annotate(
-        secret_count=count_related(Secret, 'role')
-    )
+    queryset = SecretRole.objects.annotate(secret_count=count_related(Secret, "role"))
     table = tables.SecretRoleTable
 
 
 #
 # Secrets
 #
+
 
 class SecretListView(generic.ObjectListView):
     queryset = Secret.objects.all()
@@ -216,13 +214,13 @@ class SecretBulkImportView(generic.BulkImportView):
 
 
 class SecretBulkEditView(generic.BulkEditView):
-    queryset = Secret.objects.prefetch_related('role')
+    queryset = Secret.objects.prefetch_related("role")
     filterset = filters.SecretFilterSet
     table = tables.SecretTable
     form = forms.SecretBulkEditForm
 
 
 class SecretBulkDeleteView(generic.BulkDeleteView):
-    queryset = Secret.objects.prefetch_related('role')
+    queryset = Secret.objects.prefetch_related("role")
     filterset = filters.SecretFilterSet
     table = tables.SecretTable

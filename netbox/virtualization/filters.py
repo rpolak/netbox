@@ -2,7 +2,11 @@ import django_filters
 from django.db.models import Q
 
 from dcim.models import DeviceRole, Platform, Region, Site
-from extras.filters import CustomFieldModelFilterSet, CreatedUpdatedFilterSet, LocalConfigContextFilterSet
+from extras.filters import (
+    CustomFieldModelFilterSet,
+    CreatedUpdatedFilterSet,
+    LocalConfigContextFilterSet,
+)
 from tenancy.filters import TenancyFilterSet
 from utilities.filters import (
     BaseFilterSet,
@@ -35,7 +39,9 @@ class ClusterGroupFilterSet(BaseFilterSet, NameSlugSearchFilterSet):
         fields = ["id", "name", "slug", "description"]
 
 
-class ClusterFilterSet(BaseFilterSet, TenancyFilterSet, CustomFieldModelFilterSet, CreatedUpdatedFilterSet):
+class ClusterFilterSet(
+    BaseFilterSet, TenancyFilterSet, CustomFieldModelFilterSet, CreatedUpdatedFilterSet
+):
     q = django_filters.CharFilter(
         method="search",
         label="Search",
@@ -100,7 +106,7 @@ class VirtualMachineFilterSet(
     LocalConfigContextFilterSet,
     TenancyFilterSet,
     CustomFieldModelFilterSet,
-    CreatedUpdatedFilterSet
+    CreatedUpdatedFilterSet,
 ):
     q = django_filters.CharFilter(
         method="search",

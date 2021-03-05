@@ -284,9 +284,9 @@ def badge(value, show_empty=False):
     }
 
 
-@register.inclusion_tag('utilities/templatetags/table_config_form.html')
+@register.inclusion_tag("utilities/templatetags/table_config_form.html")
 def table_config_form(table, table_name=None):
     return {
-        'table_name': table_name or table.__class__.__name__,
-        'table_config_form': TableConfigForm(table=table),
+        "table_name": table_name or table.__class__.__name__,
+        "table_config_form": TableConfigForm(table=table),
     }

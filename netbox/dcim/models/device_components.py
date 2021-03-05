@@ -22,18 +22,18 @@ from utilities.utils import serialize_object
 
 
 __all__ = (
-    'BaseInterface',
-    'CableTermination',
-    'ConsolePort',
-    'ConsoleServerPort',
-    'DeviceBay',
-    'FrontPort',
-    'Interface',
-    'InventoryItem',
-    'PathEndpoint',
-    'PowerOutlet',
-    'PowerPort',
-    'RearPort',
+    "BaseInterface",
+    "CableTermination",
+    "ConsolePort",
+    "ConsoleServerPort",
+    "DeviceBay",
+    "FrontPort",
+    "Interface",
+    "InventoryItem",
+    "PathEndpoint",
+    "PowerOutlet",
+    "PowerPort",
+    "RearPort",
 )
 
 
@@ -41,6 +41,7 @@ class ComponentModel(models.Model):
     """
     An abstract model inherited by any model which has a parent Device.
     """
+
     device = models.ForeignKey(
         to="dcim.Device", on_delete=models.CASCADE, related_name="%(class)ss"
     )
@@ -88,6 +89,7 @@ class CableTermination(models.Model):
     shortcut to referencing `cable.termination_b`, for example. `_cable_peer` is set or cleared by the receivers in
     dcim.signals when a Cable instance is created or deleted, respectively.
     """
+
     cable = models.ForeignKey(
         to="dcim.Cable",
         on_delete=models.SET_NULL,
@@ -98,17 +100,13 @@ class CableTermination(models.Model):
     _cable_peer_type = models.ForeignKey(
         to=ContentType,
         on_delete=models.SET_NULL,
-        related_name='+',
+        related_name="+",
         blank=True,
-        null=True
+        null=True,
     )
-    _cable_peer_id = models.PositiveIntegerField(
-        blank=True,
-        null=True
-    )
+    _cable_peer_id = models.PositiveIntegerField(blank=True, null=True)
     _cable_peer = GenericForeignKey(
-        ct_field='_cable_peer_type',
-        fk_field='_cable_peer_id'
+        ct_field="_cable_peer_type", fk_field="_cable_peer_id"
     )
 
     # Generic relations to Cable. These ensure that an attached Cable is deleted if the terminated object is deleted.
@@ -141,11 +139,9 @@ class PathEndpoint(models.Model):
 
     `connected_endpoint()` is a convenience method for returning the destination of the associated CablePath, if any.
     """
+
     _path = models.ForeignKey(
-        to='dcim.CablePath',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
+        to="dcim.CablePath", on_delete=models.SET_NULL, null=True, blank=True
     )
 
     class Meta:
@@ -174,7 +170,7 @@ class PathEndpoint(models.Model):
         """
         Caching accessor for the attached CablePath's destination (if any)
         """
-        if not hasattr(self, '_connected_endpoint'):
+        if not hasattr(self, "_connected_endpoint"):
             self._connected_endpoint = self._path.destination if self._path else None
         return self._connected_endpoint
 
@@ -183,7 +179,8 @@ class PathEndpoint(models.Model):
 # Console ports
 #
 
-@extras_features('export_templates', 'webhooks', 'custom_links')
+
+@extras_features("export_templates", "webhooks", "custom_links")
 class ConsolePort(CableTermination, PathEndpoint, ComponentModel):
     """
     A physical console port within a Device. ConsolePorts connect to ConsoleServerPorts.
@@ -220,7 +217,8 @@ class ConsolePort(CableTermination, PathEndpoint, ComponentModel):
 # Console server ports
 #
 
-@extras_features('webhooks', 'custom_links')
+
+@extras_features("webhooks", "custom_links")
 class ConsoleServerPort(CableTermination, PathEndpoint, ComponentModel):
     """
     A physical port within a Device (typically a designated console server) which provides access to ConsolePorts.
@@ -257,7 +255,8 @@ class ConsoleServerPort(CableTermination, PathEndpoint, ComponentModel):
 # Power ports
 #
 
-@extras_features('export_templates', 'webhooks', 'custom_links')
+
+@extras_features("export_templates", "webhooks", "custom_links")
 class PowerPort(CableTermination, PathEndpoint, ComponentModel):
     """
     A physical power supply (intake) port within a Device. PowerPorts connect to PowerOutlets.
@@ -329,13 +328,14 @@ class PowerPort(CableTermination, PathEndpoint, ComponentModel):
         # Calculate aggregate draw of all child power outlets if no numbers have been defined manually
         if self.allocated_draw is None and self.maximum_draw is None:
             poweroutlet_ct = ContentType.objects.get_for_model(PowerOutlet)
-            outlet_ids = PowerOutlet.objects.filter(power_port=self).values_list('pk', flat=True)
+            outlet_ids = PowerOutlet.objects.filter(power_port=self).values_list(
+                "pk", flat=True
+            )
             utilization = PowerPort.objects.filter(
-                _cable_peer_type=poweroutlet_ct,
-                _cable_peer_id__in=outlet_ids
+                _cable_peer_type=poweroutlet_ct, _cable_peer_id__in=outlet_ids
             ).aggregate(
-                maximum_draw_total=Sum('maximum_draw'),
-                allocated_draw_total=Sum('allocated_draw'),
+                maximum_draw_total=Sum("maximum_draw"),
+                allocated_draw_total=Sum("allocated_draw"),
             )
             ret = {
                 "allocated": utilization["allocated_draw_total"] or 0,
@@ -345,15 +345,19 @@ class PowerPort(CableTermination, PathEndpoint, ComponentModel):
             }
 
             # Calculate per-leg aggregates for three-phase feeds
-            if getattr(self._cable_peer, 'phase', None) == PowerFeedPhaseChoices.PHASE_3PHASE:
+            if (
+                getattr(self._cable_peer, "phase", None)
+                == PowerFeedPhaseChoices.PHASE_3PHASE
+            ):
                 for leg, leg_name in PowerOutletFeedLegChoices:
-                    outlet_ids = PowerOutlet.objects.filter(power_port=self, feed_leg=leg).values_list('pk', flat=True)
+                    outlet_ids = PowerOutlet.objects.filter(
+                        power_port=self, feed_leg=leg
+                    ).values_list("pk", flat=True)
                     utilization = PowerPort.objects.filter(
-                        _cable_peer_type=poweroutlet_ct,
-                        _cable_peer_id__in=outlet_ids
+                        _cable_peer_type=poweroutlet_ct, _cable_peer_id__in=outlet_ids
                     ).aggregate(
-                        maximum_draw_total=Sum('maximum_draw'),
-                        allocated_draw_total=Sum('allocated_draw'),
+                        maximum_draw_total=Sum("maximum_draw"),
+                        allocated_draw_total=Sum("allocated_draw"),
                     )
 
             return ret
@@ -371,7 +375,8 @@ class PowerPort(CableTermination, PathEndpoint, ComponentModel):
 # Power outlets
 #
 
-@extras_features('webhooks', 'custom_links')
+
+@extras_features("webhooks", "custom_links")
 class PowerOutlet(CableTermination, PathEndpoint, ComponentModel):
     """
     A physical power outlet (output) within a Device which provides power to a PowerPort.
@@ -474,7 +479,7 @@ class BaseInterface(models.Model):
         return super().save(*args, **kwargs)
 
 
-@extras_features('export_templates', 'webhooks', 'custom_links')
+@extras_features("export_templates", "webhooks", "custom_links")
 class Interface(CableTermination, PathEndpoint, ComponentModel, BaseInterface):
     """
     A network interface within a Device. A physical Interface can connect to exactly one other Interface.
@@ -498,8 +503,8 @@ class Interface(CableTermination, PathEndpoint, ComponentModel, BaseInterface):
     type = models.CharField(max_length=50, choices=InterfaceTypeChoices)
     mgmt_only = models.BooleanField(
         default=False,
-        verbose_name='Management only',
-        help_text='This interface is used only for out-of-band management'
+        verbose_name="Management only",
+        help_text="This interface is used only for out-of-band management",
     )
     untagged_vlan = models.ForeignKey(
         to="ipam.VLAN",
@@ -640,7 +645,8 @@ class Interface(CableTermination, PathEndpoint, ComponentModel, BaseInterface):
 # Pass-through ports
 #
 
-@extras_features('webhooks', 'custom_links')
+
+@extras_features("webhooks", "custom_links")
 class FrontPort(CableTermination, ComponentModel):
     """
     A pass-through port on the front of a Device.
@@ -711,7 +717,7 @@ class FrontPort(CableTermination, ComponentModel):
             )
 
 
-@extras_features('webhooks', 'custom_links')
+@extras_features("webhooks", "custom_links")
 class RearPort(CableTermination, ComponentModel):
     """
     A pass-through port on the rear of a Device.
@@ -764,7 +770,8 @@ class RearPort(CableTermination, ComponentModel):
 # Device bays
 #
 
-@extras_features('webhooks', 'custom_links')
+
+@extras_features("webhooks", "custom_links")
 class DeviceBay(ComponentModel):
     """
     An empty space within a Device which can house a child device
@@ -831,19 +838,21 @@ class DeviceBay(ComponentModel):
 # Inventory items
 #
 
-@extras_features('export_templates', 'webhooks', 'custom_links')
+
+@extras_features("export_templates", "webhooks", "custom_links")
 class InventoryItem(MPTTModel, ComponentModel):
     """
     An InventoryItem represents a serialized piece of hardware within a Device, such as a line card or power supply.
     InventoryItems are used only for inventory purposes.
     """
+
     parent = TreeForeignKey(
-        to='self',
+        to="self",
         on_delete=models.CASCADE,
         related_name="child_items",
         blank=True,
         null=True,
-        db_index=True
+        db_index=True,
     )
     manufacturer = models.ForeignKey(
         to="dcim.Manufacturer",

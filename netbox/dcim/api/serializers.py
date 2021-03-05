@@ -7,10 +7,38 @@ from rest_framework.validators import UniqueTogetherValidator
 from dcim.choices import *
 from dcim.constants import *
 from dcim.models import (
-    Cable, CablePath, ConsolePort, ConsolePortTemplate, ConsoleServerPort, ConsoleServerPortTemplate, Device, DeviceBay,
-    DeviceBayTemplate, DeviceType, DeviceRole, FrontPort, FrontPortTemplate, Interface, InterfaceTemplate,
-    Manufacturer, InventoryItem, Platform, PowerFeed, PowerOutlet, PowerOutletTemplate, PowerPanel, PowerPort,
-    PowerPortTemplate, Rack, RackGroup, RackReservation, RackRole, RearPort, RearPortTemplate, Region, Site,
+    Cable,
+    CablePath,
+    ConsolePort,
+    ConsolePortTemplate,
+    ConsoleServerPort,
+    ConsoleServerPortTemplate,
+    Device,
+    DeviceBay,
+    DeviceBayTemplate,
+    DeviceType,
+    DeviceRole,
+    FrontPort,
+    FrontPortTemplate,
+    Interface,
+    InterfaceTemplate,
+    Manufacturer,
+    InventoryItem,
+    Platform,
+    PowerFeed,
+    PowerOutlet,
+    PowerOutletTemplate,
+    PowerPanel,
+    PowerPort,
+    PowerPortTemplate,
+    Rack,
+    RackGroup,
+    RackReservation,
+    RackRole,
+    RearPort,
+    RearPortTemplate,
+    Region,
+    Site,
     VirtualChassis,
 )
 from dcim.utils import decompile_path_node
@@ -19,7 +47,11 @@ from extras.api.serializers import TaggedObjectSerializer
 from ipam.api.nested_serializers import NestedIPAddressSerializer, NestedVLANSerializer
 from ipam.models import VLAN
 from netbox.api import (
-    ChoiceField, ContentTypeField, SerializedPKRelatedField, TimeZoneField, ValidatedModelSerializer,
+    ChoiceField,
+    ContentTypeField,
+    SerializedPKRelatedField,
+    TimeZoneField,
+    ValidatedModelSerializer,
     WritableNestedSerializer,
 )
 from tenancy.api.nested_serializers import NestedTenantSerializer
@@ -35,7 +67,9 @@ class CableTerminationSerializer(serializers.ModelSerializer):
 
     def get_cable_peer_type(self, obj):
         if obj._cable_peer is not None:
-            return f'{obj._cable_peer._meta.app_label}.{obj._cable_peer._meta.model_name}'
+            return (
+                f"{obj._cable_peer._meta.app_label}.{obj._cable_peer._meta.model_name}"
+            )
         return None
 
     @swagger_serializer_method(serializer_or_field=serializers.DictField)
@@ -44,8 +78,8 @@ class CableTerminationSerializer(serializers.ModelSerializer):
         Return the appropriate serializer for the cable termination model.
         """
         if obj._cable_peer is not None:
-            serializer = get_serializer_for_model(obj._cable_peer, prefix='Nested')
-            context = {'request': self.context['request']}
+            serializer = get_serializer_for_model(obj._cable_peer, prefix="Nested")
+            context = {"request": self.context["request"]}
             return serializer(obj._cable_peer, context=context).data
         return None
 
@@ -57,7 +91,7 @@ class ConnectedEndpointSerializer(ValidatedModelSerializer):
 
     def get_connected_endpoint_type(self, obj):
         if obj._path is not None and obj._path.destination is not None:
-            return f'{obj._path.destination._meta.app_label}.{obj._path.destination._meta.model_name}'
+            return f"{obj._path.destination._meta.app_label}.{obj._path.destination._meta.model_name}"
         return None
 
     @swagger_serializer_method(serializer_or_field=serializers.DictField)
@@ -66,8 +100,10 @@ class ConnectedEndpointSerializer(ValidatedModelSerializer):
         Return the appropriate serializer for the type of connected object.
         """
         if obj._path is not None and obj._path.destination is not None:
-            serializer = get_serializer_for_model(obj._path.destination, prefix='Nested')
-            context = {'request': self.context['request']}
+            serializer = get_serializer_for_model(
+                obj._path.destination, prefix="Nested"
+            )
+            context = {"request": self.context["request"]}
             return serializer(obj._path.destination, context=context).data
         return None
 
@@ -268,14 +304,27 @@ class RackUnitSerializer(serializers.Serializer):
 
 
 class RackReservationSerializer(TaggedObjectSerializer, CustomFieldModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='dcim-api:rackreservation-detail')
+    url = serializers.HyperlinkedIdentityField(
+        view_name="dcim-api:rackreservation-detail"
+    )
     rack = NestedRackSerializer()
     user = NestedUserSerializer()
     tenant = NestedTenantSerializer(required=False, allow_null=True)
 
     class Meta:
         model = RackReservation
-        fields = ['id', 'url', 'rack', 'units', 'created', 'user', 'tenant', 'description', 'tags', 'custom_fields']
+        fields = [
+            "id",
+            "url",
+            "rack",
+            "units",
+            "created",
+            "user",
+            "tenant",
+            "description",
+            "tags",
+            "custom_fields",
+        ]
 
 
 class RackElevationDetailFilterSerializer(serializers.Serializer):
@@ -677,14 +726,14 @@ class DeviceNAPALMSerializer(serializers.Serializer):
     method = serializers.DictField()
 
 
-class ConsoleServerPortSerializer(TaggedObjectSerializer, CableTerminationSerializer, ConnectedEndpointSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='dcim-api:consoleserverport-detail')
-    device = NestedDeviceSerializer()
-    type = ChoiceField(
-        choices=ConsolePortTypeChoices,
-        allow_blank=True,
-        required=False
+class ConsoleServerPortSerializer(
+    TaggedObjectSerializer, CableTerminationSerializer, ConnectedEndpointSerializer
+):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="dcim-api:consoleserverport-detail"
     )
+    device = NestedDeviceSerializer()
+    type = ChoiceField(choices=ConsolePortTypeChoices, allow_blank=True, required=False)
     device = NestedDeviceSerializer()
     type = ChoiceField(choices=ConsolePortTypeChoices, allow_blank=True, required=False)
     cable = NestedCableSerializer(read_only=True)
@@ -692,13 +741,27 @@ class ConsoleServerPortSerializer(TaggedObjectSerializer, CableTerminationSerial
     class Meta:
         model = ConsoleServerPort
         fields = [
-            'id', 'url', 'device', 'name', 'label', 'type', 'description', 'cable', 'cable_peer', 'cable_peer_type',
-            'connected_endpoint', 'connected_endpoint_type', 'connected_endpoint_reachable', 'tags',
+            "id",
+            "url",
+            "device",
+            "name",
+            "label",
+            "type",
+            "description",
+            "cable",
+            "cable_peer",
+            "cable_peer_type",
+            "connected_endpoint",
+            "connected_endpoint_type",
+            "connected_endpoint_reachable",
+            "tags",
         ]
 
 
-class ConsolePortSerializer(TaggedObjectSerializer, CableTerminationSerializer, ConnectedEndpointSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='dcim-api:consoleport-detail')
+class ConsolePortSerializer(
+    TaggedObjectSerializer, CableTerminationSerializer, ConnectedEndpointSerializer
+):
+    url = serializers.HyperlinkedIdentityField(view_name="dcim-api:consoleport-detail")
     device = NestedDeviceSerializer()
     type = ChoiceField(choices=ConsolePortTypeChoices, allow_blank=True, required=False)
     cable = NestedCableSerializer(read_only=True)
@@ -706,13 +769,27 @@ class ConsolePortSerializer(TaggedObjectSerializer, CableTerminationSerializer, 
     class Meta:
         model = ConsolePort
         fields = [
-            'id', 'url', 'device', 'name', 'label', 'type', 'description', 'cable', 'cable_peer', 'cable_peer_type',
-            'connected_endpoint', 'connected_endpoint_type', 'connected_endpoint_reachable', 'tags',
+            "id",
+            "url",
+            "device",
+            "name",
+            "label",
+            "type",
+            "description",
+            "cable",
+            "cable_peer",
+            "cable_peer_type",
+            "connected_endpoint",
+            "connected_endpoint_type",
+            "connected_endpoint_reachable",
+            "tags",
         ]
 
 
-class PowerOutletSerializer(TaggedObjectSerializer, CableTerminationSerializer, ConnectedEndpointSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='dcim-api:poweroutlet-detail')
+class PowerOutletSerializer(
+    TaggedObjectSerializer, CableTerminationSerializer, ConnectedEndpointSerializer
+):
+    url = serializers.HyperlinkedIdentityField(view_name="dcim-api:poweroutlet-detail")
     device = NestedDeviceSerializer()
     type = ChoiceField(choices=PowerOutletTypeChoices, allow_blank=True, required=False)
     power_port = NestedPowerPortSerializer(required=False)
@@ -724,14 +801,29 @@ class PowerOutletSerializer(TaggedObjectSerializer, CableTerminationSerializer, 
     class Meta:
         model = PowerOutlet
         fields = [
-            'id', 'url', 'device', 'name', 'label', 'type', 'power_port', 'feed_leg', 'description', 'cable',
-            'cable_peer', 'cable_peer_type', 'connected_endpoint', 'connected_endpoint_type',
-            'connected_endpoint_reachable', 'tags',
+            "id",
+            "url",
+            "device",
+            "name",
+            "label",
+            "type",
+            "power_port",
+            "feed_leg",
+            "description",
+            "cable",
+            "cable_peer",
+            "cable_peer_type",
+            "connected_endpoint",
+            "connected_endpoint_type",
+            "connected_endpoint_reachable",
+            "tags",
         ]
 
 
-class PowerPortSerializer(TaggedObjectSerializer, CableTerminationSerializer, ConnectedEndpointSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='dcim-api:powerport-detail')
+class PowerPortSerializer(
+    TaggedObjectSerializer, CableTerminationSerializer, ConnectedEndpointSerializer
+):
+    url = serializers.HyperlinkedIdentityField(view_name="dcim-api:powerport-detail")
     device = NestedDeviceSerializer()
     type = ChoiceField(choices=PowerPortTypeChoices, allow_blank=True, required=False)
     cable = NestedCableSerializer(read_only=True)
@@ -739,14 +831,29 @@ class PowerPortSerializer(TaggedObjectSerializer, CableTerminationSerializer, Co
     class Meta:
         model = PowerPort
         fields = [
-            'id', 'url', 'device', 'name', 'label', 'type', 'maximum_draw', 'allocated_draw', 'description', 'cable',
-            'cable_peer', 'cable_peer_type', 'connected_endpoint', 'connected_endpoint_type',
-            'connected_endpoint_reachable', 'tags',
+            "id",
+            "url",
+            "device",
+            "name",
+            "label",
+            "type",
+            "maximum_draw",
+            "allocated_draw",
+            "description",
+            "cable",
+            "cable_peer",
+            "cable_peer_type",
+            "connected_endpoint",
+            "connected_endpoint_type",
+            "connected_endpoint_reachable",
+            "tags",
         ]
 
 
-class InterfaceSerializer(TaggedObjectSerializer, CableTerminationSerializer, ConnectedEndpointSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='dcim-api:interface-detail')
+class InterfaceSerializer(
+    TaggedObjectSerializer, CableTerminationSerializer, ConnectedEndpointSerializer
+):
+    url = serializers.HyperlinkedIdentityField(view_name="dcim-api:interface-detail")
     device = NestedDeviceSerializer()
     type = ChoiceField(choices=InterfaceTypeChoices)
     lag = NestedInterfaceSerializer(required=False, allow_null=True)
@@ -764,28 +871,51 @@ class InterfaceSerializer(TaggedObjectSerializer, CableTerminationSerializer, Co
     class Meta:
         model = Interface
         fields = [
-            'id', 'url', 'device', 'name', 'label', 'type', 'enabled', 'lag', 'mtu', 'mac_address', 'mgmt_only',
-            'description', 'mode', 'untagged_vlan', 'tagged_vlans', 'cable', 'cable_peer', 'cable_peer_type',
-            'connected_endpoint', 'connected_endpoint_type', 'connected_endpoint_reachable', 'tags',
-            'count_ipaddresses',
+            "id",
+            "url",
+            "device",
+            "name",
+            "label",
+            "type",
+            "enabled",
+            "lag",
+            "mtu",
+            "mac_address",
+            "mgmt_only",
+            "description",
+            "mode",
+            "untagged_vlan",
+            "tagged_vlans",
+            "cable",
+            "cable_peer",
+            "cable_peer_type",
+            "connected_endpoint",
+            "connected_endpoint_type",
+            "connected_endpoint_reachable",
+            "tags",
+            "count_ipaddresses",
         ]
 
     def validate(self, data):
 
         # Validate many-to-many VLAN assignments
-        device = self.instance.device if self.instance else data.get('device')
-        for vlan in data.get('tagged_vlans', []):
+        device = self.instance.device if self.instance else data.get("device")
+        for vlan in data.get("tagged_vlans", []):
             if vlan.site not in [device.site, None]:
-                raise serializers.ValidationError({
-                    'tagged_vlans': f"VLAN {vlan} must belong to the same site as the interface's parent device, or "
-                                    f"it must be global."
-                })
+                raise serializers.ValidationError(
+                    {
+                        "tagged_vlans": f"VLAN {vlan} must belong to the same site as the interface's parent device, or "
+                        f"it must be global."
+                    }
+                )
 
         return super().validate(data)
 
 
-class RearPortSerializer(TaggedObjectSerializer, CableTerminationSerializer, ValidatedModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='dcim-api:rearport-detail')
+class RearPortSerializer(
+    TaggedObjectSerializer, CableTerminationSerializer, ValidatedModelSerializer
+):
+    url = serializers.HyperlinkedIdentityField(view_name="dcim-api:rearport-detail")
     device = NestedDeviceSerializer()
     type = ChoiceField(choices=PortTypeChoices)
     cable = NestedCableSerializer(read_only=True)
@@ -793,8 +923,18 @@ class RearPortSerializer(TaggedObjectSerializer, CableTerminationSerializer, Val
     class Meta:
         model = RearPort
         fields = [
-            'id', 'url', 'device', 'name', 'label', 'type', 'positions', 'description', 'cable', 'cable_peer',
-            'cable_peer_type', 'tags',
+            "id",
+            "url",
+            "device",
+            "name",
+            "label",
+            "type",
+            "positions",
+            "description",
+            "cable",
+            "cable_peer",
+            "cable_peer_type",
+            "tags",
         ]
 
 
@@ -810,8 +950,10 @@ class FrontPortRearPortSerializer(WritableNestedSerializer):
         fields = ["id", "url", "name", "label"]
 
 
-class FrontPortSerializer(TaggedObjectSerializer, CableTerminationSerializer, ValidatedModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='dcim-api:frontport-detail')
+class FrontPortSerializer(
+    TaggedObjectSerializer, CableTerminationSerializer, ValidatedModelSerializer
+):
+    url = serializers.HyperlinkedIdentityField(view_name="dcim-api:frontport-detail")
     device = NestedDeviceSerializer()
     type = ChoiceField(choices=PortTypeChoices)
     rear_port = FrontPortRearPortSerializer()
@@ -820,8 +962,19 @@ class FrontPortSerializer(TaggedObjectSerializer, CableTerminationSerializer, Va
     class Meta:
         model = FrontPort
         fields = [
-            'id', 'url', 'device', 'name', 'label', 'type', 'rear_port', 'rear_port_position', 'description', 'cable',
-            'cable_peer', 'cable_peer_type', 'tags',
+            "id",
+            "url",
+            "device",
+            "name",
+            "label",
+            "type",
+            "rear_port",
+            "rear_port_position",
+            "description",
+            "cable",
+            "cable_peer",
+            "cable_peer_type",
+            "tags",
         ]
 
 
@@ -855,15 +1008,31 @@ class InventoryItemSerializer(TaggedObjectSerializer, ValidatedModelSerializer):
     )
     device = NestedDeviceSerializer()
     # Provide a default value to satisfy UniqueTogetherValidator
-    parent = serializers.PrimaryKeyRelatedField(queryset=InventoryItem.objects.all(), allow_null=True, default=None)
-    manufacturer = NestedManufacturerSerializer(required=False, allow_null=True, default=None)
-    _depth = serializers.IntegerField(source='level', read_only=True)
+    parent = serializers.PrimaryKeyRelatedField(
+        queryset=InventoryItem.objects.all(), allow_null=True, default=None
+    )
+    manufacturer = NestedManufacturerSerializer(
+        required=False, allow_null=True, default=None
+    )
+    _depth = serializers.IntegerField(source="level", read_only=True)
 
     class Meta:
         model = InventoryItem
         fields = [
-            'id', 'url', 'device', 'parent', 'name', 'label', 'manufacturer', 'part_id', 'serial', 'asset_tag',
-            'discovered', 'description', 'tags', '_depth',
+            "id",
+            "url",
+            "device",
+            "parent",
+            "name",
+            "label",
+            "manufacturer",
+            "part_id",
+            "serial",
+            "asset_tag",
+            "discovered",
+            "description",
+            "tags",
+            "_depth",
         ]
 
 
@@ -871,8 +1040,9 @@ class InventoryItemSerializer(TaggedObjectSerializer, ValidatedModelSerializer):
 # Cables
 #
 
+
 class CableSerializer(TaggedObjectSerializer, CustomFieldModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='dcim-api:cable-detail')
+    url = serializers.HyperlinkedIdentityField(view_name="dcim-api:cable-detail")
     termination_a_type = ContentTypeField(
         queryset=ContentType.objects.filter(CABLE_TERMINATION_MODELS)
     )
@@ -889,9 +1059,22 @@ class CableSerializer(TaggedObjectSerializer, CustomFieldModelSerializer):
     class Meta:
         model = Cable
         fields = [
-            'id', 'url', 'termination_a_type', 'termination_a_id', 'termination_a', 'termination_b_type',
-            'termination_b_id', 'termination_b', 'type', 'status', 'label', 'color', 'length', 'length_unit', 'tags',
-            'custom_fields',
+            "id",
+            "url",
+            "termination_a_type",
+            "termination_a_id",
+            "termination_a",
+            "termination_b_type",
+            "termination_b_id",
+            "termination_b",
+            "type",
+            "status",
+            "label",
+            "color",
+            "length",
+            "length_unit",
+            "tags",
+            "custom_fields",
         ]
 
     def _get_termination(self, obj, side):
@@ -949,7 +1132,14 @@ class CablePathSerializer(serializers.ModelSerializer):
     class Meta:
         model = CablePath
         fields = [
-            'id', 'origin_type', 'origin', 'destination_type', 'destination', 'path', 'is_active', 'is_split',
+            "id",
+            "origin_type",
+            "origin",
+            "destination_type",
+            "destination",
+            "path",
+            "is_active",
+            "is_split",
         ]
 
     @swagger_serializer_method(serializer_or_field=serializers.DictField)
@@ -957,8 +1147,8 @@ class CablePathSerializer(serializers.ModelSerializer):
         """
         Return the appropriate serializer for the origin.
         """
-        serializer = get_serializer_for_model(obj.origin, prefix='Nested')
-        context = {'request': self.context['request']}
+        serializer = get_serializer_for_model(obj.origin, prefix="Nested")
+        context = {"request": self.context["request"]}
         return serializer(obj.origin, context=context).data
 
     @swagger_serializer_method(serializer_or_field=serializers.DictField)
@@ -967,8 +1157,8 @@ class CablePathSerializer(serializers.ModelSerializer):
         Return the appropriate serializer for the destination, if any.
         """
         if obj.destination_id is not None:
-            serializer = get_serializer_for_model(obj.destination, prefix='Nested')
-            context = {'request': self.context['request']}
+            serializer = get_serializer_for_model(obj.destination, prefix="Nested")
+            context = {"request": self.context["request"]}
             return serializer(obj.destination, context=context).data
         return None
 
@@ -976,8 +1166,8 @@ class CablePathSerializer(serializers.ModelSerializer):
     def get_path(self, obj):
         ret = []
         for node in obj.get_path():
-            serializer = get_serializer_for_model(node, prefix='Nested')
-            context = {'request': self.context['request']}
+            serializer = get_serializer_for_model(node, prefix="Nested")
+            context = {"request": self.context["request"]}
             ret.append(serializer(node, context=context).data)
         return ret
 
@@ -989,12 +1179,12 @@ class CablePathSerializer(serializers.ModelSerializer):
 
 class InterfaceConnectionSerializer(ValidatedModelSerializer):
     interface_a = serializers.SerializerMethodField()
-    interface_b = NestedInterfaceSerializer(source='connected_endpoint')
+    interface_b = NestedInterfaceSerializer(source="connected_endpoint")
     connected_endpoint_reachable = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Interface
-        fields = ['interface_a', 'interface_b', 'connected_endpoint_reachable']
+        fields = ["interface_a", "interface_b", "connected_endpoint_reachable"]
 
     @swagger_serializer_method(serializer_or_field=NestedInterfaceSerializer)
     def get_interface_a(self, obj):
@@ -1012,22 +1202,35 @@ class InterfaceConnectionSerializer(ValidatedModelSerializer):
 # Virtual chassis
 #
 
+
 class VirtualChassisSerializer(TaggedObjectSerializer, CustomFieldModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='dcim-api:virtualchassis-detail')
+    url = serializers.HyperlinkedIdentityField(
+        view_name="dcim-api:virtualchassis-detail"
+    )
     master = NestedDeviceSerializer(required=False)
     member_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = VirtualChassis
-        fields = ['id', 'url', 'name', 'domain', 'master', 'tags', 'custom_fields', 'member_count']
+        fields = [
+            "id",
+            "url",
+            "name",
+            "domain",
+            "master",
+            "tags",
+            "custom_fields",
+            "member_count",
+        ]
 
 
 #
 # Power panels
 #
 
+
 class PowerPanelSerializer(TaggedObjectSerializer, CustomFieldModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='dcim-api:powerpanel-detail')
+    url = serializers.HyperlinkedIdentityField(view_name="dcim-api:powerpanel-detail")
     site = NestedSiteSerializer()
     rack_group = NestedRackGroupSerializer(
         required=False, allow_null=True, default=None
@@ -1036,16 +1239,25 @@ class PowerPanelSerializer(TaggedObjectSerializer, CustomFieldModelSerializer):
 
     class Meta:
         model = PowerPanel
-        fields = ['id', 'url', 'site', 'rack_group', 'name', 'tags', 'custom_fields', 'powerfeed_count']
+        fields = [
+            "id",
+            "url",
+            "site",
+            "rack_group",
+            "name",
+            "tags",
+            "custom_fields",
+            "powerfeed_count",
+        ]
 
 
 class PowerFeedSerializer(
     TaggedObjectSerializer,
     CableTerminationSerializer,
     ConnectedEndpointSerializer,
-    CustomFieldModelSerializer
+    CustomFieldModelSerializer,
 ):
-    url = serializers.HyperlinkedIdentityField(view_name='dcim-api:powerfeed-detail')
+    url = serializers.HyperlinkedIdentityField(view_name="dcim-api:powerfeed-detail")
     power_panel = NestedPowerPanelSerializer()
     rack = NestedRackSerializer(required=False, allow_null=True, default=None)
     type = ChoiceField(
@@ -1065,8 +1277,27 @@ class PowerFeedSerializer(
     class Meta:
         model = PowerFeed
         fields = [
-            'id', 'url', 'power_panel', 'rack', 'name', 'status', 'type', 'supply', 'phase', 'voltage', 'amperage',
-            'max_utilization', 'comments', 'cable', 'cable_peer', 'cable_peer_type', 'connected_endpoint',
-            'connected_endpoint_type', 'connected_endpoint_reachable', 'tags', 'custom_fields', 'created',
-            'last_updated',
+            "id",
+            "url",
+            "power_panel",
+            "rack",
+            "name",
+            "status",
+            "type",
+            "supply",
+            "phase",
+            "voltage",
+            "amperage",
+            "max_utilization",
+            "comments",
+            "cable",
+            "cable_peer",
+            "cable_peer_type",
+            "connected_endpoint",
+            "connected_endpoint_type",
+            "connected_endpoint_reachable",
+            "tags",
+            "custom_fields",
+            "created",
+            "last_updated",
         ]

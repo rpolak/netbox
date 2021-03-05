@@ -11,7 +11,18 @@ from dcim.models import (
 )
 from ipam.choices import *
 from ipam.filters import *
-from ipam.models import Aggregate, IPAddress, Prefix, RIR, Role, RouteTarget, Service, VLAN, VLANGroup, VRF
+from ipam.models import (
+    Aggregate,
+    IPAddress,
+    Prefix,
+    RIR,
+    Role,
+    RouteTarget,
+    Service,
+    VLAN,
+    VLANGroup,
+    VRF,
+)
 from virtualization.models import Cluster, ClusterType, VirtualMachine, VMInterface
 from tenancy.models import Tenant, TenantGroup
 
@@ -24,9 +35,9 @@ class VRFTestCase(TestCase):
     def setUpTestData(cls):
 
         route_targets = (
-            RouteTarget(name='65000:1001'),
-            RouteTarget(name='65000:1002'),
-            RouteTarget(name='65000:1003'),
+            RouteTarget(name="65000:1001"),
+            RouteTarget(name="65000:1002"),
+            RouteTarget(name="65000:1003"),
         )
         RouteTarget.objects.bulk_create(route_targets)
 
@@ -81,16 +92,16 @@ class VRFTestCase(TestCase):
 
     def test_import_target(self):
         route_targets = RouteTarget.objects.all()[:2]
-        params = {'import_target_id': [route_targets[0].pk, route_targets[1].pk]}
+        params = {"import_target_id": [route_targets[0].pk, route_targets[1].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
-        params = {'import_target': [route_targets[0].name, route_targets[1].name]}
+        params = {"import_target": [route_targets[0].name, route_targets[1].name]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_export_target(self):
         route_targets = RouteTarget.objects.all()[:2]
-        params = {'export_target_id': [route_targets[0].pk, route_targets[1].pk]}
+        params = {"export_target_id": [route_targets[0].pk, route_targets[1].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
-        params = {'export_target': [route_targets[0].name, route_targets[1].name]}
+        params = {"export_target": [route_targets[0].name, route_targets[1].name]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_tenant(self):
@@ -116,40 +127,40 @@ class RouteTargetTestCase(TestCase):
     def setUpTestData(cls):
 
         tenant_groups = (
-            TenantGroup(name='Tenant group 1', slug='tenant-group-1'),
-            TenantGroup(name='Tenant group 2', slug='tenant-group-2'),
-            TenantGroup(name='Tenant group 3', slug='tenant-group-3'),
+            TenantGroup(name="Tenant group 1", slug="tenant-group-1"),
+            TenantGroup(name="Tenant group 2", slug="tenant-group-2"),
+            TenantGroup(name="Tenant group 3", slug="tenant-group-3"),
         )
         for tenantgroup in tenant_groups:
             tenantgroup.save()
 
         tenants = (
-            Tenant(name='Tenant 1', slug='tenant-1', group=tenant_groups[0]),
-            Tenant(name='Tenant 2', slug='tenant-2', group=tenant_groups[1]),
-            Tenant(name='Tenant 3', slug='tenant-3', group=tenant_groups[2]),
+            Tenant(name="Tenant 1", slug="tenant-1", group=tenant_groups[0]),
+            Tenant(name="Tenant 2", slug="tenant-2", group=tenant_groups[1]),
+            Tenant(name="Tenant 3", slug="tenant-3", group=tenant_groups[2]),
         )
         Tenant.objects.bulk_create(tenants)
 
         route_targets = (
-            RouteTarget(name='65000:1001', tenant=tenants[0]),
-            RouteTarget(name='65000:1002', tenant=tenants[0]),
-            RouteTarget(name='65000:1003', tenant=tenants[0]),
-            RouteTarget(name='65000:1004', tenant=tenants[0]),
-            RouteTarget(name='65000:2001', tenant=tenants[1]),
-            RouteTarget(name='65000:2002', tenant=tenants[1]),
-            RouteTarget(name='65000:2003', tenant=tenants[1]),
-            RouteTarget(name='65000:2004', tenant=tenants[1]),
-            RouteTarget(name='65000:3001', tenant=tenants[2]),
-            RouteTarget(name='65000:3002', tenant=tenants[2]),
-            RouteTarget(name='65000:3003', tenant=tenants[2]),
-            RouteTarget(name='65000:3004', tenant=tenants[2]),
+            RouteTarget(name="65000:1001", tenant=tenants[0]),
+            RouteTarget(name="65000:1002", tenant=tenants[0]),
+            RouteTarget(name="65000:1003", tenant=tenants[0]),
+            RouteTarget(name="65000:1004", tenant=tenants[0]),
+            RouteTarget(name="65000:2001", tenant=tenants[1]),
+            RouteTarget(name="65000:2002", tenant=tenants[1]),
+            RouteTarget(name="65000:2003", tenant=tenants[1]),
+            RouteTarget(name="65000:2004", tenant=tenants[1]),
+            RouteTarget(name="65000:3001", tenant=tenants[2]),
+            RouteTarget(name="65000:3002", tenant=tenants[2]),
+            RouteTarget(name="65000:3003", tenant=tenants[2]),
+            RouteTarget(name="65000:3004", tenant=tenants[2]),
         )
         RouteTarget.objects.bulk_create(route_targets)
 
         vrfs = (
-            VRF(name='VRF 1', rd='65000:100'),
-            VRF(name='VRF 2', rd='65000:200'),
-            VRF(name='VRF 3', rd='65000:300'),
+            VRF(name="VRF 1", rd="65000:100"),
+            VRF(name="VRF 2", rd="65000:200"),
+            VRF(name="VRF 3", rd="65000:300"),
         )
         VRF.objects.bulk_create(vrfs)
         vrfs[0].import_targets.add(route_targets[0], route_targets[1])
@@ -158,39 +169,39 @@ class RouteTargetTestCase(TestCase):
         vrfs[1].export_targets.add(route_targets[6], route_targets[7])
 
     def test_id(self):
-        params = {'id': self.queryset.values_list('pk', flat=True)[:2]}
+        params = {"id": self.queryset.values_list("pk", flat=True)[:2]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 2)
 
     def test_name(self):
-        params = {'name': ['65000:1001', '65000:1002', '65000:1003']}
+        params = {"name": ["65000:1001", "65000:1002", "65000:1003"]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
 
     def test_importing_vrf(self):
         vrfs = VRF.objects.all()[:2]
-        params = {'importing_vrf_id': [vrfs[0].pk, vrfs[1].pk]}
+        params = {"importing_vrf_id": [vrfs[0].pk, vrfs[1].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
-        params = {'importing_vrf': [vrfs[0].rd, vrfs[1].rd]}
+        params = {"importing_vrf": [vrfs[0].rd, vrfs[1].rd]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
 
     def test_exporting_vrf(self):
         vrfs = VRF.objects.all()[:2]
-        params = {'exporting_vrf_id': [vrfs[0].pk, vrfs[1].pk]}
+        params = {"exporting_vrf_id": [vrfs[0].pk, vrfs[1].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
-        params = {'exporting_vrf': [vrfs[0].rd, vrfs[1].rd]}
+        params = {"exporting_vrf": [vrfs[0].rd, vrfs[1].rd]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
 
     def test_tenant(self):
         tenants = Tenant.objects.all()[:2]
-        params = {'tenant_id': [tenants[0].pk, tenants[1].pk]}
+        params = {"tenant_id": [tenants[0].pk, tenants[1].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 8)
-        params = {'tenant': [tenants[0].slug, tenants[1].slug]}
+        params = {"tenant": [tenants[0].slug, tenants[1].slug]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 8)
 
     def test_tenant_group(self):
         tenant_groups = TenantGroup.objects.all()[:2]
-        params = {'tenant_group_id': [tenant_groups[0].pk, tenant_groups[1].pk]}
+        params = {"tenant_group_id": [tenant_groups[0].pk, tenant_groups[1].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 8)
-        params = {'tenant_group': [tenant_groups[0].slug, tenant_groups[1].slug]}
+        params = {"tenant_group": [tenant_groups[0].slug, tenant_groups[1].slug]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 8)
 
 
@@ -249,27 +260,57 @@ class AggregateTestCase(TestCase):
         RIR.objects.bulk_create(rirs)
 
         tenant_groups = (
-            TenantGroup(name='Tenant group 1', slug='tenant-group-1'),
-            TenantGroup(name='Tenant group 2', slug='tenant-group-2'),
-            TenantGroup(name='Tenant group 3', slug='tenant-group-3'),
+            TenantGroup(name="Tenant group 1", slug="tenant-group-1"),
+            TenantGroup(name="Tenant group 2", slug="tenant-group-2"),
+            TenantGroup(name="Tenant group 3", slug="tenant-group-3"),
         )
         for tenantgroup in tenant_groups:
             tenantgroup.save()
 
         tenants = (
-            Tenant(name='Tenant 1', slug='tenant-1', group=tenant_groups[0]),
-            Tenant(name='Tenant 2', slug='tenant-2', group=tenant_groups[1]),
-            Tenant(name='Tenant 3', slug='tenant-3', group=tenant_groups[2]),
+            Tenant(name="Tenant 1", slug="tenant-1", group=tenant_groups[0]),
+            Tenant(name="Tenant 2", slug="tenant-2", group=tenant_groups[1]),
+            Tenant(name="Tenant 3", slug="tenant-3", group=tenant_groups[2]),
         )
         Tenant.objects.bulk_create(tenants)
 
         aggregates = (
-            Aggregate(prefix='10.1.0.0/16', rir=rirs[0], tenant=tenants[0], date_added='2020-01-01'),
-            Aggregate(prefix='10.2.0.0/16', rir=rirs[0], tenant=tenants[1], date_added='2020-01-02'),
-            Aggregate(prefix='10.3.0.0/16', rir=rirs[1], tenant=tenants[2], date_added='2020-01-03'),
-            Aggregate(prefix='2001:db8:1::/48', rir=rirs[1], tenant=tenants[0], date_added='2020-01-04'),
-            Aggregate(prefix='2001:db8:2::/48', rir=rirs[2], tenant=tenants[1], date_added='2020-01-05'),
-            Aggregate(prefix='2001:db8:3::/48', rir=rirs[2], tenant=tenants[2], date_added='2020-01-06'),
+            Aggregate(
+                prefix="10.1.0.0/16",
+                rir=rirs[0],
+                tenant=tenants[0],
+                date_added="2020-01-01",
+            ),
+            Aggregate(
+                prefix="10.2.0.0/16",
+                rir=rirs[0],
+                tenant=tenants[1],
+                date_added="2020-01-02",
+            ),
+            Aggregate(
+                prefix="10.3.0.0/16",
+                rir=rirs[1],
+                tenant=tenants[2],
+                date_added="2020-01-03",
+            ),
+            Aggregate(
+                prefix="2001:db8:1::/48",
+                rir=rirs[1],
+                tenant=tenants[0],
+                date_added="2020-01-04",
+            ),
+            Aggregate(
+                prefix="2001:db8:2::/48",
+                rir=rirs[2],
+                tenant=tenants[1],
+                date_added="2020-01-05",
+            ),
+            Aggregate(
+                prefix="2001:db8:3::/48",
+                rir=rirs[2],
+                tenant=tenants[2],
+                date_added="2020-01-06",
+            ),
         )
         Aggregate.objects.bulk_create(aggregates)
 
@@ -299,16 +340,16 @@ class AggregateTestCase(TestCase):
 
     def test_tenant(self):
         tenants = Tenant.objects.all()[:2]
-        params = {'tenant_id': [tenants[0].pk, tenants[1].pk]}
+        params = {"tenant_id": [tenants[0].pk, tenants[1].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
-        params = {'tenant': [tenants[0].slug, tenants[1].slug]}
+        params = {"tenant": [tenants[0].slug, tenants[1].slug]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
 
     def test_tenant_group(self):
         tenant_groups = TenantGroup.objects.all()[:2]
-        params = {'tenant_group_id': [tenant_groups[0].pk, tenant_groups[1].pk]}
+        params = {"tenant_group_id": [tenant_groups[0].pk, tenant_groups[1].pk]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
-        params = {'tenant_group': [tenant_groups[0].slug, tenant_groups[1].slug]}
+        params = {"tenant_group": [tenant_groups[0].slug, tenant_groups[1].slug]}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
 
 
@@ -363,9 +404,9 @@ class PrefixTestCase(TestCase):
         Site.objects.bulk_create(sites)
 
         route_targets = (
-            RouteTarget(name='65000:100'),
-            RouteTarget(name='65000:200'),
-            RouteTarget(name='65000:300'),
+            RouteTarget(name="65000:100"),
+            RouteTarget(name="65000:200"),
+            RouteTarget(name="65000:300"),
         )
         RouteTarget.objects.bulk_create(route_targets)
 
@@ -524,12 +565,20 @@ class PrefixTestCase(TestCase):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
 
     def test_present_in_vrf(self):
-        vrf1 = VRF.objects.get(name='VRF 1')
-        vrf2 = VRF.objects.get(name='VRF 2')
-        self.assertEqual(self.filterset({'present_in_vrf_id': vrf1.pk}, self.queryset).qs.count(), 6)
-        self.assertEqual(self.filterset({'present_in_vrf_id': vrf2.pk}, self.queryset).qs.count(), 2)
-        self.assertEqual(self.filterset({'present_in_vrf': vrf1.rd}, self.queryset).qs.count(), 6)
-        self.assertEqual(self.filterset({'present_in_vrf': vrf2.rd}, self.queryset).qs.count(), 2)
+        vrf1 = VRF.objects.get(name="VRF 1")
+        vrf2 = VRF.objects.get(name="VRF 2")
+        self.assertEqual(
+            self.filterset({"present_in_vrf_id": vrf1.pk}, self.queryset).qs.count(), 6
+        )
+        self.assertEqual(
+            self.filterset({"present_in_vrf_id": vrf2.pk}, self.queryset).qs.count(), 2
+        )
+        self.assertEqual(
+            self.filterset({"present_in_vrf": vrf1.rd}, self.queryset).qs.count(), 6
+        )
+        self.assertEqual(
+            self.filterset({"present_in_vrf": vrf2.rd}, self.queryset).qs.count(), 2
+        )
 
     def test_region(self):
         regions = Region.objects.all()[:2]
@@ -1161,12 +1210,42 @@ class ServiceTestCase(TestCase):
         VirtualMachine.objects.bulk_create(virtual_machines)
 
         services = (
-            Service(device=devices[0], name='Service 1', protocol=ServiceProtocolChoices.PROTOCOL_TCP, ports=[1001]),
-            Service(device=devices[1], name='Service 2', protocol=ServiceProtocolChoices.PROTOCOL_TCP, ports=[1002]),
-            Service(device=devices[2], name='Service 3', protocol=ServiceProtocolChoices.PROTOCOL_UDP, ports=[1003]),
-            Service(virtual_machine=virtual_machines[0], name='Service 4', protocol=ServiceProtocolChoices.PROTOCOL_TCP, ports=[2001]),
-            Service(virtual_machine=virtual_machines[1], name='Service 5', protocol=ServiceProtocolChoices.PROTOCOL_TCP, ports=[2002]),
-            Service(virtual_machine=virtual_machines[2], name='Service 6', protocol=ServiceProtocolChoices.PROTOCOL_UDP, ports=[2003]),
+            Service(
+                device=devices[0],
+                name="Service 1",
+                protocol=ServiceProtocolChoices.PROTOCOL_TCP,
+                ports=[1001],
+            ),
+            Service(
+                device=devices[1],
+                name="Service 2",
+                protocol=ServiceProtocolChoices.PROTOCOL_TCP,
+                ports=[1002],
+            ),
+            Service(
+                device=devices[2],
+                name="Service 3",
+                protocol=ServiceProtocolChoices.PROTOCOL_UDP,
+                ports=[1003],
+            ),
+            Service(
+                virtual_machine=virtual_machines[0],
+                name="Service 4",
+                protocol=ServiceProtocolChoices.PROTOCOL_TCP,
+                ports=[2001],
+            ),
+            Service(
+                virtual_machine=virtual_machines[1],
+                name="Service 5",
+                protocol=ServiceProtocolChoices.PROTOCOL_TCP,
+                ports=[2002],
+            ),
+            Service(
+                virtual_machine=virtual_machines[2],
+                name="Service 6",
+                protocol=ServiceProtocolChoices.PROTOCOL_UDP,
+                ports=[2003],
+            ),
         )
         Service.objects.bulk_create(services)
 
@@ -1183,7 +1262,7 @@ class ServiceTestCase(TestCase):
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 4)
 
     def test_port(self):
-        params = {'port': '1001'}
+        params = {"port": "1001"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
 
     def test_device(self):

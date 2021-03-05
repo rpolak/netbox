@@ -107,7 +107,7 @@ class RegionTest(APIViewTestCases.APIViewTestCase):
         },
     ]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
 
     @classmethod
@@ -120,9 +120,9 @@ class RegionTest(APIViewTestCases.APIViewTestCase):
 
 class SiteTest(APIViewTestCases.APIViewTestCase):
     model = Site
-    brief_fields = ['id', 'name', 'slug', 'url']
+    brief_fields = ["id", "name", "slug", "url"]
     bulk_update_data = {
-        'status': 'planned',
+        "status": "planned",
     }
 
     @classmethod
@@ -164,9 +164,9 @@ class SiteTest(APIViewTestCases.APIViewTestCase):
 
 class RackGroupTest(APIViewTestCases.APIViewTestCase):
     model = RackGroup
-    brief_fields = ['_depth', 'id', 'name', 'rack_count', 'slug', 'url']
+    brief_fields = ["_depth", "id", "name", "rack_count", "slug", "url"]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
 
     @classmethod
@@ -249,7 +249,7 @@ class RackRoleTest(APIViewTestCases.APIViewTestCase):
         },
     ]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
 
     @classmethod
@@ -265,9 +265,9 @@ class RackRoleTest(APIViewTestCases.APIViewTestCase):
 
 class RackTest(APIViewTestCases.APIViewTestCase):
     model = Rack
-    brief_fields = ['device_count', 'display_name', 'id', 'name', 'url']
+    brief_fields = ["device_count", "display_name", "id", "name", "url"]
     bulk_update_data = {
-        'status': 'planned',
+        "status": "planned",
     }
 
     @classmethod
@@ -365,9 +365,9 @@ class RackTest(APIViewTestCases.APIViewTestCase):
 
 class RackReservationTest(APIViewTestCases.APIViewTestCase):
     model = RackReservation
-    brief_fields = ['id', 'units', 'url', 'user']
+    brief_fields = ["id", "units", "url", "user"]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
 
     @classmethod
@@ -447,7 +447,7 @@ class ManufacturerTest(APIViewTestCases.APIViewTestCase):
         },
     ]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
 
     @classmethod
@@ -463,9 +463,17 @@ class ManufacturerTest(APIViewTestCases.APIViewTestCase):
 
 class DeviceTypeTest(APIViewTestCases.APIViewTestCase):
     model = DeviceType
-    brief_fields = ['device_count', 'display_name', 'id', 'manufacturer', 'model', 'slug', 'url']
+    brief_fields = [
+        "device_count",
+        "display_name",
+        "id",
+        "manufacturer",
+        "model",
+        "slug",
+        "url",
+    ]
     bulk_update_data = {
-        'part_number': 'ABC123',
+        "part_number": "ABC123",
     }
 
     @classmethod
@@ -517,9 +525,9 @@ class DeviceTypeTest(APIViewTestCases.APIViewTestCase):
 
 class ConsolePortTemplateTest(APIViewTestCases.APIViewTestCase):
     model = ConsolePortTemplate
-    brief_fields = ['id', 'name', 'url']
+    brief_fields = ["id", "name", "url"]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
 
     @classmethod
@@ -556,9 +564,9 @@ class ConsolePortTemplateTest(APIViewTestCases.APIViewTestCase):
 
 class ConsoleServerPortTemplateTest(APIViewTestCases.APIViewTestCase):
     model = ConsoleServerPortTemplate
-    brief_fields = ['id', 'name', 'url']
+    brief_fields = ["id", "name", "url"]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
 
     @classmethod
@@ -601,9 +609,9 @@ class ConsoleServerPortTemplateTest(APIViewTestCases.APIViewTestCase):
 
 class PowerPortTemplateTest(APIViewTestCases.APIViewTestCase):
     model = PowerPortTemplate
-    brief_fields = ['id', 'name', 'url']
+    brief_fields = ["id", "name", "url"]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
 
     @classmethod
@@ -640,9 +648,9 @@ class PowerPortTemplateTest(APIViewTestCases.APIViewTestCase):
 
 class PowerOutletTemplateTest(APIViewTestCases.APIViewTestCase):
     model = PowerOutletTemplate
-    brief_fields = ['id', 'name', 'url']
+    brief_fields = ["id", "name", "url"]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
 
     @classmethod
@@ -679,9 +687,9 @@ class PowerOutletTemplateTest(APIViewTestCases.APIViewTestCase):
 
 class InterfaceTemplateTest(APIViewTestCases.APIViewTestCase):
     model = InterfaceTemplate
-    brief_fields = ['id', 'name', 'url']
+    brief_fields = ["id", "name", "url"]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
 
     @classmethod
@@ -727,9 +735,9 @@ class InterfaceTemplateTest(APIViewTestCases.APIViewTestCase):
 
 class FrontPortTemplateTest(APIViewTestCases.APIViewTestCase):
     model = FrontPortTemplate
-    brief_fields = ['id', 'name', 'url']
+    brief_fields = ["id", "name", "url"]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
 
     @classmethod
@@ -799,34 +807,34 @@ class FrontPortTemplateTest(APIViewTestCases.APIViewTestCase):
 
         cls.create_data = [
             {
-                'device_type': devicetype.pk,
-                'name': 'Front Port Template 4',
-                'type': PortTypeChoices.TYPE_8P8C,
-                'rear_port': rear_port_templates[3].pk,
-                'rear_port_position': 1,
+                "device_type": devicetype.pk,
+                "name": "Front Port Template 4",
+                "type": PortTypeChoices.TYPE_8P8C,
+                "rear_port": rear_port_templates[3].pk,
+                "rear_port_position": 1,
             },
             {
-                'device_type': devicetype.pk,
-                'name': 'Front Port Template 5',
-                'type': PortTypeChoices.TYPE_8P8C,
-                'rear_port': rear_port_templates[4].pk,
-                'rear_port_position': 1,
+                "device_type": devicetype.pk,
+                "name": "Front Port Template 5",
+                "type": PortTypeChoices.TYPE_8P8C,
+                "rear_port": rear_port_templates[4].pk,
+                "rear_port_position": 1,
             },
             {
-                'device_type': devicetype.pk,
-                'name': 'Front Port Template 6',
-                'type': PortTypeChoices.TYPE_8P8C,
-                'rear_port': rear_port_templates[5].pk,
-                'rear_port_position': 1,
+                "device_type": devicetype.pk,
+                "name": "Front Port Template 6",
+                "type": PortTypeChoices.TYPE_8P8C,
+                "rear_port": rear_port_templates[5].pk,
+                "rear_port_position": 1,
             },
         ]
 
 
 class RearPortTemplateTest(APIViewTestCases.APIViewTestCase):
     model = RearPortTemplate
-    brief_fields = ['id', 'name', 'url']
+    brief_fields = ["id", "name", "url"]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
 
     @classmethod
@@ -878,9 +886,9 @@ class RearPortTemplateTest(APIViewTestCases.APIViewTestCase):
 
 class DeviceBayTemplateTest(APIViewTestCases.APIViewTestCase):
     model = DeviceBayTemplate
-    brief_fields = ['id', 'name', 'url']
+    brief_fields = ["id", "name", "url"]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
 
     @classmethod
@@ -890,9 +898,9 @@ class DeviceBayTemplateTest(APIViewTestCases.APIViewTestCase):
         )
         devicetype = DeviceType.objects.create(
             manufacturer=manufacturer,
-            model='Device Type 1',
-            slug='device-type-1',
-            subdevice_role=SubdeviceRoleChoices.ROLE_PARENT
+            model="Device Type 1",
+            slug="device-type-1",
+            subdevice_role=SubdeviceRoleChoices.ROLE_PARENT,
         )
 
         device_bay_templates = (
@@ -939,7 +947,7 @@ class DeviceRoleTest(APIViewTestCases.APIViewTestCase):
         },
     ]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
 
     @classmethod
@@ -971,7 +979,7 @@ class PlatformTest(APIViewTestCases.APIViewTestCase):
         },
     ]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
 
     @classmethod
@@ -987,9 +995,9 @@ class PlatformTest(APIViewTestCases.APIViewTestCase):
 
 class DeviceTest(APIViewTestCases.APIViewTestCase):
     model = Device
-    brief_fields = ['display_name', 'id', 'name', 'url']
+    brief_fields = ["display_name", "id", "name", "url"]
     bulk_update_data = {
-        'status': 'failed',
+        "status": "failed",
     }
 
     @classmethod
@@ -1138,9 +1146,9 @@ class DeviceTest(APIViewTestCases.APIViewTestCase):
 
 class ConsolePortTest(Mixins.ComponentTraceMixin, APIViewTestCases.APIViewTestCase):
     model = ConsolePort
-    brief_fields = ['cable', 'device', 'id', 'name', 'url']
+    brief_fields = ["cable", "device", "id", "name", "url"]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
     peer_termination_type = ConsoleServerPort
 
@@ -1187,9 +1195,9 @@ class ConsoleServerPortTest(
     Mixins.ComponentTraceMixin, APIViewTestCases.APIViewTestCase
 ):
     model = ConsoleServerPort
-    brief_fields = ['cable', 'device', 'id', 'name', 'url']
+    brief_fields = ["cable", "device", "id", "name", "url"]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
     peer_termination_type = ConsolePort
 
@@ -1234,9 +1242,9 @@ class ConsoleServerPortTest(
 
 class PowerPortTest(Mixins.ComponentTraceMixin, APIViewTestCases.APIViewTestCase):
     model = PowerPort
-    brief_fields = ['cable', 'device', 'id', 'name', 'url']
+    brief_fields = ["cable", "device", "id", "name", "url"]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
     peer_termination_type = PowerOutlet
 
@@ -1281,9 +1289,9 @@ class PowerPortTest(Mixins.ComponentTraceMixin, APIViewTestCases.APIViewTestCase
 
 class PowerOutletTest(Mixins.ComponentTraceMixin, APIViewTestCases.APIViewTestCase):
     model = PowerOutlet
-    brief_fields = ['cable', 'device', 'id', 'name', 'url']
+    brief_fields = ["cable", "device", "id", "name", "url"]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
     peer_termination_type = PowerPort
 
@@ -1328,9 +1336,9 @@ class PowerOutletTest(Mixins.ComponentTraceMixin, APIViewTestCases.APIViewTestCa
 
 class InterfaceTest(Mixins.ComponentTraceMixin, APIViewTestCases.APIViewTestCase):
     model = Interface
-    brief_fields = ['cable', 'device', 'id', 'name', 'url']
+    brief_fields = ["cable", "device", "id", "name", "url"]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
     peer_termination_type = Interface
 
@@ -1394,9 +1402,9 @@ class InterfaceTest(Mixins.ComponentTraceMixin, APIViewTestCases.APIViewTestCase
 
 class FrontPortTest(APIViewTestCases.APIViewTestCase):
     model = FrontPort
-    brief_fields = ['cable', 'device', 'id', 'name', 'url']
+    brief_fields = ["cable", "device", "id", "name", "url"]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
     peer_termination_type = Interface
 
@@ -1475,9 +1483,9 @@ class FrontPortTest(APIViewTestCases.APIViewTestCase):
 
 class RearPortTest(APIViewTestCases.APIViewTestCase):
     model = RearPort
-    brief_fields = ['cable', 'device', 'id', 'name', 'url']
+    brief_fields = ["cable", "device", "id", "name", "url"]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
     peer_termination_type = Interface
 
@@ -1525,9 +1533,9 @@ class RearPortTest(APIViewTestCases.APIViewTestCase):
 
 class DeviceBayTest(APIViewTestCases.APIViewTestCase):
     model = DeviceBay
-    brief_fields = ['device', 'id', 'name', 'url']
+    brief_fields = ["device", "id", "name", "url"]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
 
     @classmethod
@@ -1612,9 +1620,9 @@ class DeviceBayTest(APIViewTestCases.APIViewTestCase):
 
 class InventoryItemTest(APIViewTestCases.APIViewTestCase):
     model = InventoryItem
-    brief_fields = ['_depth', 'device', 'id', 'name', 'url']
+    brief_fields = ["_depth", "device", "id", "name", "url"]
     bulk_update_data = {
-        'description': 'New description',
+        "description": "New description",
     }
 
     @classmethod
@@ -1633,9 +1641,15 @@ class InventoryItemTest(APIViewTestCases.APIViewTestCase):
             device_type=devicetype, device_role=devicerole, name="Device 1", site=site
         )
 
-        InventoryItem.objects.create(device=device, name='Inventory Item 1', manufacturer=manufacturer)
-        InventoryItem.objects.create(device=device, name='Inventory Item 2', manufacturer=manufacturer)
-        InventoryItem.objects.create(device=device, name='Inventory Item 3', manufacturer=manufacturer)
+        InventoryItem.objects.create(
+            device=device, name="Inventory Item 1", manufacturer=manufacturer
+        )
+        InventoryItem.objects.create(
+            device=device, name="Inventory Item 2", manufacturer=manufacturer
+        )
+        InventoryItem.objects.create(
+            device=device, name="Inventory Item 3", manufacturer=manufacturer
+        )
 
         cls.create_data = [
             {
@@ -1658,10 +1672,10 @@ class InventoryItemTest(APIViewTestCases.APIViewTestCase):
 
 class CableTest(APIViewTestCases.APIViewTestCase):
     model = Cable
-    brief_fields = ['id', 'label', 'url']
+    brief_fields = ["id", "label", "url"]
     bulk_update_data = {
-        'length': 100,
-        'length_unit': 'm',
+        "length": 100,
+        "length_unit": "m",
     }
 
     # TODO: Allow updating cable terminations
@@ -1928,15 +1942,33 @@ class VirtualChassisTest(APIViewTestCases.APIViewTestCase):
             ),
         )
         VirtualChassis.objects.bulk_create(virtual_chassis)
-        Device.objects.filter(pk=devices[0].pk).update(virtual_chassis=virtual_chassis[0], vc_position=1)
-        Device.objects.filter(pk=devices[1].pk).update(virtual_chassis=virtual_chassis[0], vc_position=2)
-        Device.objects.filter(pk=devices[2].pk).update(virtual_chassis=virtual_chassis[0], vc_position=3)
-        Device.objects.filter(pk=devices[3].pk).update(virtual_chassis=virtual_chassis[1], vc_position=1)
-        Device.objects.filter(pk=devices[4].pk).update(virtual_chassis=virtual_chassis[1], vc_position=2)
-        Device.objects.filter(pk=devices[5].pk).update(virtual_chassis=virtual_chassis[1], vc_position=3)
-        Device.objects.filter(pk=devices[6].pk).update(virtual_chassis=virtual_chassis[2], vc_position=1)
-        Device.objects.filter(pk=devices[7].pk).update(virtual_chassis=virtual_chassis[2], vc_position=2)
-        Device.objects.filter(pk=devices[8].pk).update(virtual_chassis=virtual_chassis[2], vc_position=3)
+        Device.objects.filter(pk=devices[0].pk).update(
+            virtual_chassis=virtual_chassis[0], vc_position=1
+        )
+        Device.objects.filter(pk=devices[1].pk).update(
+            virtual_chassis=virtual_chassis[0], vc_position=2
+        )
+        Device.objects.filter(pk=devices[2].pk).update(
+            virtual_chassis=virtual_chassis[0], vc_position=3
+        )
+        Device.objects.filter(pk=devices[3].pk).update(
+            virtual_chassis=virtual_chassis[1], vc_position=1
+        )
+        Device.objects.filter(pk=devices[4].pk).update(
+            virtual_chassis=virtual_chassis[1], vc_position=2
+        )
+        Device.objects.filter(pk=devices[5].pk).update(
+            virtual_chassis=virtual_chassis[1], vc_position=3
+        )
+        Device.objects.filter(pk=devices[6].pk).update(
+            virtual_chassis=virtual_chassis[2], vc_position=1
+        )
+        Device.objects.filter(pk=devices[7].pk).update(
+            virtual_chassis=virtual_chassis[2], vc_position=2
+        )
+        Device.objects.filter(pk=devices[8].pk).update(
+            virtual_chassis=virtual_chassis[2], vc_position=3
+        )
 
         cls.update_data = {
             "name": "Virtual Chassis X",
@@ -1960,7 +1992,7 @@ class VirtualChassisTest(APIViewTestCases.APIViewTestCase):
         ]
 
         cls.bulk_update_data = {
-            'domain': 'newdomain',
+            "domain": "newdomain",
         }
 
 
@@ -1971,53 +2003,58 @@ class PowerPanelTest(APIViewTestCases.APIViewTestCase):
     @classmethod
     def setUpTestData(cls):
         sites = (
-            Site.objects.create(name='Site 1', slug='site-1'),
-            Site.objects.create(name='Site 2', slug='site-2'),
+            Site.objects.create(name="Site 1", slug="site-1"),
+            Site.objects.create(name="Site 2", slug="site-2"),
         )
 
         rack_groups = (
-            RackGroup.objects.create(name='Rack Group 1', slug='rack-group-1', site=sites[0]),
-            RackGroup.objects.create(name='Rack Group 2', slug='rack-group-2', site=sites[0]),
-            RackGroup.objects.create(name='Rack Group 3', slug='rack-group-3', site=sites[0]),
-            RackGroup.objects.create(name='Rack Group 4', slug='rack-group-3', site=sites[1]),
+            RackGroup.objects.create(
+                name="Rack Group 1", slug="rack-group-1", site=sites[0]
+            ),
+            RackGroup.objects.create(
+                name="Rack Group 2", slug="rack-group-2", site=sites[0]
+            ),
+            RackGroup.objects.create(
+                name="Rack Group 3", slug="rack-group-3", site=sites[0]
+            ),
+            RackGroup.objects.create(
+                name="Rack Group 4", slug="rack-group-3", site=sites[1]
+            ),
         )
 
         power_panels = (
-            PowerPanel(site=sites[0], rack_group=rack_groups[0], name='Power Panel 1'),
-            PowerPanel(site=sites[0], rack_group=rack_groups[1], name='Power Panel 2'),
-            PowerPanel(site=sites[0], rack_group=rack_groups[2], name='Power Panel 3'),
+            PowerPanel(site=sites[0], rack_group=rack_groups[0], name="Power Panel 1"),
+            PowerPanel(site=sites[0], rack_group=rack_groups[1], name="Power Panel 2"),
+            PowerPanel(site=sites[0], rack_group=rack_groups[2], name="Power Panel 3"),
         )
         PowerPanel.objects.bulk_create(power_panels)
 
         cls.create_data = [
             {
-                'name': 'Power Panel 4',
-                'site': sites[0].pk,
-                'rack_group': rack_groups[0].pk,
+                "name": "Power Panel 4",
+                "site": sites[0].pk,
+                "rack_group": rack_groups[0].pk,
             },
             {
-                'name': 'Power Panel 5',
-                'site': sites[0].pk,
-                'rack_group': rack_groups[1].pk,
+                "name": "Power Panel 5",
+                "site": sites[0].pk,
+                "rack_group": rack_groups[1].pk,
             },
             {
-                'name': 'Power Panel 6',
-                'site': sites[0].pk,
-                'rack_group': rack_groups[2].pk,
+                "name": "Power Panel 6",
+                "site": sites[0].pk,
+                "rack_group": rack_groups[2].pk,
             },
         ]
 
-        cls.bulk_update_data = {
-            'site': sites[1].pk,
-            'rack_group': rack_groups[3].pk
-        }
+        cls.bulk_update_data = {"site": sites[1].pk, "rack_group": rack_groups[3].pk}
 
 
 class PowerFeedTest(APIViewTestCases.APIViewTestCase):
     model = PowerFeed
-    brief_fields = ['cable', 'id', 'name', 'url']
+    brief_fields = ["cable", "id", "name", "url"]
     bulk_update_data = {
-        'status': 'planned',
+        "status": "planned",
     }
 
     @classmethod

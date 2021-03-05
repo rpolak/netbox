@@ -25,16 +25,16 @@ from .validators import DNSValidator
 
 
 __all__ = (
-    'Aggregate',
-    'IPAddress',
-    'Prefix',
-    'RIR',
-    'Role',
-    'RouteTarget',
-    'Service',
-    'VLAN',
-    'VLANGroup',
-    'VRF',
+    "Aggregate",
+    "IPAddress",
+    "Prefix",
+    "RIR",
+    "Role",
+    "RouteTarget",
+    "Service",
+    "VLAN",
+    "VLANGroup",
+    "VRF",
 )
 
 
@@ -45,9 +45,8 @@ class VRF(ChangeLoggedModel, CustomFieldModel):
     table). Prefixes and IPAddresses can optionally be assigned to VRFs. (Prefixes and IPAddresses not assigned to a VRF
     are said to exist in the "global" table.)
     """
-    name = models.CharField(
-        max_length=100
-    )
+
+    name = models.CharField(max_length=100)
     rd = models.CharField(
         max_length=VRF_RD_MAX_LENGTH,
         unique=True,
@@ -69,14 +68,10 @@ class VRF(ChangeLoggedModel, CustomFieldModel):
         help_text="Prevent duplicate prefixes/IP addresses within this VRF",
     )
     import_targets = models.ManyToManyField(
-        to='ipam.RouteTarget',
-        related_name='importing_vrfs',
-        blank=True
+        to="ipam.RouteTarget", related_name="importing_vrfs", blank=True
     )
     export_targets = models.ManyToManyField(
-        to='ipam.RouteTarget',
-        related_name='exporting_vrfs',
-        blank=True
+        to="ipam.RouteTarget", related_name="exporting_vrfs", blank=True
     )
     tags = TaggableManager(through=TaggedItem)
 
@@ -116,41 +111,39 @@ class VRF(ChangeLoggedModel, CustomFieldModel):
         return self.name
 
 
-@extras_features('custom_fields', 'custom_links', 'export_templates', 'webhooks')
+@extras_features("custom_fields", "custom_links", "export_templates", "webhooks")
 class RouteTarget(ChangeLoggedModel, CustomFieldModel):
     """
     A BGP extended community used to control the redistribution of routes among VRFs, as defined in RFC 4364.
     """
+
     name = models.CharField(
         max_length=VRF_RD_MAX_LENGTH,  # Same format options as VRF RD (RFC 4360 section 4)
         unique=True,
-        help_text='Route target value (formatted in accordance with RFC 4360)'
+        help_text="Route target value (formatted in accordance with RFC 4360)",
     )
-    description = models.CharField(
-        max_length=200,
-        blank=True
-    )
+    description = models.CharField(max_length=200, blank=True)
     tenant = models.ForeignKey(
-        to='tenancy.Tenant',
+        to="tenancy.Tenant",
         on_delete=models.PROTECT,
-        related_name='route_targets',
+        related_name="route_targets",
         blank=True,
-        null=True
+        null=True,
     )
     tags = TaggableManager(through=TaggedItem)
 
     objects = RestrictedQuerySet.as_manager()
 
-    csv_headers = ['name', 'description', 'tenant']
+    csv_headers = ["name", "description", "tenant"]
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('ipam:routetarget', args=[self.pk])
+        return reverse("ipam:routetarget", args=[self.pk])
 
     def to_csv(self):
         return (
@@ -165,14 +158,9 @@ class RIR(ChangeLoggedModel):
     A Regional Internet Registry (RIR) is responsible for the allocation of a large portion of the global IP address
     space. This can be an organization like ARIN or RIPE, or a governing standard such as RFC 1918.
     """
-    name = models.CharField(
-        max_length=100,
-        unique=True
-    )
-    slug = models.SlugField(
-        max_length=100,
-        unique=True
-    )
+
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
     is_private = models.BooleanField(
         default=False,
         verbose_name="Private",
@@ -215,31 +203,28 @@ class Aggregate(ChangeLoggedModel, CustomFieldModel):
     rir = models.ForeignKey(
         to="ipam.RIR",
         on_delete=models.PROTECT,
-        related_name='aggregates',
-        verbose_name='RIR'
+        related_name="aggregates",
+        verbose_name="RIR",
     )
     tenant = models.ForeignKey(
-        to='tenancy.Tenant',
+        to="tenancy.Tenant",
         on_delete=models.PROTECT,
-        related_name='aggregates',
+        related_name="aggregates",
         blank=True,
-        null=True
+        null=True,
     )
-    date_added = models.DateField(
-        blank=True,
-        null=True
-    )
-    description = models.CharField(
-        max_length=200,
-        blank=True
-    )
+    date_added = models.DateField(blank=True, null=True)
+    description = models.CharField(max_length=200, blank=True)
     tags = TaggableManager(through=TaggedItem)
 
     objects = RestrictedQuerySet.as_manager()
 
-    csv_headers = ['prefix', 'rir', 'tenant', 'date_added', 'description']
+    csv_headers = ["prefix", "rir", "tenant", "date_added", "description"]
     clone_fields = [
-        'rir', 'tenant', 'date_added', 'description',
+        "rir",
+        "tenant",
+        "date_added",
+        "description",
     ]
 
     class Meta:
@@ -326,17 +311,10 @@ class Role(ChangeLoggedModel):
     A Role represents the functional role of a Prefix or VLAN; for example, "Customer," "Infrastructure," or
     "Management."
     """
-    name = models.CharField(
-        max_length=100,
-        unique=True
-    )
-    slug = models.SlugField(
-        max_length=100,
-        unique=True
-    )
-    weight = models.PositiveSmallIntegerField(
-        default=1000
-    )
+
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
+    weight = models.PositiveSmallIntegerField(default=1000)
     description = models.CharField(
         max_length=200,
         blank=True,
@@ -779,18 +757,27 @@ class IPAddress(ChangeLoggedModel, CustomFieldModel):
                 )
 
             # Enforce unique IP space (if applicable)
-            if (self.vrf is None and settings.ENFORCE_GLOBAL_UNIQUE) or (self.vrf and self.vrf.enforce_unique):
+            if (self.vrf is None and settings.ENFORCE_GLOBAL_UNIQUE) or (
+                self.vrf and self.vrf.enforce_unique
+            ):
                 duplicate_ips = self.get_duplicates()
                 if duplicate_ips and (
-                        self.role not in IPADDRESS_ROLES_NONUNIQUE or
-                        any(dip.role not in IPADDRESS_ROLES_NONUNIQUE for dip in duplicate_ips)
+                    self.role not in IPADDRESS_ROLES_NONUNIQUE
+                    or any(
+                        dip.role not in IPADDRESS_ROLES_NONUNIQUE
+                        for dip in duplicate_ips
+                    )
                 ):
-                    raise ValidationError({
-                        'address': "Duplicate IP address found in {}: {}".format(
-                            "VRF {}".format(self.vrf) if self.vrf else "global table",
-                            duplicate_ips.first(),
-                        )
-                    })
+                    raise ValidationError(
+                        {
+                            "address": "Duplicate IP address found in {}: {}".format(
+                                "VRF {}".format(self.vrf)
+                                if self.vrf
+                                else "global table",
+                                duplicate_ips.first(),
+                            )
+                        }
+                    )
 
         # Check for primary IP assignment that doesn't match the assigned device/VM
         if self.pk:
@@ -891,12 +878,9 @@ class VLANGroup(ChangeLoggedModel):
     """
     A VLAN group is an arbitrary collection of VLANs within which VLAN IDs and names must be unique.
     """
-    name = models.CharField(
-        max_length=100
-    )
-    slug = models.SlugField(
-        max_length=100
-    )
+
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=100)
     site = models.ForeignKey(
         to="dcim.Site",
         on_delete=models.PROTECT,
@@ -1100,23 +1084,18 @@ class Service(ChangeLoggedModel, CustomFieldModel):
         on_delete=models.CASCADE,
         related_name="services",
         null=True,
-        blank=True
+        blank=True,
     )
-    name = models.CharField(
-        max_length=100
-    )
-    protocol = models.CharField(
-        max_length=50,
-        choices=ServiceProtocolChoices
-    )
+    name = models.CharField(max_length=100)
+    protocol = models.CharField(max_length=50, choices=ServiceProtocolChoices)
     ports = ArrayField(
         base_field=models.PositiveIntegerField(
             validators=[
                 MinValueValidator(SERVICE_PORT_MIN),
-                MaxValueValidator(SERVICE_PORT_MAX)
+                MaxValueValidator(SERVICE_PORT_MAX),
             ]
         ),
-        verbose_name='Port numbers'
+        verbose_name="Port numbers",
     )
     ipaddresses = models.ManyToManyField(
         to="ipam.IPAddress",
@@ -1128,13 +1107,20 @@ class Service(ChangeLoggedModel, CustomFieldModel):
 
     objects = RestrictedQuerySet.as_manager()
 
-    csv_headers = ['device', 'virtual_machine', 'name', 'protocol', 'ports', 'description']
+    csv_headers = [
+        "device",
+        "virtual_machine",
+        "name",
+        "protocol",
+        "ports",
+        "description",
+    ]
 
     class Meta:
-        ordering = ('protocol', 'ports', 'pk')  # (protocol, port) may be non-unique
+        ordering = ("protocol", "ports", "pk")  # (protocol, port) may be non-unique
 
     def __str__(self):
-        return f'{self.name} ({self.get_protocol_display()}/{self.port_list})'
+        return f"{self.name} ({self.get_protocol_display()}/{self.port_list})"
 
     def get_absolute_url(self):
         return reverse("ipam:service", args=[self.pk])

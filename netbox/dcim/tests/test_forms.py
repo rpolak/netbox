@@ -102,36 +102,40 @@ class DeviceTestCase(TestCase):
         self.assertTrue(form.save())
 
     def test_non_racked_device_with_face(self):
-        form = DeviceForm(data={
-            'name': 'New Device',
-            'device_role': DeviceRole.objects.first().pk,
-            'tenant': None,
-            'manufacturer': Manufacturer.objects.first().pk,
-            'device_type': DeviceType.objects.first().pk,
-            'site': Site.objects.first().pk,
-            'rack': None,
-            'face': DeviceFaceChoices.FACE_REAR,
-            'platform': None,
-            'status': DeviceStatusChoices.STATUS_ACTIVE,
-        })
+        form = DeviceForm(
+            data={
+                "name": "New Device",
+                "device_role": DeviceRole.objects.first().pk,
+                "tenant": None,
+                "manufacturer": Manufacturer.objects.first().pk,
+                "device_type": DeviceType.objects.first().pk,
+                "site": Site.objects.first().pk,
+                "rack": None,
+                "face": DeviceFaceChoices.FACE_REAR,
+                "platform": None,
+                "status": DeviceStatusChoices.STATUS_ACTIVE,
+            }
+        )
         self.assertFalse(form.is_valid())
-        self.assertIn('face', form.errors)
+        self.assertIn("face", form.errors)
 
     def test_non_racked_device_with_position(self):
-        form = DeviceForm(data={
-            'name': 'New Device',
-            'device_role': DeviceRole.objects.first().pk,
-            'tenant': None,
-            'manufacturer': Manufacturer.objects.first().pk,
-            'device_type': DeviceType.objects.first().pk,
-            'site': Site.objects.first().pk,
-            'rack': None,
-            'position': 10,
-            'platform': None,
-            'status': DeviceStatusChoices.STATUS_ACTIVE,
-        })
+        form = DeviceForm(
+            data={
+                "name": "New Device",
+                "device_role": DeviceRole.objects.first().pk,
+                "tenant": None,
+                "manufacturer": Manufacturer.objects.first().pk,
+                "device_type": DeviceType.objects.first().pk,
+                "site": Site.objects.first().pk,
+                "rack": None,
+                "position": 10,
+                "platform": None,
+                "status": DeviceStatusChoices.STATUS_ACTIVE,
+            }
+        )
         self.assertFalse(form.is_valid())
-        self.assertIn('position', form.errors)
+        self.assertIn("position", form.errors)
 
 
 class LabelTestCase(TestCase):

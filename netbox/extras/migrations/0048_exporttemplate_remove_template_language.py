@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('extras', '0047_tag_ordering'),
+        ("extras", "0047_tag_ordering"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='exporttemplate',
-            name='template_language',
+            model_name="exporttemplate",
+            name="template_language",
         ),
     ]

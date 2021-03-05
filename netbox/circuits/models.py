@@ -20,20 +20,15 @@ __all__ = (
 )
 
 
-@extras_features('custom_fields', 'custom_links', 'export_templates', 'webhooks')
+@extras_features("custom_fields", "custom_links", "export_templates", "webhooks")
 class Provider(ChangeLoggedModel, CustomFieldModel):
     """
     Each Circuit belongs to a Provider. This is usually a telecommunications company or similar organization. This model
     stores information pertinent to the user's relationship with the Provider.
     """
-    name = models.CharField(
-        max_length=100,
-        unique=True
-    )
-    slug = models.SlugField(
-        max_length=100,
-        unique=True
-    )
+
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
     asn = ASNField(
         blank=True,
         null=True,
@@ -89,14 +84,9 @@ class CircuitType(ChangeLoggedModel):
     Circuits can be organized by their functional role. For example, a user might wish to define CircuitTypes named
     "Long Haul," "Metro," or "Out-of-Band".
     """
-    name = models.CharField(
-        max_length=100,
-        unique=True
-    )
-    slug = models.SlugField(
-        max_length=100,
-        unique=True
-    )
+
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
     description = models.CharField(
         max_length=200,
         blank=True,
@@ -130,10 +120,8 @@ class Circuit(ChangeLoggedModel, CustomFieldModel):
     circuits. Each circuit is also assigned a CircuitType and a Site.  Circuit port speed and commit rate are measured
     in Kbps.
     """
-    cid = models.CharField(
-        max_length=100,
-        verbose_name='Circuit ID'
-    )
+
+    cid = models.CharField(max_length=100, verbose_name="Circuit ID")
     provider = models.ForeignKey(
         to="circuits.Provider", on_delete=models.PROTECT, related_name="circuits"
     )
@@ -235,9 +223,7 @@ class CircuitTermination(PathEndpoint, CableTermination):
         to="dcim.Site", on_delete=models.PROTECT, related_name="circuit_terminations"
     )
     port_speed = models.PositiveIntegerField(
-        verbose_name='Port speed (Kbps)',
-        blank=True,
-        null=True
+        verbose_name="Port speed (Kbps)", blank=True, null=True
     )
     upstream_speed = models.PositiveIntegerField(
         blank=True,

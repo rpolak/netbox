@@ -41,18 +41,10 @@ class ClusterType(ChangeLoggedModel):
     """
     A type of Cluster.
     """
-    name = models.CharField(
-        max_length=100,
-        unique=True
-    )
-    slug = models.SlugField(
-        max_length=100,
-        unique=True
-    )
-    description = models.CharField(
-        max_length=200,
-        blank=True
-    )
+
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
+    description = models.CharField(max_length=200, blank=True)
 
     objects = RestrictedQuerySet.as_manager()
 
@@ -84,18 +76,10 @@ class ClusterGroup(ChangeLoggedModel):
     """
     An organizational group of Clusters.
     """
-    name = models.CharField(
-        max_length=100,
-        unique=True
-    )
-    slug = models.SlugField(
-        max_length=100,
-        unique=True
-    )
-    description = models.CharField(
-        max_length=200,
-        blank=True
-    )
+
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
+    description = models.CharField(max_length=200, blank=True)
 
     objects = RestrictedQuerySet.as_manager()
 
@@ -271,10 +255,10 @@ class VirtualMachine(ChangeLoggedModel, ConfigContextModel, CustomFieldModel):
         blank=True, null=True, verbose_name="Memory (MB)"
     )
     secrets = GenericRelation(
-        to='secrets.Secret',
-        content_type_field='assigned_object_type',
-        object_id_field='assigned_object_id',
-        related_query_name='virtual_machine'
+        to="secrets.Secret",
+        content_type_field="assigned_object_type",
+        object_id_field="assigned_object_id",
+        related_query_name="virtual_machine",
     )
     tags = TaggableManager(through=TaggedItem)
 
@@ -388,7 +372,8 @@ class VirtualMachine(ChangeLoggedModel, ConfigContextModel, CustomFieldModel):
 # Interfaces
 #
 
-@extras_features('export_templates', 'webhooks')
+
+@extras_features("export_templates", "webhooks")
 class VMInterface(BaseInterface):
     virtual_machine = models.ForeignKey(
         to="virtualization.VirtualMachine",
@@ -463,11 +448,16 @@ class VMInterface(BaseInterface):
         super().clean()
 
         # Validate untagged VLAN
-        if self.untagged_vlan and self.untagged_vlan.site not in [self.virtual_machine.site, None]:
-            raise ValidationError({
-                'untagged_vlan': f"The untagged VLAN ({self.untagged_vlan}) must belong to the same site as the "
-                                 f"interface's parent virtual machine, or it must be global"
-            })
+        if self.untagged_vlan and self.untagged_vlan.site not in [
+            self.virtual_machine.site,
+            None,
+        ]:
+            raise ValidationError(
+                {
+                    "untagged_vlan": f"The untagged VLAN ({self.untagged_vlan}) must belong to the same site as the "
+                    f"interface's parent virtual machine, or it must be global"
+                }
+            )
 
     def to_objectchange(self, action):
         # Annotate the parent VirtualMachine

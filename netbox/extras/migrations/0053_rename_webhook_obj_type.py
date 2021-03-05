@@ -6,13 +6,13 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('extras', '0052_customfield_cleanup'),
+        ("extras", "0052_customfield_cleanup"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='webhook',
-            old_name='obj_type',
-            new_name='content_types',
+            model_name="webhook",
+            old_name="obj_type",
+            new_name="content_types",
         ),
     ]

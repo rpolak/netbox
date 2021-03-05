@@ -20,7 +20,9 @@ class SecretRoleFilterSet(BaseFilterSet, NameSlugSearchFilterSet):
         fields = ["id", "name", "slug"]
 
 
-class SecretFilterSet(BaseFilterSet, CustomFieldModelFilterSet, CreatedUpdatedFilterSet):
+class SecretFilterSet(
+    BaseFilterSet, CustomFieldModelFilterSet, CreatedUpdatedFilterSet
+):
     q = django_filters.CharFilter(
         method="search",
         label="Search",
@@ -42,20 +44,20 @@ class SecretFilterSet(BaseFilterSet, CustomFieldModelFilterSet, CreatedUpdatedFi
         label="Device (name)",
     )
     device_id = django_filters.ModelMultipleChoiceFilter(
-        field_name='device',
+        field_name="device",
         queryset=Device.objects.all(),
-        label='Device (ID)',
+        label="Device (ID)",
     )
     virtual_machine = django_filters.ModelMultipleChoiceFilter(
-        field_name='virtual_machine__name',
+        field_name="virtual_machine__name",
         queryset=VirtualMachine.objects.all(),
-        to_field_name='name',
-        label='Virtual machine (name)',
+        to_field_name="name",
+        label="Virtual machine (name)",
     )
     virtual_machine_id = django_filters.ModelMultipleChoiceFilter(
-        field_name='virtual_machine',
+        field_name="virtual_machine",
         queryset=VirtualMachine.objects.all(),
-        label='Virtual machine (ID)',
+        label="Virtual machine (ID)",
     )
     tag = TagFilter()
 

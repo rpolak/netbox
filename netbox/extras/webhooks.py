@@ -39,7 +39,9 @@ def enqueue_webhooks(instance, user, request_id, action):
         ObjectChangeActionChoices.ACTION_UPDATE: "type_update",
         ObjectChangeActionChoices.ACTION_DELETE: "type_delete",
     }[action]
-    webhooks = Webhook.objects.filter(content_types=content_type, enabled=True, **{action_flag: True})
+    webhooks = Webhook.objects.filter(
+        content_types=content_type, enabled=True, **{action_flag: True}
+    )
 
     if webhooks.exists():
         # Get the Model's API serializer class and serialize the object

@@ -4,16 +4,16 @@ from ipam import models
 from netbox.api import WritableNestedSerializer
 
 __all__ = [
-    'NestedAggregateSerializer',
-    'NestedIPAddressSerializer',
-    'NestedPrefixSerializer',
-    'NestedRIRSerializer',
-    'NestedRoleSerializer',
-    'NestedRouteTargetSerializer',
-    'NestedServiceSerializer',
-    'NestedVLANGroupSerializer',
-    'NestedVLANSerializer',
-    'NestedVRFSerializer',
+    "NestedAggregateSerializer",
+    "NestedIPAddressSerializer",
+    "NestedPrefixSerializer",
+    "NestedRIRSerializer",
+    "NestedRoleSerializer",
+    "NestedRouteTargetSerializer",
+    "NestedServiceSerializer",
+    "NestedVLANGroupSerializer",
+    "NestedVLANSerializer",
+    "NestedVRFSerializer",
 ]
 
 
@@ -35,12 +35,13 @@ class NestedVRFSerializer(WritableNestedSerializer):
 # Route targets
 #
 
+
 class NestedRouteTargetSerializer(WritableNestedSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='ipam-api:routetarget-detail')
+    url = serializers.HyperlinkedIdentityField(view_name="ipam-api:routetarget-detail")
 
     class Meta:
         model = models.RouteTarget
-        fields = ['id', 'url', 'name']
+        fields = ["id", "url", "name"]
 
 
 #
@@ -136,4 +137,4 @@ class NestedServiceSerializer(WritableNestedSerializer):
 
     class Meta:
         model = models.Service
-        fields = ['id', 'url', 'name', 'protocol', 'ports']
+        fields = ["id", "url", "name", "protocol", "ports"]

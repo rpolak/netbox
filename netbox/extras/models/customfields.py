@@ -12,7 +12,13 @@ from django.utils.safestring import mark_safe
 
 from extras.choices import *
 from extras.utils import FeatureQuery
-from utilities.forms import CSVChoiceField, DatePicker, LaxURLField, StaticSelect2, add_blank_choice
+from utilities.forms import (
+    CSVChoiceField,
+    DatePicker,
+    LaxURLField,
+    StaticSelect2,
+    add_blank_choice,
+)
 from utilities.querysets import RestrictedQuerySet
 from utilities.validators import validate_regex
 
@@ -21,11 +27,11 @@ class CustomFieldModel(models.Model):
     """
     Abstract class for any model which may have custom fields associated with it.
     """
+
     custom_field_data = models.JSONField(
-        encoder=DjangoJSONEncoder,
-        blank=True,
-        default=dict
+        encoder=DjangoJSONEncoder, blank=True, default=dict
     )
+
 
 class CustomFieldModel(models.Model):
     class Meta:
@@ -43,9 +49,9 @@ class CustomFieldModel(models.Model):
         Return a dictionary of custom fields for a single object in the form {<field>: value}.
         """
         fields = CustomField.objects.get_for_model(self)
-        return OrderedDict([
-            (field, self.custom_field_data.get(field.name)) for field in fields
-        ])
+        return OrderedDict(
+            [(field, self.custom_field_data.get(field.name)) for field in fields]
+        )
 
     def clean(self):
         super().clean()
@@ -55,11 +61,15 @@ class CustomFieldModel(models.Model):
         # Validate all field values
         for field_name, value in self.custom_field_data.items():
             if field_name not in custom_fields:
-                raise ValidationError(f"Unknown field name '{field_name}' in custom field data.")
+                raise ValidationError(
+                    f"Unknown field name '{field_name}' in custom field data."
+                )
             try:
                 custom_fields[field_name].validate(value)
             except ValidationError as e:
-                raise ValidationError(f"Invalid value for custom field '{field_name}': {e.message}")
+                raise ValidationError(
+                    f"Invalid value for custom field '{field_name}': {e.message}"
+                )
 
         # Check for missing required values
         for cf in custom_fields.values():
@@ -89,13 +99,9 @@ class CustomField(models.Model):
     type = models.CharField(
         max_length=50,
         choices=CustomFieldTypeChoices,
-        default=CustomFieldTypeChoices.TYPE_TEXT
+        default=CustomFieldTypeChoices.TYPE_TEXT,
     )
-    name = models.CharField(
-        max_length=50,
-        unique=True,
-        help_text='Internal field name'
-    )
+    name = models.CharField(max_length=50, unique=True, help_text="Internal field name")
     name = models.CharField(max_length=50, unique=True)
     label = models.CharField(
         max_length=50,
@@ -119,8 +125,8 @@ class CustomField(models.Model):
     default = models.JSONField(
         blank=True,
         null=True,
-        help_text='Default value for the field (must be a JSON value). Encapsulate '
-                  'strings with double quotes (e.g. "Foo").'
+        help_text="Default value for the field (must be a JSON value). Encapsulate "
+        'strings with double quotes (e.g. "Foo").',
     )
     weight = models.PositiveSmallIntegerField(
         default=100, help_text="Fields with higher weights appear lower in a form."
@@ -128,28 +134,28 @@ class CustomField(models.Model):
     validation_minimum = models.PositiveIntegerField(
         blank=True,
         null=True,
-        verbose_name='Minimum value',
-        help_text='Minimum allowed value (for numeric fields)'
+        verbose_name="Minimum value",
+        help_text="Minimum allowed value (for numeric fields)",
     )
     validation_maximum = models.PositiveIntegerField(
         blank=True,
         null=True,
-        verbose_name='Maximum value',
-        help_text='Maximum allowed value (for numeric fields)'
+        verbose_name="Maximum value",
+        help_text="Maximum allowed value (for numeric fields)",
     )
     validation_regex = models.CharField(
         blank=True,
         validators=[validate_regex],
         max_length=500,
-        verbose_name='Validation regex',
-        help_text='Regular expression to enforce on text field values. Use ^ and $ to force matching of entire string. '
-                  'For example, <code>^[A-Z]{3}$</code> will limit values to exactly three uppercase letters.'
+        verbose_name="Validation regex",
+        help_text="Regular expression to enforce on text field values. Use ^ and $ to force matching of entire string. "
+        "For example, <code>^[A-Z]{3}$</code> will limit values to exactly three uppercase letters.",
     )
     choices = ArrayField(
         base_field=models.CharField(max_length=100),
         blank=True,
         null=True,
-        help_text='Comma-separated list of available choices (for selection fields)'
+        help_text="Comma-separated list of available choices (for selection fields)",
     )
 
     objects = CustomFieldManager()
@@ -167,8 +173,10 @@ class CustomField(models.Model):
         """
         for ct in content_types:
             model = ct.model_class()
-            for obj in model.objects.filter(**{f'custom_field_data__{self.name}__isnull': False}):
-                del(obj.custom_field_data[self.name])
+            for obj in model.objects.filter(
+                **{f"custom_field_data__{self.name}__isnull": False}
+            ):
+                del obj.custom_field_data[self.name]
                 obj.save()
 
     def clean(self):
@@ -179,44 +187,71 @@ class CustomField(models.Model):
             try:
                 self.validate(self.default)
             except ValidationError as err:
-                raise ValidationError({
-                    'default': f'Invalid default value "{self.default}": {err.message}'
-                })
+                raise ValidationError(
+                    {
+                        "default": f'Invalid default value "{self.default}": {err.message}'
+                    }
+                )
 
         # Minimum/maximum values can be set only for numeric fields
-        if self.validation_minimum is not None and self.type != CustomFieldTypeChoices.TYPE_INTEGER:
-            raise ValidationError({
-                'validation_minimum': "A minimum value may be set only for numeric fields"
-            })
-        if self.validation_maximum is not None and self.type != CustomFieldTypeChoices.TYPE_INTEGER:
-            raise ValidationError({
-                'validation_maximum': "A maximum value may be set only for numeric fields"
-            })
+        if (
+            self.validation_minimum is not None
+            and self.type != CustomFieldTypeChoices.TYPE_INTEGER
+        ):
+            raise ValidationError(
+                {
+                    "validation_minimum": "A minimum value may be set only for numeric fields"
+                }
+            )
+        if (
+            self.validation_maximum is not None
+            and self.type != CustomFieldTypeChoices.TYPE_INTEGER
+        ):
+            raise ValidationError(
+                {
+                    "validation_maximum": "A maximum value may be set only for numeric fields"
+                }
+            )
 
         # Regex validation can be set only for text fields
-        regex_types = (CustomFieldTypeChoices.TYPE_TEXT, CustomFieldTypeChoices.TYPE_URL)
+        regex_types = (
+            CustomFieldTypeChoices.TYPE_TEXT,
+            CustomFieldTypeChoices.TYPE_URL,
+        )
         if self.validation_regex and self.type not in regex_types:
-            raise ValidationError({
-                'validation_regex': "Regular expression validation is supported only for text and URL fields"
-            })
+            raise ValidationError(
+                {
+                    "validation_regex": "Regular expression validation is supported only for text and URL fields"
+                }
+            )
 
         # Choices can be set only on selection fields
         if self.choices and self.type != CustomFieldTypeChoices.TYPE_SELECT:
-            raise ValidationError({
-                'choices': "Choices may be set only for custom selection fields."
-            })
+            raise ValidationError(
+                {"choices": "Choices may be set only for custom selection fields."}
+            )
 
         # A selection field must have at least two choices defined
-        if self.type == CustomFieldTypeChoices.TYPE_SELECT and self.choices and len(self.choices) < 2:
-            raise ValidationError({
-                'choices': "Selection fields must specify at least two choices."
-            })
+        if (
+            self.type == CustomFieldTypeChoices.TYPE_SELECT
+            and self.choices
+            and len(self.choices) < 2
+        ):
+            raise ValidationError(
+                {"choices": "Selection fields must specify at least two choices."}
+            )
 
         # A selection field's default (if any) must be present in its available choices
-        if self.type == CustomFieldTypeChoices.TYPE_SELECT and self.default and self.default not in self.choices:
-            raise ValidationError({
-                'default': f"The specified default value ({self.default}) is not listed as an available choice."
-            })
+        if (
+            self.type == CustomFieldTypeChoices.TYPE_SELECT
+            and self.default
+            and self.default not in self.choices
+        ):
+            raise ValidationError(
+                {
+                    "default": f"The specified default value ({self.default}) is not listed as an available choice."
+                }
+            )
 
     def to_form_field(
         self, set_initial=True, enforce_required=True, for_csv_import=False
@@ -237,15 +272,15 @@ class CustomField(models.Model):
                 required=required,
                 initial=initial,
                 min_value=self.validation_minimum,
-                max_value=self.validation_maximum
+                max_value=self.validation_maximum,
             )
 
         # Boolean
         elif self.type == CustomFieldTypeChoices.TYPE_BOOLEAN:
             choices = (
-                (None, '---------'),
-                (True, 'True'),
-                (False, 'False'),
+                (None, "---------"),
+                (True, "True"),
+                (False, "False"),
             )
             field = forms.NullBooleanField(
                 required=required,
@@ -290,7 +325,9 @@ class CustomField(models.Model):
                 field.validators = [
                     RegexValidator(
                         regex=self.validation_regex,
-                        message=mark_safe(f"Values must match this regex: <code>{self.validation_regex}</code>")
+                        message=mark_safe(
+                            f"Values must match this regex: <code>{self.validation_regex}</code>"
+                        ),
                     )
                 ]
 
@@ -305,12 +342,14 @@ class CustomField(models.Model):
         """
         Validate a value according to the field's type validation rules.
         """
-        if value not in [None, '']:
+        if value not in [None, ""]:
 
             # Validate text field
             if self.type == CustomFieldTypeChoices.TYPE_TEXT and self.validation_regex:
                 if not re.match(self.validation_regex, value):
-                    raise ValidationError(f"Value must match regex '{self.validation_regex}'")
+                    raise ValidationError(
+                        f"Value must match regex '{self.validation_regex}'"
+                    )
 
             # Validate integer
             if self.type == CustomFieldTypeChoices.TYPE_INTEGER:
@@ -318,22 +357,39 @@ class CustomField(models.Model):
                     int(value)
                 except ValueError:
                     raise ValidationError("Value must be an integer.")
-                if self.validation_minimum is not None and value < self.validation_minimum:
-                    raise ValidationError(f"Value must be at least {self.validation_minimum}")
-                if self.validation_maximum is not None and value > self.validation_maximum:
-                    raise ValidationError(f"Value must not exceed {self.validation_maximum}")
+                if (
+                    self.validation_minimum is not None
+                    and value < self.validation_minimum
+                ):
+                    raise ValidationError(
+                        f"Value must be at least {self.validation_minimum}"
+                    )
+                if (
+                    self.validation_maximum is not None
+                    and value > self.validation_maximum
+                ):
+                    raise ValidationError(
+                        f"Value must not exceed {self.validation_maximum}"
+                    )
 
             # Validate boolean
-            if self.type == CustomFieldTypeChoices.TYPE_BOOLEAN and value not in [True, False, 1, 0]:
+            if self.type == CustomFieldTypeChoices.TYPE_BOOLEAN and value not in [
+                True,
+                False,
+                1,
+                0,
+            ]:
                 raise ValidationError("Value must be true or false.")
 
             # Validate date
             if self.type == CustomFieldTypeChoices.TYPE_DATE:
                 if type(value) is not date:
                     try:
-                        datetime.strptime(value, '%Y-%m-%d')
+                        datetime.strptime(value, "%Y-%m-%d")
                     except ValueError:
-                        raise ValidationError("Date values must be in the format YYYY-MM-DD.")
+                        raise ValidationError(
+                            "Date values must be in the format YYYY-MM-DD."
+                        )
 
             # Validate selected choice
             if self.type == CustomFieldTypeChoices.TYPE_SELECT:

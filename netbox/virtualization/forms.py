@@ -518,12 +518,13 @@ class VirtualMachineFilterForm(
 # VM interfaces
 #
 
+
 class VMInterfaceForm(BootstrapMixin, InterfaceCommonForm, forms.ModelForm):
     untagged_vlan = DynamicModelChoiceField(
         queryset=VLAN.objects.all(),
         required=False,
-        label='Untagged VLAN',
-        display_field='display_name',
+        label="Untagged VLAN",
+        display_field="display_name",
         brief_mode=False,
         query_params={
             "site_id": "null",
@@ -532,8 +533,8 @@ class VMInterfaceForm(BootstrapMixin, InterfaceCommonForm, forms.ModelForm):
     tagged_vlans = DynamicModelMultipleChoiceField(
         queryset=VLAN.objects.all(),
         required=False,
-        label='Tagged VLANs',
-        display_field='display_name',
+        label="Tagged VLANs",
+        display_field="display_name",
         brief_mode=False,
         query_params={
             "site_id": "null",
@@ -578,16 +579,9 @@ class VMInterfaceForm(BootstrapMixin, InterfaceCommonForm, forms.ModelForm):
 
 
 class VMInterfaceCreateForm(BootstrapMixin, InterfaceCommonForm):
-    virtual_machine = DynamicModelChoiceField(
-        queryset=VirtualMachine.objects.all()
-    )
-    name_pattern = ExpandableNameField(
-        label='Name'
-    )
-    enabled = forms.BooleanField(
-        required=False,
-        initial=True
-    )
+    virtual_machine = DynamicModelChoiceField(queryset=VirtualMachine.objects.all())
+    name_pattern = ExpandableNameField(label="Name")
+    enabled = forms.BooleanField(required=False, initial=True)
     mtu = forms.IntegerField(
         required=False,
         min_value=INTERFACE_MTU_MIN,

@@ -32,6 +32,7 @@ class Webhook(models.Model):
     delete in NetBox. The request will contain a representation of the object, which the remote application can act on.
     Each Webhook can be limited to firing only on certain actions or certain object types.
     """
+
     content_types = models.ManyToManyField(
         to=ContentType,
         related_name="webhooks",
@@ -239,9 +240,7 @@ class ExportTemplate(models.Model):
         """
         Render the contents of the template.
         """
-        context = {
-            'queryset': queryset
-        }
+        context = {"queryset": queryset}
         output = render_jinja2(self.template_code, context)
 
         # Replace CRLF-style line terminators

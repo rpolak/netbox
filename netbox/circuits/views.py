@@ -16,9 +16,10 @@ from .models import Circuit, CircuitTermination, CircuitType, Provider
 # Providers
 #
 
+
 class ProviderListView(generic.ObjectListView):
     queryset = Provider.objects.annotate(
-        count_circuits=count_related(Circuit, 'provider')
+        count_circuits=count_related(Circuit, "provider")
     )
     filterset = filters.ProviderFilterSet
     filterset_form = forms.ProviderFilterForm
@@ -29,11 +30,12 @@ class ProviderView(generic.ObjectView):
     queryset = Provider.objects.all()
 
     def get_extra_context(self, request, instance):
-        circuits = Circuit.objects.restrict(request.user, 'view').filter(
-            provider=instance
-        ).prefetch_related(
-            'type', 'tenant', 'terminations__site'
-        ).annotate_sites()
+        circuits = (
+            Circuit.objects.restrict(request.user, "view")
+            .filter(provider=instance)
+            .prefetch_related("type", "tenant", "terminations__site")
+            .annotate_sites()
+        )
 
         circuits_table = tables.CircuitTable(circuits)
         circuits_table.columns.hide("provider")
@@ -45,7 +47,7 @@ class ProviderView(generic.ObjectView):
         RequestConfig(request, paginate).configure(circuits_table)
 
         return {
-            'circuits_table': circuits_table,
+            "circuits_table": circuits_table,
         }
 
 
@@ -67,7 +69,7 @@ class ProviderBulkImportView(generic.BulkImportView):
 
 class ProviderBulkEditView(generic.BulkEditView):
     queryset = Provider.objects.annotate(
-        count_circuits=count_related(Circuit, 'provider')
+        count_circuits=count_related(Circuit, "provider")
     )
     filterset = filters.ProviderFilterSet
     table = tables.ProviderTable
@@ -76,7 +78,7 @@ class ProviderBulkEditView(generic.BulkEditView):
 
 class ProviderBulkDeleteView(generic.BulkDeleteView):
     queryset = Provider.objects.annotate(
-        count_circuits=count_related(Circuit, 'provider')
+        count_circuits=count_related(Circuit, "provider")
     )
     filterset = filters.ProviderFilterSet
     table = tables.ProviderTable
@@ -86,9 +88,10 @@ class ProviderBulkDeleteView(generic.BulkDeleteView):
 # Circuit Types
 #
 
+
 class CircuitTypeListView(generic.ObjectListView):
     queryset = CircuitType.objects.annotate(
-        circuit_count=count_related(Circuit, 'type')
+        circuit_count=count_related(Circuit, "type")
     )
     table = tables.CircuitTypeTable
 
@@ -110,7 +113,7 @@ class CircuitTypeBulkImportView(generic.BulkImportView):
 
 class CircuitTypeBulkDeleteView(generic.BulkDeleteView):
     queryset = CircuitType.objects.annotate(
-        circuit_count=count_related(Circuit, 'type')
+        circuit_count=count_related(Circuit, "type")
     )
     table = tables.CircuitTypeTable
 
@@ -118,6 +121,7 @@ class CircuitTypeBulkDeleteView(generic.BulkDeleteView):
 #
 # Circuits
 #
+
 
 class CircuitListView(generic.ObjectListView):
     queryset = Circuit.objects.prefetch_related(
@@ -134,26 +138,44 @@ class CircuitView(generic.ObjectView):
     def get_extra_context(self, request, instance):
 
         # A-side termination
-        termination_a = CircuitTermination.objects.restrict(request.user, 'view').prefetch_related(
-            'site__region'
-        ).filter(
-            circuit=instance, term_side=CircuitTerminationSideChoices.SIDE_A
-        ).first()
-        if termination_a and termination_a.connected_endpoint and hasattr(termination_a.connected_endpoint, 'ip_addresses'):
-            termination_a.ip_addresses = termination_a.connected_endpoint.ip_addresses.restrict(request.user, 'view')
+        termination_a = (
+            CircuitTermination.objects.restrict(request.user, "view")
+            .prefetch_related("site__region")
+            .filter(circuit=instance, term_side=CircuitTerminationSideChoices.SIDE_A)
+            .first()
+        )
+        if (
+            termination_a
+            and termination_a.connected_endpoint
+            and hasattr(termination_a.connected_endpoint, "ip_addresses")
+        ):
+            termination_a.ip_addresses = (
+                termination_a.connected_endpoint.ip_addresses.restrict(
+                    request.user, "view"
+                )
+            )
 
         # Z-side termination
-        termination_z = CircuitTermination.objects.restrict(request.user, 'view').prefetch_related(
-            'site__region'
-        ).filter(
-            circuit=instance, term_side=CircuitTerminationSideChoices.SIDE_Z
-        ).first()
-        if termination_z and termination_z.connected_endpoint and hasattr(termination_z.connected_endpoint, 'ip_addresses'):
-            termination_z.ip_addresses = termination_z.connected_endpoint.ip_addresses.restrict(request.user, 'view')
+        termination_z = (
+            CircuitTermination.objects.restrict(request.user, "view")
+            .prefetch_related("site__region")
+            .filter(circuit=instance, term_side=CircuitTerminationSideChoices.SIDE_Z)
+            .first()
+        )
+        if (
+            termination_z
+            and termination_z.connected_endpoint
+            and hasattr(termination_z.connected_endpoint, "ip_addresses")
+        ):
+            termination_z.ip_addresses = (
+                termination_z.connected_endpoint.ip_addresses.restrict(
+                    request.user, "view"
+                )
+            )
 
         return {
-            'termination_a': termination_a,
-            'termination_z': termination_z,
+            "termination_a": termination_a,
+            "termination_z": termination_z,
         }
 
 
@@ -276,6 +298,7 @@ class CircuitSwapTerminations(generic.ObjectEditView):
 #
 # Circuit terminations
 #
+
 
 class CircuitTerminationEditView(generic.ObjectEditView):
     queryset = CircuitTermination.objects.all()

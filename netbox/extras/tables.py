@@ -1,7 +1,14 @@
 import django_tables2 as tables
 from django.conf import settings
 
-from utilities.tables import BaseTable, BooleanColumn, ButtonsColumn, ChoiceFieldColumn, ColorColumn, ToggleColumn
+from utilities.tables import (
+    BaseTable,
+    BooleanColumn,
+    ButtonsColumn,
+    ChoiceFieldColumn,
+    ColorColumn,
+    ToggleColumn,
+)
 from .models import ConfigContext, ObjectChange, Tag, TaggedItem
 
 TAGGED_ITEM = """
@@ -81,14 +88,9 @@ class ConfigContextTable(BaseTable):
 
 
 class ObjectChangeTable(BaseTable):
-    time = tables.DateTimeColumn(
-        linkify=True,
-        format=settings.SHORT_DATETIME_FORMAT
-    )
+    time = tables.DateTimeColumn(linkify=True, format=settings.SHORT_DATETIME_FORMAT)
     action = ChoiceFieldColumn()
-    changed_object_type = tables.Column(
-        verbose_name='Type'
-    )
+    changed_object_type = tables.Column(verbose_name="Type")
     object_repr = tables.TemplateColumn(
         template_code=OBJECTCHANGE_OBJECT, verbose_name="Object"
     )

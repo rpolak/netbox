@@ -240,14 +240,9 @@ class SecretRole(ChangeLoggedModel):
     A SecretRole represents an arbitrary functional classification of Secrets. For example, a user might define roles
     such as "Login Credentials" or "SNMP Communities."
     """
-    name = models.CharField(
-        max_length=100,
-        unique=True
-    )
-    slug = models.SlugField(
-        max_length=100,
-        unique=True
-    )
+
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
     description = models.CharField(
         max_length=200,
         blank=True,
@@ -285,14 +280,11 @@ class Secret(ChangeLoggedModel, CustomFieldModel):
     A Secret can be up to 65,535 bytes (64KB - 1B) in length. Each secret string will be padded with random data to
     a minimum of 64 bytes during encryption in order to protect short strings from ciphertext analysis.
     """
-    assigned_object_type = models.ForeignKey(
-        to=ContentType,
-        on_delete=models.PROTECT
-    )
+
+    assigned_object_type = models.ForeignKey(to=ContentType, on_delete=models.PROTECT)
     assigned_object_id = models.PositiveIntegerField()
     assigned_object = GenericForeignKey(
-        ct_field='assigned_object_type',
-        fk_field='assigned_object_id'
+        ct_field="assigned_object_type", fk_field="assigned_object_id"
     )
     role = models.ForeignKey(
         to="secrets.SecretRole", on_delete=models.PROTECT, related_name="secrets"
@@ -307,25 +299,31 @@ class Secret(ChangeLoggedModel, CustomFieldModel):
     objects = RestrictedQuerySet.as_manager()
 
     plaintext = None
-    csv_headers = ['assigned_object_type', 'assigned_object_id', 'role', 'name', 'plaintext']
+    csv_headers = [
+        "assigned_object_type",
+        "assigned_object_id",
+        "role",
+        "name",
+        "plaintext",
+    ]
 
     class Meta:
-        ordering = ('role', 'name', 'pk')
-        unique_together = ('assigned_object_type', 'assigned_object_id', 'role', 'name')
+        ordering = ("role", "name", "pk")
+        unique_together = ("assigned_object_type", "assigned_object_id", "role", "name")
 
     def __init__(self, *args, **kwargs):
         self.plaintext = kwargs.pop("plaintext", None)
         super().__init__(*args, **kwargs)
 
     def __str__(self):
-        return self.name or 'Secret'
+        return self.name or "Secret"
 
     def get_absolute_url(self):
         return reverse("secrets:secret", args=[self.pk])
 
     def to_csv(self):
         return (
-            f'{self.assigned_object_type.app_label}.{self.assigned_object_type.model}',
+            f"{self.assigned_object_type.app_label}.{self.assigned_object_type.model}",
             self.assigned_object_id,
             self.role,
             self.name,

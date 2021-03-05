@@ -122,7 +122,7 @@ class NumericArrayField(SimpleArrayField):
         if not value:
             return []
         if isinstance(value, str):
-            value = ','.join([str(n) for n in parse_numeric_range(value)])
+            value = ",".join([str(n) for n in parse_numeric_range(value)])
         return super().to_python(value)
 
 
