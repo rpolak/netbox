@@ -245,7 +245,10 @@ class LinkedCountColumn(tables.Column):
         if value:
             url = reverse(self.viewname, kwargs=self.view_kwargs)
             if self.url_params:
-                url += '?' + '&'.join([f'{k}={getattr(record, v)}' for k, v in self.url_params.items()])
+                url += '?' + '&'.join(
+                    f'{k}={getattr(record, v)}' for k, v in self.url_params.items()
+                )
+
             return mark_safe(f'<a href="{url}">{value}</a>')
         return value
 

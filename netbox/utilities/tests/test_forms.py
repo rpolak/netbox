@@ -302,19 +302,19 @@ class CSVDataFieldTest(TestCase):
         self.assertEqual(self.field.clean(input), output)
 
     def test_clean_invalid_header(self):
-        input = """
+        with self.assertRaises(forms.ValidationError):
+            input = """
         address,status,vrf,xxx
         192.0.2.1/32,Active,Test VRF,123
         """
-        with self.assertRaises(forms.ValidationError):
             self.field.clean(input)
 
     def test_clean_missing_required_header(self):
-        input = """
+        with self.assertRaises(forms.ValidationError):
+            input = """
         status,vrf
         Active,Test VRF
         """
-        with self.assertRaises(forms.ValidationError):
             self.field.clean(input)
 
     def test_clean_default_to_field(self):
@@ -351,17 +351,17 @@ class CSVDataFieldTest(TestCase):
         self.assertEqual(self.field.clean(input), output)
 
     def test_clean_invalid_to_field(self):
-        input = """
+        with self.assertRaises(forms.ValidationError):
+            input = """
         address,status,vrf.xxx
         192.0.2.1/32,Active,123:456
         """
-        with self.assertRaises(forms.ValidationError):
             self.field.clean(input)
 
     def test_clean_to_field_on_non_object(self):
-        input = """
+        with self.assertRaises(forms.ValidationError):
+            input = """
         address,status.foo,vrf
         192.0.2.1/32,Bar,Test VRF
         """
-        with self.assertRaises(forms.ValidationError):
             self.field.clean(input)

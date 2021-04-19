@@ -318,61 +318,63 @@ class PowerPort(CableTermination, PathEndpoint, ComponentModel):
     def clean(self):
         super().clean()
 
-        if self.maximum_draw is not None and self.allocated_draw is not None:
-            if self.allocated_draw > self.maximum_draw:
-                raise ValidationError({
-                    'allocated_draw': f"Allocated draw cannot exceed the maximum draw ({self.maximum_draw}W)."
-                })
+        if (
+            self.maximum_draw is not None
+            and self.allocated_draw is not None
+            and self.allocated_draw > self.maximum_draw
+        ):
+            raise ValidationError({
+                'allocated_draw': f"Allocated draw cannot exceed the maximum draw ({self.maximum_draw}W)."
+            })
 
     def get_power_draw(self):
         """
         Return the allocated and maximum power draw (in VA) and child PowerOutlet count for this PowerPort.
         """
         # Calculate aggregate draw of all child power outlets if no numbers have been defined manually
-        if self.allocated_draw is None and self.maximum_draw is None:
-            poweroutlet_ct = ContentType.objects.get_for_model(PowerOutlet)
-            outlet_ids = PowerOutlet.objects.filter(power_port=self).values_list('pk', flat=True)
-            utilization = PowerPort.objects.filter(
-                _cable_peer_type=poweroutlet_ct,
-                _cable_peer_id__in=outlet_ids
-            ).aggregate(
-                maximum_draw_total=Sum('maximum_draw'),
-                allocated_draw_total=Sum('allocated_draw'),
-            )
-            ret = {
-                'allocated': utilization['allocated_draw_total'] or 0,
-                'maximum': utilization['maximum_draw_total'] or 0,
-                'outlet_count': len(outlet_ids),
+        if self.allocated_draw is not None or self.maximum_draw is not None:
+            # Default to administratively defined values
+            return {
+                'allocated': self.allocated_draw or 0,
+                'maximum': self.maximum_draw or 0,
+                'outlet_count': PowerOutlet.objects.filter(power_port=self).count(),
                 'legs': [],
             }
-
-            # Calculate per-leg aggregates for three-phase feeds
-            if getattr(self._cable_peer, 'phase', None) == PowerFeedPhaseChoices.PHASE_3PHASE:
-                for leg, leg_name in PowerOutletFeedLegChoices:
-                    outlet_ids = PowerOutlet.objects.filter(power_port=self, feed_leg=leg).values_list('pk', flat=True)
-                    utilization = PowerPort.objects.filter(
-                        _cable_peer_type=poweroutlet_ct,
-                        _cable_peer_id__in=outlet_ids
-                    ).aggregate(
-                        maximum_draw_total=Sum('maximum_draw'),
-                        allocated_draw_total=Sum('allocated_draw'),
-                    )
-                    ret['legs'].append({
-                        'name': leg_name,
-                        'allocated': utilization['allocated_draw_total'] or 0,
-                        'maximum': utilization['maximum_draw_total'] or 0,
-                        'outlet_count': len(outlet_ids),
-                    })
-
-            return ret
-
-        # Default to administratively defined values
-        return {
-            'allocated': self.allocated_draw or 0,
-            'maximum': self.maximum_draw or 0,
-            'outlet_count': PowerOutlet.objects.filter(power_port=self).count(),
+        poweroutlet_ct = ContentType.objects.get_for_model(PowerOutlet)
+        outlet_ids = PowerOutlet.objects.filter(power_port=self).values_list('pk', flat=True)
+        utilization = PowerPort.objects.filter(
+            _cable_peer_type=poweroutlet_ct,
+            _cable_peer_id__in=outlet_ids
+        ).aggregate(
+            maximum_draw_total=Sum('maximum_draw'),
+            allocated_draw_total=Sum('allocated_draw'),
+        )
+        ret = {
+            'allocated': utilization['allocated_draw_total'] or 0,
+            'maximum': utilization['maximum_draw_total'] or 0,
+            'outlet_count': len(outlet_ids),
             'legs': [],
         }
+
+        # Calculate per-leg aggregates for three-phase feeds
+        if getattr(self._cable_peer, 'phase', None) == PowerFeedPhaseChoices.PHASE_3PHASE:
+            for leg, leg_name in PowerOutletFeedLegChoices:
+                outlet_ids = PowerOutlet.objects.filter(power_port=self, feed_leg=leg).values_list('pk', flat=True)
+                utilization = PowerPort.objects.filter(
+                    _cable_peer_type=poweroutlet_ct,
+                    _cable_peer_id__in=outlet_ids
+                ).aggregate(
+                    maximum_draw_total=Sum('maximum_draw'),
+                    allocated_draw_total=Sum('allocated_draw'),
+                )
+                ret['legs'].append({
+                    'name': leg_name,
+                    'allocated': utilization['allocated_draw_total'] or 0,
+                    'maximum': utilization['maximum_draw_total'] or 0,
+                    'outlet_count': len(outlet_ids),
+                })
+
+        return ret
 
 
 #

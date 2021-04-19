@@ -46,16 +46,17 @@ def handle_rackgroup_site_change(instance, created, **kwargs):
     Update child RackGroups and Racks if Site assignment has changed. We intentionally recurse through each child
     object instead of calling update() on the QuerySet to ensure the proper change records get created for each.
     """
-    if not created:
-        for rackgroup in instance.get_children():
-            rackgroup.site = instance.site
-            rackgroup.save()
-        for rack in Rack.objects.filter(group=instance).exclude(site=instance.site):
-            rack.site = instance.site
-            rack.save()
-        for powerpanel in PowerPanel.objects.filter(rack_group=instance).exclude(site=instance.site):
-            powerpanel.site = instance.site
-            powerpanel.save()
+    if created:
+        return
+    for rackgroup in instance.get_children():
+        rackgroup.site = instance.site
+        rackgroup.save()
+    for rack in Rack.objects.filter(group=instance).exclude(site=instance.site):
+        rack.site = instance.site
+        rack.save()
+    for powerpanel in PowerPanel.objects.filter(rack_group=instance).exclude(site=instance.site):
+        powerpanel.site = instance.site
+        powerpanel.save()
 
 
 @receiver(post_save, sender=Rack)

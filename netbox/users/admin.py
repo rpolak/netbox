@@ -27,7 +27,9 @@ class ObjectPermissionInline(admin.TabularInline):
     @staticmethod
     def object_types(instance):
         # Don't call .values_list() here because we want to reference the pre-fetched object_types
-        return ', '.join([ot.name for ot in instance.objectpermission.object_types.all()])
+        return ', '.join(
+            ot.name for ot in instance.objectpermission.object_types.all()
+        )
 
     @staticmethod
     def actions(instance):
@@ -176,7 +178,7 @@ class ObjectPermissionForm(forms.ModelForm):
 
         # Append any of the selected CRUD checkboxes to the actions list
         if not self.cleaned_data.get('actions'):
-            self.cleaned_data['actions'] = list()
+            self.cleaned_data['actions'] = []
         for action in ['view', 'add', 'change', 'delete']:
             if self.cleaned_data[f'can_{action}'] and action not in self.cleaned_data['actions']:
                 self.cleaned_data['actions'].append(action)
@@ -269,15 +271,15 @@ class ObjectPermissionAdmin(admin.ModelAdmin):
         return super().get_queryset(request).prefetch_related('object_types', 'users', 'groups')
 
     def list_models(self, obj):
-        return ', '.join([f"{ct}" for ct in obj.object_types.all()])
+        return ', '.join(f"{ct}" for ct in obj.object_types.all())
     list_models.short_description = 'Models'
 
     def list_users(self, obj):
-        return ', '.join([u.username for u in obj.users.all()])
+        return ', '.join(u.username for u in obj.users.all())
     list_users.short_description = 'Users'
 
     def list_groups(self, obj):
-        return ', '.join([g.name for g in obj.groups.all()])
+        return ', '.join(g.name for g in obj.groups.all())
     list_groups.short_description = 'Groups'
 
     #

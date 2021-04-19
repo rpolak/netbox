@@ -57,8 +57,7 @@ class NetBoxSwaggerAutoSchema(SwaggerAutoSchema):
 
                 self.writable_serializers[type(serializer)] = type(writable_name, (type(serializer),), properties)
 
-            writable_class = self.writable_serializers[type(serializer)]
-            return writable_class
+            return self.writable_serializers[type(serializer)]
 
 
 class SerializedPKRelatedFieldInspector(FieldInspector):
@@ -97,12 +96,17 @@ class ChoiceFieldInspector(FieldInspector):
                 # Change value_schema for IPAddressFamilyChoices, RackWidthChoices
                 value_schema = openapi.Schema(type=openapi.TYPE_INTEGER, enum=choice_value)
 
-            schema = SwaggerType(type=openapi.TYPE_OBJECT, required=["label", "value"], properties={
-                "label": openapi.Schema(type=openapi.TYPE_STRING, enum=choice_label),
-                "value": value_schema
-            })
+            return SwaggerType(
+                type=openapi.TYPE_OBJECT,
+                required=["label", "value"],
+                properties={
+                    "label": openapi.Schema(
+                        type=openapi.TYPE_STRING, enum=choice_label
+                    ),
+                    "value": value_schema,
+                },
+            )
 
-            return schema
 
         return NotHandled
 

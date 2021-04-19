@@ -544,9 +544,7 @@ class Prefix(ChangeLoggedModel, CustomFieldModel):
         """
         prefix = netaddr.IPSet(self.prefix)
         child_prefixes = netaddr.IPSet([child.prefix for child in self.get_child_prefixes()])
-        available_prefixes = prefix - child_prefixes
-
-        return available_prefixes
+        return prefix - child_prefixes
 
     def get_available_ips(self):
         """
@@ -750,17 +748,15 @@ class IPAddress(ChangeLoggedModel, CustomFieldModel):
         # Check for primary IP assignment that doesn't match the assigned device/VM
         if self.pk:
             device = Device.objects.filter(Q(primary_ip4=self) | Q(primary_ip6=self)).first()
-            if device:
-                if getattr(self.assigned_object, 'device', None) != device:
-                    raise ValidationError({
-                        'interface': f"IP address is primary for device {device} but not assigned to it!"
-                    })
+            if device and getattr(self.assigned_object, 'device', None) != device:
+                raise ValidationError({
+                    'interface': f"IP address is primary for device {device} but not assigned to it!"
+                })
             vm = VirtualMachine.objects.filter(Q(primary_ip4=self) | Q(primary_ip6=self)).first()
-            if vm:
-                if getattr(self.assigned_object, 'virtual_machine', None) != vm:
-                    raise ValidationError({
-                        'vminterface': f"IP address is primary for virtual machine {vm} but not assigned to it!"
-                    })
+            if vm and getattr(self.assigned_object, 'virtual_machine', None) != vm:
+                raise ValidationError({
+                    'vminterface': f"IP address is primary for virtual machine {vm} but not assigned to it!"
+                })
 
         # Validate IP status selection
         if self.status == IPAddressStatusChoices.STATUS_SLAAC and self.family != 6:

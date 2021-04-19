@@ -185,7 +185,7 @@ class ModelViewSet(BulkUpdateModelMixin, BulkDestroyModelMixin, ModelViewSet_):
         except ProtectedError as e:
             protected_objects = list(e.protected_objects)
             msg = f'Unable to delete object. {len(protected_objects)} dependent objects were found: '
-            msg += ', '.join([f'{obj} ({obj.pk})' for obj in protected_objects])
+            msg += ', '.join(f'{obj} ({obj.pk})' for obj in protected_objects)
             logger.warning(msg)
             return self.finalize_response(
                 request,

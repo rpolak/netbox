@@ -793,18 +793,25 @@ class IPAddressForm(BootstrapMixin, TenancyForm, ReturnURLForm, CustomFieldModel
 
         # Assign/clear this IPAddress as the primary for the associated Device/VirtualMachine.
         interface = self.instance.assigned_object
-        if interface and self.cleaned_data['primary_for_parent']:
-            if ipaddress.address.version == 4:
-                interface.parent.primary_ip4 = ipaddress
-            else:
-                interface.parent.primary_ip6 = ipaddress
-            interface.parent.save()
-        elif interface and ipaddress.address.version == 4 and interface.parent.primary_ip4 == ipaddress:
-            interface.parent.primary_ip4 = None
-            interface.parent.save()
-        elif interface and ipaddress.address.version == 6 and interface.parent.primary_ip6 == ipaddress:
-            interface.parent.primary_ip6 = None
-            interface.parent.save()
+        if interface:
+            if self.cleaned_data['primary_for_parent']:
+                if ipaddress.address.version == 4:
+                    interface.parent.primary_ip4 = ipaddress
+                else:
+                    interface.parent.primary_ip6 = ipaddress
+                interface.parent.save()
+            elif (
+                ipaddress.address.version == 4
+                and interface.parent.primary_ip4 == ipaddress
+            ):
+                interface.parent.primary_ip4 = None
+                interface.parent.save()
+            elif (
+                ipaddress.address.version == 6
+                and interface.parent.primary_ip6 == ipaddress
+            ):
+                interface.parent.primary_ip6 = None
+                interface.parent.save()
 
         return ipaddress
 

@@ -704,9 +704,7 @@ class CableSerializer(TaggedObjectSerializer, CustomFieldModelSerializer):
             return None
         serializer = get_serializer_for_model(termination, prefix='Nested')
         context = {'request': self.context['request']}
-        data = serializer(termination, context=context).data
-
-        return data
+        return serializer(termination, context=context).data
 
     @swagger_serializer_method(serializer_or_field=serializers.DictField)
     def get_termination_a(self, obj):

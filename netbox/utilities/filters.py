@@ -202,13 +202,13 @@ class BaseFilterSet(django_filters.FilterSet):
             MultiValueNumberFilter,
             MultiValueTimeFilter
         )):
-            lookup_map = FILTER_NUMERIC_BASED_LOOKUP_MAP
+            return FILTER_NUMERIC_BASED_LOOKUP_MAP
 
         elif isinstance(existing_filter, (
             TreeNodeMultipleChoiceFilter,
         )):
             # TreeNodeMultipleChoiceFilter only support negation but must maintain the `in` lookup expression
-            lookup_map = FILTER_TREENODE_NEGATION_LOOKUP_MAP
+            return FILTER_TREENODE_NEGATION_LOOKUP_MAP
 
         elif isinstance(existing_filter, (
             django_filters.ModelChoiceFilter,
@@ -216,7 +216,7 @@ class BaseFilterSet(django_filters.FilterSet):
             TagFilter
         )) or existing_filter.extra.get('choices'):
             # These filter types support only negation
-            lookup_map = FILTER_NEGATION_LOOKUP_MAP
+            return FILTER_NEGATION_LOOKUP_MAP
 
         elif isinstance(existing_filter, (
             django_filters.filters.CharFilter,
@@ -224,12 +224,10 @@ class BaseFilterSet(django_filters.FilterSet):
             MultiValueCharFilter,
             MultiValueMACAddressFilter
         )):
-            lookup_map = FILTER_CHAR_BASED_LOOKUP_MAP
+            return FILTER_CHAR_BASED_LOOKUP_MAP
 
         else:
-            lookup_map = None
-
-        return lookup_map
+            return None
 
     @classmethod
     def get_filters(cls):

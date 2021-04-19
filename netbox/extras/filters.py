@@ -51,9 +51,12 @@ class CustomFieldFilter(django_filters.Filter):
 
         self.field_name = f'custom_field_data__{self.field_name}'
 
-        if custom_field.type not in EXACT_FILTER_TYPES:
-            if custom_field.filter_logic == CustomFieldFilterLogicChoices.FILTER_LOOSE:
-                self.lookup_expr = 'icontains'
+        if (
+            custom_field.type not in EXACT_FILTER_TYPES
+            and custom_field.filter_logic
+            == CustomFieldFilterLogicChoices.FILTER_LOOSE
+        ):
+            self.lookup_expr = 'icontains'
 
 
 class CustomFieldModelFilterSet(django_filters.FilterSet):

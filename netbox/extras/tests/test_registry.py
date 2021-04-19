@@ -13,9 +13,7 @@ class RegistryTest(TestCase):
 
     def test_manipulate_store(self):
         reg = Registry()
-        reg['foo'] = [1, 2]
-        reg['foo'].append(3)
-
+        reg['foo'] = [1, 2, 3]
         self.assertListEqual(reg['foo'], [1, 2, 3])
 
     def test_overwrite_store(self):

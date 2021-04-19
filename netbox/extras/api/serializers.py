@@ -356,9 +356,7 @@ class ObjectChangeSerializer(serializers.ModelSerializer):
         context = {
             'request': self.context['request']
         }
-        data = serializer(obj.changed_object, context=context).data
-
-        return data
+        return serializer(obj.changed_object, context=context).data
 
 
 #

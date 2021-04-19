@@ -1418,7 +1418,7 @@ class CableTest(APIViewTestCases.APIViewTestCase):
 
         interfaces = []
         for device in devices:
-            for i in range(0, 10):
+            for i in range(10):
                 interfaces.append(Interface(device=device, type=InterfaceTypeChoices.TYPE_1GE_FIXED, name=f'eth{i}'))
         Interface.objects.bulk_create(interfaces)
 
@@ -1527,7 +1527,7 @@ class VirtualChassisTest(APIViewTestCases.APIViewTestCase):
         # Create 12 interfaces per device
         interfaces = []
         for i, device in enumerate(devices):
-            for j in range(0, 13):
+            for j in range(13):
                 interfaces.append(
                     # Interface name starts with parent device's position in VC; e.g. 1/1, 1/2, 1/3...
                     Interface(device=device, name=f'{i%3+1}/{j}', type=InterfaceTypeChoices.TYPE_1GE_FIXED)

@@ -101,23 +101,24 @@ class SecretEditView(generic.ObjectEditView):
             secret = form.save(commit=False)
 
             # We must have a session key in order to set the plaintext of a Secret
-            if form.cleaned_data['plaintext'] and session_key is None:
-                logger.debug("Unable to proceed: No session key was provided with the request")
-                form.add_error(None, "No session key was provided with the request. Unable to encrypt secret data.")
+            if form.cleaned_data['plaintext']:
+                if session_key is None:
+                    logger.debug("Unable to proceed: No session key was provided with the request")
+                    form.add_error(None, "No session key was provided with the request. Unable to encrypt secret data.")
 
-            elif form.cleaned_data['plaintext']:
-                master_key = None
-                try:
-                    sk = SessionKey.objects.get(userkey__user=request.user)
-                    master_key = sk.get_master_key(session_key)
-                except SessionKey.DoesNotExist:
-                    logger.debug("Unable to proceed: User has no session key assigned")
-                    form.add_error(None, "No session key found for this user.")
+                else:
+                    master_key = None
+                    try:
+                        sk = SessionKey.objects.get(userkey__user=request.user)
+                        master_key = sk.get_master_key(session_key)
+                    except SessionKey.DoesNotExist:
+                        logger.debug("Unable to proceed: User has no session key assigned")
+                        form.add_error(None, "No session key found for this user.")
 
-                if master_key is not None:
-                    logger.debug("Successfully resolved master key for encryption")
-                    secret.plaintext = str(form.cleaned_data['plaintext'])
-                    secret.encrypt(master_key)
+                    if master_key is not None:
+                        logger.debug("Successfully resolved master key for encryption")
+                        secret.plaintext = str(form.cleaned_data['plaintext'])
+                        secret.encrypt(master_key)
 
             secret.save()
             form.save_m2m()
