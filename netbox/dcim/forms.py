@@ -50,12 +50,10 @@ def get_device_by_name_or_pk(name):
     """
     Attempt to retrieve a device by either its name or primary key ('{pk}').
     """
-    if re.match(DEVICE_BY_PK_RE, name):
-        pk = name.strip('{}')
-        device = Device.objects.get(pk=pk)
-    else:
-        device = Device.objects.get(name=name)
-    return device
+    if not re.match(DEVICE_BY_PK_RE, name):
+        return Device.objects.get(name=name)
+    pk = name.strip('{}')
+    return Device.objects.get(pk=pk)
 
 
 class DeviceComponentFilterForm(BootstrapMixin, forms.Form):

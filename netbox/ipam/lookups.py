@@ -132,7 +132,7 @@ class NetIn(Lookup):
     @staticmethod
     def create_in_clause(clause_part, max_size):
         clause_elements = [clause_part]
-        for offset in range(0, max_size):
+        for offset in range(max_size):
             if offset > 0:
                 clause_elements.append(', ')
             clause_elements.append('%s')

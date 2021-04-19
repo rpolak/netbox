@@ -187,7 +187,7 @@ class ConfigContextTestCase(TestCase):
         )
         Tenant.objects.bulk_create(tenants)
 
-        for i in range(0, 3):
+        for i in range(3):
             is_active = bool(i % 2)
             c = ConfigContext.objects.create(
                 name='Config Context {}'.format(i + 1),

@@ -167,11 +167,14 @@ class PowerPortTemplate(ComponentTemplateModel):
     def clean(self):
         super().clean()
 
-        if self.maximum_draw is not None and self.allocated_draw is not None:
-            if self.allocated_draw > self.maximum_draw:
-                raise ValidationError({
-                    'allocated_draw': f"Allocated draw cannot exceed the maximum draw ({self.maximum_draw}W)."
-                })
+        if (
+            self.maximum_draw is not None
+            and self.allocated_draw is not None
+            and self.allocated_draw > self.maximum_draw
+        ):
+            raise ValidationError({
+                'allocated_draw': f"Allocated draw cannot exceed the maximum draw ({self.maximum_draw}W)."
+            })
 
 
 class PowerOutletTemplate(ComponentTemplateModel):

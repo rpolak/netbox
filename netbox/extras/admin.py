@@ -62,7 +62,7 @@ class WebhookAdmin(admin.ModelAdmin):
     )
 
     def models(self, obj):
-        return ', '.join([ct.name for ct in obj.content_types.all()])
+        return ', '.join(ct.name for ct in obj.content_types.all())
 
 
 #
@@ -119,7 +119,7 @@ class CustomFieldAdmin(admin.ModelAdmin):
     )
 
     def models(self, obj):
-        return ', '.join([ct.name for ct in obj.content_types.all()])
+        return ', '.join(ct.name for ct in obj.content_types.all())
 
 
 #

@@ -21,11 +21,7 @@ class RackElevationSVG:
     def __init__(self, rack, user=None, include_images=True, base_url=None):
         self.rack = rack
         self.include_images = include_images
-        if base_url is not None:
-            self.base_url = base_url.rstrip('/')
-        else:
-            self.base_url = ''
-
+        self.base_url = base_url.rstrip('/') if base_url is not None else ''
         # Determine the subset of devices within this rack that are viewable by the user, if any
         permitted_devices = self.rack.devices
         if user is not None:
@@ -167,7 +163,7 @@ class RackElevationSVG:
         reserved_units = self.rack.get_reserved_units()
 
         unit_cursor = 0
-        for ru in range(0, self.rack.u_height):
+        for ru in range(self.rack.u_height):
             start_y = ru * unit_height
             position_coordinates = (legend_width / 2, start_y + unit_height / 2 + RACK_ELEVATION_BORDER_WIDTH)
             unit = ru + 1 if self.rack.desc_units else self.rack.u_height - ru

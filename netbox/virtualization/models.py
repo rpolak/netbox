@@ -326,9 +326,10 @@ class VirtualMachine(ChangeLoggedModel, ConfigContextModel, CustomFieldModel):
             if ip is not None:
                 if ip.assigned_object in interfaces:
                     pass
-                elif ip.nat_inside is not None and ip.nat_inside.assigned_object in interfaces:
-                    pass
-                else:
+                elif (
+                    ip.nat_inside is None
+                    or ip.nat_inside.assigned_object not in interfaces
+                ):
                     raise ValidationError({
                         field: f"The specified IP address ({ip}) is not assigned to this VM.",
                     })
@@ -352,12 +353,15 @@ class VirtualMachine(ChangeLoggedModel, ConfigContextModel, CustomFieldModel):
 
     @property
     def primary_ip(self):
-        if settings.PREFER_IPV4 and self.primary_ip4:
+        if (
+            settings.PREFER_IPV4
+            and self.primary_ip4
+            or not self.primary_ip6
+            and self.primary_ip4
+        ):
             return self.primary_ip4
         elif self.primary_ip6:
             return self.primary_ip6
-        elif self.primary_ip4:
-            return self.primary_ip4
         else:
             return None
 

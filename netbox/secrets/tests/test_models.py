@@ -127,7 +127,7 @@ class SecretTestCase(TestCase):
         plaintext = "1234567890abcdef"
         ivs = []
         ciphertexts = []
-        for i in range(1, 51):
+        for _ in range(1, 51):
             s = Secret(plaintext=plaintext)
             s.encrypt(self.secret_key)
             ivs.append(s.ciphertext[0:16])

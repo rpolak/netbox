@@ -622,15 +622,17 @@ class Device(ChangeLoggedModel, ConfigContextModel, CustomFieldModel):
         # Check for a duplicate name on a device assigned to the same Site and no Tenant. This is necessary
         # because Django does not consider two NULL fields to be equal, and thus will not trigger a violation
         # of the uniqueness constraint without manual intervention.
-        if self.name and hasattr(self, 'site') and self.tenant is None:
-            if Device.objects.exclude(pk=self.pk).filter(
-                    name=self.name,
-                    site=self.site,
-                    tenant__isnull=True
-            ):
-                raise ValidationError({
-                    'name': 'A device with this name already exists.'
-                })
+        if (
+            self.name
+            and hasattr(self, 'site')
+            and self.tenant is None
+            and Device.objects.exclude(pk=self.pk).filter(
+                name=self.name, site=self.site, tenant__isnull=True
+            )
+        ):
+            raise ValidationError({
+                'name': 'A device with this name already exists.'
+            })
 
         super().validate_unique(exclude)
 
@@ -704,9 +706,10 @@ class Device(ChangeLoggedModel, ConfigContextModel, CustomFieldModel):
                 })
             if self.primary_ip4.assigned_object in vc_interfaces:
                 pass
-            elif self.primary_ip4.nat_inside is not None and self.primary_ip4.nat_inside.assigned_object in vc_interfaces:
-                pass
-            else:
+            elif (
+                self.primary_ip4.nat_inside is None
+                or self.primary_ip4.nat_inside.assigned_object not in vc_interfaces
+            ):
                 raise ValidationError({
                     'primary_ip4': f"The specified IP address ({self.primary_ip4}) is not assigned to this device."
                 })
@@ -717,20 +720,25 @@ class Device(ChangeLoggedModel, ConfigContextModel, CustomFieldModel):
                 })
             if self.primary_ip6.assigned_object in vc_interfaces:
                 pass
-            elif self.primary_ip6.nat_inside is not None and self.primary_ip6.nat_inside.assigned_object in vc_interfaces:
-                pass
-            else:
+            elif (
+                self.primary_ip6.nat_inside is None
+                or self.primary_ip6.nat_inside.assigned_object not in vc_interfaces
+            ):
                 raise ValidationError({
                     'primary_ip6': f"The specified IP address ({self.primary_ip6}) is not assigned to this device."
                 })
 
         # Validate manufacturer/platform
-        if hasattr(self, 'device_type') and self.platform:
-            if self.platform.manufacturer and self.platform.manufacturer != self.device_type.manufacturer:
-                raise ValidationError({
-                    'platform': "The assigned platform is limited to {} device types, but this device's type belongs "
-                                "to {}.".format(self.platform.manufacturer, self.device_type.manufacturer)
-                })
+        if (
+            hasattr(self, 'device_type')
+            and self.platform
+            and self.platform.manufacturer
+            and self.platform.manufacturer != self.device_type.manufacturer
+        ):
+            raise ValidationError({
+                'platform': "The assigned platform is limited to {} device types, but this device's type belongs "
+                            "to {}.".format(self.platform.manufacturer, self.device_type.manufacturer)
+            })
 
         # A Device can only be assigned to a Cluster in the same Site (or no Site)
         if self.cluster and self.cluster.site is not None and self.cluster.site != self.site:
@@ -825,12 +833,15 @@ class Device(ChangeLoggedModel, ConfigContextModel, CustomFieldModel):
 
     @property
     def primary_ip(self):
-        if settings.PREFER_IPV4 and self.primary_ip4:
+        if (
+            settings.PREFER_IPV4
+            and self.primary_ip4
+            or not self.primary_ip6
+            and self.primary_ip4
+        ):
             return self.primary_ip4
         elif self.primary_ip6:
             return self.primary_ip6
-        elif self.primary_ip4:
-            return self.primary_ip4
         else:
             return None
 

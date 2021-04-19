@@ -9,7 +9,7 @@ def copy_master_name(apps, schema_editor):
     VirtualChassis = apps.get_model('dcim', 'VirtualChassis')
 
     for vc in VirtualChassis.objects.prefetch_related('master'):
-        name = vc.master.name if vc.master.name else f'Unnamed VC #{vc.pk}'
+        name = vc.master.name or f'Unnamed VC #{vc.pk}'
         VirtualChassis.objects.filter(pk=vc.pk).update(name=name)
 
 

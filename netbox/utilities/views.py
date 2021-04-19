@@ -33,10 +33,9 @@ class ContentTypePermissionRequiredMixin(AccessMixin):
         permission_required = self.get_required_permission()
 
         # Check that the user has been granted the required permission(s).
-        if user.has_perms((permission_required, *self.additional_permissions)):
-            return True
-
-        return False
+        return bool(
+            user.has_perms((permission_required, *self.additional_permissions))
+        )
 
     def dispatch(self, request, *args, **kwargs):
         if not self.has_permission():

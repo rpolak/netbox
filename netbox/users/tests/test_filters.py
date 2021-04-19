@@ -155,7 +155,7 @@ class ObjectPermissionTestCase(TestCase):
             ObjectPermission(name='Permission 7', actions=['delete'], enabled=False),
         )
         ObjectPermission.objects.bulk_create(permissions)
-        for i in range(0, 3):
+        for i in range(3):
             permissions[i].groups.set([groups[i]])
             permissions[i].users.set([users[i]])
             permissions[i].object_types.set([object_types[i]])

@@ -394,11 +394,7 @@ if CACHING_REDIS_USING_SENTINEL:
         'password': CACHING_REDIS_PASSWORD,
     }
 else:
-    if CACHING_REDIS_SSL:
-        REDIS_CACHE_CON_STRING = 'rediss://'
-    else:
-        REDIS_CACHE_CON_STRING = 'redis://'
-
+    REDIS_CACHE_CON_STRING = 'rediss://' if CACHING_REDIS_SSL else 'redis://'
     if CACHING_REDIS_PASSWORD:
         REDIS_CACHE_CON_STRING = '{}:{}@'.format(REDIS_CACHE_CON_STRING, CACHING_REDIS_PASSWORD)
 
@@ -410,12 +406,7 @@ else:
     )
     CACHEOPS_REDIS = REDIS_CACHE_CON_STRING
 
-if not CACHE_TIMEOUT:
-    CACHEOPS_ENABLED = False
-else:
-    CACHEOPS_ENABLED = True
-
-
+CACHEOPS_ENABLED = bool(CACHE_TIMEOUT)
 CACHEOPS_DEFAULTS = {
     'timeout': CACHE_TIMEOUT
 }

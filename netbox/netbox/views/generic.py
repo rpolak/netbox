@@ -400,10 +400,11 @@ class BulkCreateView(GetReturnURLMixin, ObjectPermissionRequiredMixin, View):
 
     def get(self, request):
         # Set initial values for visible form fields from query args
-        initial = {}
-        for field in getattr(self.model_form._meta, 'fields', []):
-            if request.GET.get(field):
-                initial[field] = request.GET[field]
+        initial = {
+            field: request.GET[field]
+            for field in getattr(self.model_form._meta, 'fields', [])
+            if request.GET.get(field)
+        }
 
         form = self.form()
         model_form = self.model_form(initial=initial)

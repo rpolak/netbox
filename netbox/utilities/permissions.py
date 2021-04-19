@@ -61,14 +61,15 @@ def permission_is_exempt(name):
     """
     app_label, action, model_name = resolve_permission(name)
 
-    if action == 'view':
-        if (
+    return action == 'view' and (
+        (
             # All models (excluding those in EXEMPT_EXCLUDE_MODELS) are exempt from view permission enforcement
-            '*' in settings.EXEMPT_VIEW_PERMISSIONS and (app_label, model_name) not in settings.EXEMPT_EXCLUDE_MODELS
-        ) or (
+            '*' in settings.EXEMPT_VIEW_PERMISSIONS
+            and (app_label, model_name) not in settings.EXEMPT_EXCLUDE_MODELS
+        )
+        or (
             # This specific model is exempt from view permission enforcement
-            f'{app_label}.{model_name}' in settings.EXEMPT_VIEW_PERMISSIONS
-        ):
-            return True
-
-    return False
+            f'{app_label}.{model_name}'
+            in settings.EXEMPT_VIEW_PERMISSIONS
+        )
+    )

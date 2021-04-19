@@ -14,11 +14,9 @@ def _get_viewname(instance, action):
 
     # Validate action
     assert action in ('add', 'edit', 'delete')
-    viewname = "{}:{}_{}".format(
+    return "{}:{}_{}".format(
         instance._meta.app_label, instance._meta.model_name, action
     )
-
-    return viewname
 
 
 #
